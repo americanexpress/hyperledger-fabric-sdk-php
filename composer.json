@@ -1,0 +1,13 @@
+{
+    "name": "fabric-sdk-php",
+    "description": "Hyperledger fabric client SDK in PHP",
+    "type": "library",
+    "homepage": "http://americanexpress.io/",
+    "keywords": ["hyperledger", "fabric", "sdk", "php", "grpc", "protobuf"],
+    "license": "Apache-2.0",
+    "require": {
+      "grpc/grpc": "^v1.3.0",
+      "google/protobuf": "^v3.3.0",
+      "mdanter/ecc": "^v0.4.2"
+    }
+}
