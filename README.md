@@ -44,9 +44,12 @@ Composer tool is a prerequisite to resolve required PHP libraries and extensions
 ### Installing SDK
 
 `git clone {fabric-sdk-php}`
+<p &nbsp; />
 `cd fabric-sdk-php`
+<p &nbsp; />
 `composer install`
 
+<p &nbsp; />
 <p &nbsp; />
 
 ### Running the End2End test case
