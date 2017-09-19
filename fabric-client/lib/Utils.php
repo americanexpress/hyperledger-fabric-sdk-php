@@ -62,20 +62,7 @@ class Utils{
         return $chaincodeInvocationSpec;
     }
 
-    public  function createChannelHeader($type, $txID, $channelID, $epoch, $TimeStamp, $chaincodeHeaderExtension)
-    {
-        $channelHeader = new \Common\ChannelHeader();
-        $channelHeader->setType($type);
-        $channelHeader->setVersion(1);
-        $channelHeader->setTxId($txID);
-        $channelHeader->setChannelId($channelID);
-        $channelHeader->setEpoch($epoch);
-        $channelHeader->setTimestamp($TimeStamp);
-        $chaincodeHeaderExtensionString = $chaincodeHeaderExtension->serializeToString();
-        $channelHeader->setExtension($chaincodeHeaderExtensionString);
 
-        return $channelHeader;
-    }
 
 
     public   function proposalArrayToBinaryString(Array $arr) {

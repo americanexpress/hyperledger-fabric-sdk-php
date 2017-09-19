@@ -42,6 +42,28 @@ class ClientUtils
         return $signedProposal;
     }
 
+    public  function createChannelHeader($type, $txID, $channelID, $epoch, $TimeStamp, $chainCodeName,$chainCodePath,$chainCodeVersion)
+    {
+        $channelHeader = new \Common\ChannelHeader();
+        $channelHeader->setType($type);
+        $channelHeader->setVersion(1);
+        $channelHeader->setTxId($txID);
+        $channelHeader->setChannelId($channelID);
+        $channelHeader->setEpoch($epoch);
+        $channelHeader->setTimestamp($TimeStamp);
+
+        $chainCodeId = new Protos\ChaincodeID();
+        $chainCodeId->setPath($chainCodePath);
+        $chainCodeId->setName($chainCodeName);
+        $chainCodeId->setVersion($chainCodeVersion);
+        $chaincodeHeaderExtension = new Protos\ChaincodeHeaderExtension();
+        $chaincodeHeaderExtension->setChaincodeId($chainCodeId);
+        $chaincodeHeaderExtensionString = $chaincodeHeaderExtension->serializeToString();
+        $channelHeader->setExtension($chaincodeHeaderExtensionString);
+
+        return $channelHeader;
+    }
+
     function buildHeader($creator, $channelHeader, $nounce)
     {
         $signatureHeader = new Common\SignatureHeader();

@@ -20,13 +20,13 @@ class Channel
      * @param string $string
      * @return string
      */
-    function queryByChainCode(Protos\EndorserClient $connect)
+    function queryByChainCode(Protos\EndorserClient $connect, $channelId,$chainCodeName,$chainCodePath,$chainCodeVersion)
     {
 
         $utils = new \org\amex\fabric_client\Utils();
         $nounce = $utils::getNonce();
 
-        $fabricProposal = $this->createFabricProposal($nounce, $connect, $utils);
+        $fabricProposal = $this->createFabricProposal( $utils,$channelId,$chainCodeName,$chainCodePath,$chainCodeVersion);
 
 //        echo \Config::loadDefaults("timeout");
         self::sendTransactionProposal($fabricProposal, 5000, $connect);
@@ -35,18 +35,12 @@ class Channel
         // Set User Context
     }
 
-    public function createFabricProposal($nounce, $connect, Utils $utils)
+    public function createFabricProposal( Utils $utils,$channelId,$chainCodeName,$chainCodePath,$chainCodeVersion)
     {
 
         $clientUtils = new ClientUtils();
-        $timeStamp = $clientUtils->buildCurrentTimestamp();
 
-
-        $chaincodeID = new Protos\ChaincodeID();
-        $chaincodeID->setPath('github.com/sparrow_txn');
-        $chaincodeID->setName('sparrow_txn_cc');
-        $chaincodeID->setVersion('2');
-        $channelID = "foo";
+        $nounce = $utils::getNonce();
 
         $TransactionID = new TransactionID();
 
@@ -61,12 +55,9 @@ class Channel
         $txID = $TransactionID->getTxId($nounce);
         $TimeStamp = $clientUtils->buildCurrentTimestamp();
 
-
-        $chainHeader = new Common\ChannelHeader();
-        $chainHeader = $utils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $channelID, 0, $TimeStamp, $chaincodeHeaderExtension);
+        $chainHeader = $clientUtils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $channelId, 0, $TimeStamp, $chainCodeName,$chainCodePath,$chainCodeVersion);
         $chainHeaderString = $chainHeader->serializeToString();
 
-        $chaincodeInvocationSpec = new Protos\ChaincodeInvocationSpec();
         $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($chaincodeID, $ccType);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
 
@@ -121,26 +112,6 @@ class Channel
 //        return $this->sendTransactionProposal($request, $name, $clientContext);
     }
 
-    /**
-     * Query using ChainCode
-     * @param string $string
-     * @return string
-     */
-//    function getSignatureHeaderAsByteString($protoUtils, $transactionCtxt)
-//    {
-//
-//        $identity = $protoUtils->createSerializedIdentity($this->config['member']['admin_certs'], $this->config['member']['sample_msp_id']);
-//        $identitystring = $identity->serializeToString();
-//        $nounce = $transactionCtxt->getNonceValue();
-//
-//        $signatureHeader = new Common\SignatureHeader();
-//        $signatureHeader->setCreator($identitystring);
-//        $signatureHeader->setNonce($nounce);
-//
-//        $signatureHeaderString = $signatureHeader->serializeToString();
-//
-//        return $signatureHeaderString;
-//    }
 
 
     function getTransactionId($protoUtils, $nounce)
