@@ -26,7 +26,6 @@ You can clone these projects by going to the [Hyperledger repository](https://ge
 <p &nbsp; />
 <p &nbsp; />
 
-## Using the fabric-sdk-php
 
 <p &nbsp; />
 <p &nbsp; />
@@ -44,9 +43,7 @@ Composer tool is a prerequisite to resolve required PHP libraries and extensions
 ### Installing SDK
 
 `git clone {fabric-sdk-php}`
-<p &nbsp; />
 `cd fabric-sdk-php`
-<p &nbsp; />
 `composer install`
 
 <p &nbsp; />
