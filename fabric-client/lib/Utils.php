@@ -31,7 +31,6 @@ class Utils{
 
     function FabricConnect()
     {
-        //$connect = new Protos\EndorserClient('localhost:7051', [
         $connect = new \Protos\EndorserClient('localhost:7051', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);

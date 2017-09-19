@@ -17,16 +17,6 @@ class E2EUtils
 
         $fabricProposal = $channel->queryByChainCode($connect);
 
-        $requst = (new Channel())->getSignedProposal($fabricProposal);
-        list($proposalResponse, $status) = $connect->ProcessProposal($requst)->wait();
 
-        $status = ((array) $status);
-        if (isset($status["code"]) && $status["code"] == 0) {
-            print_r($proposalResponse->getPayload());
-        } else {
-            echo "status is not 0";
-            sleep(5);
-            $this->runQueryClient();
-        }
     }
 }

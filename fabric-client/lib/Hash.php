@@ -72,8 +72,9 @@ class Hash
         AwEHoUQDQgAEm97voWPlPxWb4WAzendPBydb+elCVMs/59jR8iYE4OpAtOQGiTHh
         iIpxBdCXibUQzVUBs6ECUGI581E0vRbxoQ==
         -----END EC PRIVATE KEY-----";*/
+        openssl_pkey_export($keyData, $privateKey);
         $pemSerializer = new PemPrivateKeySerializer(new DerPrivateKeySerializer($adapter));
-        $key = $pemSerializer->parse($keyData);
+        $key = $pemSerializer->parse($privateKey);
     
         return $key;
     }
@@ -88,7 +89,7 @@ class Hash
     
         $key = $privateKeyData;
         
-        $dataString = proposalArrayToBinaryString($dataArray);
+        $dataString = (new fabric_client\Utils())->proposalArrayToBinaryString($dataArray);
         
         $signer = new Signer($adapter);
         $hash = $signer->hashData($generator, $algorithm, $dataString);
