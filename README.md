@@ -1,6 +1,6 @@
 # Hyperledger Fabric Client SDK for PHP
 
-Welcome to Java SDK for Hyperledger project. The main objective of this SDK is to facilitate a client to perform basic chaincode related operations like: creating a channel, installing and accessing a chaincode etc.
+Welcome to PHP SDK for Hyperledger project. The main objective of this SDK is to facilitate a client to perform basic chaincode related operations like: creating a channel, installing and accessing a chaincode etc.
 
 Note, the fabric-sdk-php is a standalone client side interface to access the network information and ledger data over running blockchain network, it cannot be used as a persistence medium for application defined channels data.
 
@@ -43,7 +43,9 @@ Composer tool is a prerequisite to resolve required PHP libraries and extensions
 ### Installing SDK
 
 `git clone {fabric-sdk-php}`
+
 `cd fabric-sdk-php`
+
 `composer install`
 
 <p &nbsp; />
