@@ -2,23 +2,23 @@
 
 class Config
 {
-    public function loadDefaults(){
+    public static function getConfig($key)
+    {
+        $jsonStr = file_get_contents("../../test/integration/config.json");
+        $config = json_decode($jsonStr);
 
-        // read the SDK config default json and return
+        return $config->$key;
     }
 
-    public function getConfig($pathConfig){
-
-        // READ INTEGRATION/E2E/CONFIG.JSON
-        // read the test config and return
-            // return [
-        //     'member'=> [
-        //         'admin_certs' => 'resources/Admin@org1.example.com-cert.pem',
-        //         'sample_msp_id' => "Org1MSP"
-        //     ],
-        //     'connection'=>[
-        //         'host' => 'localhost:7051',
-        //     ]
-        // ];   
+    public static function loadDefaults($key)
+    {
+//
+//        // read the SDK config default json and return
+//        $jsonStr = file_get_contents("../config/default.json");
+//        $config = json_decode($jsonStr);
+//
+//        echo var_dump($config);
+//        return $config->$key;
     }
+
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace org\amex\fabric_client;
+
 use org\amex\fabric_client;
 
 use Protos;
@@ -12,7 +13,6 @@ class Channel
 
     function __construct()
     {
-
     }
 
     /**
@@ -22,18 +22,20 @@ class Channel
      */
     function queryByChainCode(Protos\EndorserClient $connect)
     {
+
         $utils = new \org\amex\fabric_client\Utils();
         $nounce = $utils::getNonce();
 
         $fabricProposal = $this->createFabricProposal($nounce, $connect, $utils);
 
-        self::sendTransactionProposal($fabricProposal, 5000,$connect);
+//        echo \Config::loadDefaults("timeout");
+        self::sendTransactionProposal($fabricProposal, 5000, $connect);
 
         // TODO
         // Set User Context
     }
 
-    public function createFabricProposal($nounce, $connect,Utils $utils)
+    public function createFabricProposal($nounce, $connect, Utils $utils)
     {
 
         $clientUtils = new ClientUtils();
@@ -50,8 +52,7 @@ class Channel
 
         $ccType = new Protos\ChaincodeSpec();
 
-        $ccType->setType(1);//1 for GOLANG
-        $ccTypeString = $ccType->serializeToString();
+        $ccType->setType(1); //1 for GOLANG
 
         $chaincodeHeaderExtension = new Protos\ChaincodeHeaderExtension();
         $chaincodeHeaderExtension->setChaincodeId($chaincodeID);
@@ -73,15 +74,12 @@ class Channel
         $payload->setInput($chaincodeInvocationSpecString);
         $payloadString = $payload->serializeToString();
 
-        $header = new Common\Header();
 
-//       $identity = (new Identity())->createSerializedIdentity($this->config['member']['admin_certs'], $this->config['member']['sample_msp_id']);
-        $identity = (new Identity())->createSerializedIdentity("../../test/fixtures/resources/Admin@org1.example.com-cert.pem", "Org1MSP");
+        $member = \Config::getConfig("members");
+        $identity = (new Identity())->createSerializedIdentity($member[0]->admin_certs, $member[0]->sample_msp_id);
 
 
         $identitystring = $identity->serializeToString();
-//        $nounce = $TransactionID->getNonceValue();
-
 
         $headerString = $clientUtils->buildHeader($identitystring, $chainHeaderString, $nounce);
         $proposal = new Protos\Proposal();
@@ -96,7 +94,17 @@ class Channel
      * @param string $string
      * @return string
      */
-    static function sendTransaction(Protos\Proposal $request, $name, $clientContext,Protos\EndorserClient $connect)
+    function sendTransactionProposal(Protos\Proposal $request, $timeout, Protos\EndorserClient $connect)
+    {
+        return $this->sendTransaction($request, null, null, $connect);
+    }
+
+    /**
+     * Query using ChainCode
+     * @param string $string
+     * @return string
+     */
+    static function sendTransaction(Protos\Proposal $request, $name, $clientContext, Protos\EndorserClient $connect)
     {
         $clientUtil = new ClientUtils();
         $request = $clientUtil->getSignedProposal($request);
@@ -111,16 +119,6 @@ class Channel
 //            $this->runQueryClient();
         }
 //        return $this->sendTransactionProposal($request, $name, $clientContext);
-    }
-
-    /**
-     * Query using ChainCode
-     * @param string $string
-     * @return string
-     */
-    function sendTransactionProposal(Protos\Proposal $request, $timeout,Protos\EndorserClient $connect)
-    {
-        return $this->sendTransaction($request, null, null,$connect);
     }
 
     /**
@@ -143,6 +141,7 @@ class Channel
 //
 //        return $signatureHeaderString;
 //    }
+
 
     function getTransactionId($protoUtils, $nounce)
     {

@@ -4,7 +4,7 @@ class TransactionID{
 
     public function getTxId($nounce)
     {
-        $ADMIN_CERTS = "../../test/fixtures/resources/Admin@org1.example.com-cert.pem";
+        $ADMIN_CERTS = "resources/Admin@org1.example.com-cert.pem";
         $fixmspID = "Org1MSP";
         $identity = new Identity();
         $identity =  $identity->createSerializedIdentity($ADMIN_CERTS, $fixmspID);
