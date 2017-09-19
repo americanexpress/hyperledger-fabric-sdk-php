@@ -30,9 +30,12 @@ You can clone these projects by going to the [Hyperledger repository](https://ge
 <p &nbsp; />
 <p &nbsp; />
 
-### Setting up the composer
+### Prerequisites
+
+* PHP version 7+
+* PHP GMP extension (php-gmp)
+* [Composer tool](https://getcomposer.org/doc/00-intro.md)
  
-Composer tool is a prerequisite to resolve required PHP libraries and extensions. The installation and setup can be referenced from [here](https://getcomposer.org/doc/00-intro.md).
 
 <p &nbsp; />
 
