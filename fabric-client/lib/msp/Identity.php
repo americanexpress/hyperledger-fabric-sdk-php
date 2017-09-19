@@ -1,5 +1,5 @@
 <?php
-
+namespace org\amex\fabric_client;
 class Identity
 {
 
@@ -7,7 +7,7 @@ class Identity
     {
         $data = file_get_contents($certs);
 
-        $SerializedIdentity = new Msp\SerializedIdentity();
+        $SerializedIdentity = new \Msp\SerializedIdentity();
         $SerializedIdentity->setMspid($mspID);
         $SerializedIdentity->setIdBytes($data);
 

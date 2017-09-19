@@ -1,4 +1,5 @@
 <?php
+namespace org\amex\fabric_client;
 
 class Utils{
 
@@ -12,14 +13,14 @@ class Utils{
         return $random;
     }
 
-    function toByteArray($proposalString)
+    public  function toByteArray($proposalString)
     {
-        $hashing = new hashing();
+        $hashing = new \Hash();
         $array = $hashing->generateByteArray($proposalString);
         return $array;
     }
 
-    function arrayToBinaryString(array $arr)
+    public  function arrayToBinaryString(array $arr)
     {
         $str = "";
         foreach ($arr as $elm) {
@@ -31,16 +32,16 @@ class Utils{
     function FabricConnect()
     {
         //$connect = new Protos\EndorserClient('localhost:7051', [
-        $connect = new Protos\EndorserClient('localhost:7051', [
-            'credentials' => Grpc\ChannelCredentials::createInsecure(),
+        $connect = new \Protos\EndorserClient('localhost:7051', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
 
         return $connect;
     }
 
-    function createChaincodeInvocationSpec($chaincodeID, $ccType)
+    public  function createChaincodeInvocationSpec($chaincodeID, $ccType)
     {
-        $chaincodeInput = new Protos\ChaincodeInput();
+        $chaincodeInput = new \Protos\ChaincodeInput();
 
         $args = array();
         $args[]="getTransactionHistory";
@@ -48,20 +49,20 @@ class Utils{
 
         $chaincodeInput->setArgs($args);
 
-        $chaincodeSpec = new Protos\ChaincodeSpec();
+        $chaincodeSpec = new \Protos\ChaincodeSpec();
         $chaincodeSpec->setType("1");
         $chaincodeSpec->setChaincodeId($chaincodeID);
         $chaincodeSpec->setInput($chaincodeInput);
 
-        $chaincodeInvocationSpec = new Protos\ChaincodeInvocationSpec();
+        $chaincodeInvocationSpec = new \Protos\ChaincodeInvocationSpec();
         $chaincodeInvocationSpec->setChaincodeSpec($chaincodeSpec);
         
         return $chaincodeInvocationSpec;
     }
 
-    function createChannelHeader($type, $txID, $channelID, $epoch, $TimeStamp, $chaincodeHeaderExtension)
+    public  function createChannelHeader($type, $txID, $channelID, $epoch, $TimeStamp, $chaincodeHeaderExtension)
     {
-        $channelHeader = new Common\ChannelHeader();
+        $channelHeader = new \Common\ChannelHeader();
         $channelHeader->setType($type);
         $channelHeader->setVersion(1);
         $channelHeader->setTxId($txID);
@@ -75,7 +76,7 @@ class Utils{
     }
 
 
-    function proposalArrayToBinaryString(Array $arr) {
+    public   function proposalArrayToBinaryString(Array $arr) {
         $str = "";
         foreach($arr as $elm) {
             $str .= chr((int) $elm);

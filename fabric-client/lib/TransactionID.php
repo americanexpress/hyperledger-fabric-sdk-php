@@ -1,5 +1,5 @@
 <?php
-
+namespace org\amex\fabric_client;
 class TransactionID{
 
     public function getTxId($nounce)
@@ -20,5 +20,4 @@ class TransactionID{
 
         return $txID;
     }
-
 }

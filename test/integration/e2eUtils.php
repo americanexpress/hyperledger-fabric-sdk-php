@@ -1,17 +1,21 @@
 <?php
 
+use org\amex\fabric_client;
+
 class E2EUtils
 {
   
-    function queryChaincode($org, $version, $value, $t, $transientMap)
+   public function queryChaincode($org, $version, $value, $t, $transientMap)
     {
-        $utils = new Utils();
-        $nouncevalue = $utils->getNonce();
+        $utils = new fabric_client\Utils();
+
+//        $nounce = $utils::getNonce();
 
         $connect = $utils->FabricConnect();
         
-        $channel = new Channel();
-        $fabricProposal = $channel->createFabricProposal($nouncevalue);
+        $channel = new org\amex\fabric_client\Channel();
+
+        $fabricProposal = $channel->queryByChainCode($connect);
 
         $requst = (new Channel())->getSignedProposal($fabricProposal);
         list($proposalResponse, $status) = $connect->ProcessProposal($requst)->wait();

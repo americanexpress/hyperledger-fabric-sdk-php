@@ -5,9 +5,13 @@ use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Serializer\PrivateKey\PemPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\PrivateKey\DerPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
+use org\amex\fabric_client;
 
-class hashing
+class Hash
 {
+
+    public $PRIVATE_KEY = "../../test/fixtures/resources/6b32e59640c594cf633ad8c64b5958ef7e5ba2a205cfeefd44a9e982ce624d93_sk";
+
     function ordutf8($string)
     {
         $offset=0;
@@ -110,13 +114,13 @@ class hashing
     }
 
 
-    function signByteString($proposal)
+    function signByteString(\Protos\Proposal $proposal)
     {
         $proposalString = $proposal->serializeToString();
-        $proposalArray = (new Utils())->toByteArray($proposalString);
+        $proposalArray = (new fabric_client\Utils())->toByteArray($proposalString);
         $privateKeyPath = $this->PRIVATE_KEY;
-        $privateKeydata = readPrivateKey($privateKeyPath);
-        $signData = signData($privateKeydata, $proposalArray);
+        $privateKeydata = $this->readPrivateKey($privateKeyPath);
+        $signData = $this->signData($privateKeydata, $proposalArray);
         return $signData;
     }
 }
