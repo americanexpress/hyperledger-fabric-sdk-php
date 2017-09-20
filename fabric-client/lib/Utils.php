@@ -1,30 +1,32 @@
 <?php
+
 namespace org\amex\fabric_client;
 
-class Utils{
+class Utils
+{
 
     /**
-    * Function for getting random nounce value
-    * @return 
-    */
+     * Function for getting random nounce value
+     * @return
+     */
     public static function getNonce()
     {
         $random = random_bytes(24); // read 24 from sdk default.json
         return $random;
     }
 
-    public  function toByteArray($proposalString)
+    public function toByteArray($proposalString)
     {
         $hashing = new \Hash();
         $array = $hashing->generateByteArray($proposalString);
         return $array;
     }
 
-    public  function arrayToBinaryString(array $arr)
+    public function arrayToBinaryString(array $arr)
     {
         $str = "";
         foreach ($arr as $elm) {
-            $str .= chr((int) $elm);
+            $str .= chr((int)$elm);
         }
         return $str;
     }
@@ -41,13 +43,13 @@ class Utils{
         return $connect;
     }
 
-    public  function createChaincodeInvocationSpec($chaincodeID, $ccType)
+    public function createChaincodeInvocationSpec($chaincodeID, $ccType)
     {
         $chaincodeInput = new \Protos\ChaincodeInput();
 
         $args = array();
-        $args[]="getTransactionHistory";
-        $args[]="bhai";
+        $args[] = "getTransactionHistory";
+        $args[] = "bhai";
 
         $chaincodeInput->setArgs($args);
 
@@ -58,17 +60,16 @@ class Utils{
 
         $chaincodeInvocationSpec = new \Protos\ChaincodeInvocationSpec();
         $chaincodeInvocationSpec->setChaincodeSpec($chaincodeSpec);
-        
+
         return $chaincodeInvocationSpec;
     }
 
 
-
-
-    public   function proposalArrayToBinaryString(Array $arr) {
+    public function proposalArrayToBinaryString(Array $arr)
+    {
         $str = "";
-        foreach($arr as $elm) {
-            $str .= chr((int) $elm);
+        foreach ($arr as $elm) {
+            $str .= chr((int)$elm);
         }
         return $str;
     }

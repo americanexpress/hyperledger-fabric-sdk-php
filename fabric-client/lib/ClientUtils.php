@@ -1,23 +1,24 @@
 <?php
 
-namespace org\amex\fabric_client ;
+namespace org\amex\fabric_client;
 
 use Protos;
 use Common;
+
 class ClientUtils
 {
 
     /**
-    * Function for getting current timestamp
-    * @return Object containing Seconds & Nanoseconds
-    */
+     * Function for getting current timestamp
+     * @return Object containing Seconds & Nanoseconds
+     */
     public static function buildCurrentTimestamp()
     {
         $TimeStamp = new \Google\Protobuf\Timestamp();
         $microtime = microtime(true);
         $time = explode(".", $microtime);
         $seconds = $time[0];
-        $nanos = (($microtime*1000) % 1000) * 1000000;
+        $nanos = (($microtime * 1000) % 1000) * 1000000;
 
         $TimeStamp->setSeconds($seconds);
         $TimeStamp->setNanos($nanos);
@@ -25,11 +26,6 @@ class ClientUtils
         return $TimeStamp;
     }
 
-    /**
-    * Query using ChainCode
-    * @param string $string
-    * @return string
-    */
     function getSignedProposal(Protos\Proposal $proposal)
     {
         $signedProposal = new Protos\SignedProposal();
@@ -42,7 +38,7 @@ class ClientUtils
         return $signedProposal;
     }
 
-    public  function createChannelHeader($type, $txID, $channelID, $epoch, $TimeStamp, $chainCodeName,$chainCodePath,$chainCodeVersion)
+    public function createChannelHeader($type, $txID, $channelID, $epoch, $TimeStamp, $chainCodeName, $chainCodePath, $chainCodeVersion)
     {
         $channelHeader = new \Common\ChannelHeader();
         $channelHeader->setType($type);
