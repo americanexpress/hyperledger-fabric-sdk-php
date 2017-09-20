@@ -26,7 +26,7 @@ $dir = dirname(__FILE__).'/lib';
 //$loader->add('', __DIR__. "/../fabric-client/lib/protosPHP");
 
 
-function scanDirectories($rootDir, $allData=array()) {
+function getFilesToInclude($rootDir, $allData=array()) {
     // set filenames invisible if you want
     $invisibleFileNames = array(".", "..", ".htaccess", ".htpasswd");
     // run through content of root directory
@@ -42,14 +42,14 @@ function scanDirectories($rootDir, $allData=array()) {
             // if content is a directory and readable, add path and name
             }elseif(is_dir($path) && is_readable($path)) {
                 // recursive callback to open new directory
-                $allData = scanDirectories($path, $allData);
+                $allData = getFilesToInclude($path, $allData);
             }
         }
     }
     return $allData;
 }
 
-$files = scanDirectories($dir);
+$files = getFilesToInclude($dir);
 
 foreach($files as $filename){
     include_once($filename);
