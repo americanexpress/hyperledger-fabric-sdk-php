@@ -1,6 +1,6 @@
 <?php
 
-use org\amex\fabric_client;
+use fabric\sdk;
 
 class E2EUtils
 {
@@ -12,13 +12,13 @@ class E2EUtils
 
     public function queryChaincode($org, $version, $value, $t, $transientMap)
     {
-        $utils = new fabric_client\Utils();
+        $utils = new fabric\sdk\Utils();
 
 //        $nounce = $utils::getNonce();
 
         $connect = $utils->FabricConnect();
 
-        $channel = new org\amex\fabric_client\Channel();
+        $channel = new fabric\sdk\Channel();
 
         $fabricProposal = $channel->queryByChainCode($connect, self::$chainChannelId,self::$chainCodeName,self::$chainCodePath,self::$chainCodeVersion);
 

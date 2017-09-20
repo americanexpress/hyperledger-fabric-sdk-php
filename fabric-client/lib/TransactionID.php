@@ -1,13 +1,17 @@
 <?php
-namespace org\amex\fabric_client;
-class TransactionID{
+
+namespace fabric\sdk;
+class TransactionID
+{
 
     public function getTxId($nounce)
     {
-        $ADMIN_CERTS = "resources/Admin@org1.example.com-cert.pem";
+        $member = \Config::getConfig("members");
+
+        $ADMIN_CERTS = $member[0]->admin_certs;
         $fixmspID = "Org1MSP";
         $identity = new Identity();
-        $identity =  $identity->createSerializedIdentity($ADMIN_CERTS, $fixmspID);
+        $identity = $identity->createSerializedIdentity($ADMIN_CERTS, $fixmspID);
         $identitystring = $identity->serializeToString();
 
         $utils = new Utils();

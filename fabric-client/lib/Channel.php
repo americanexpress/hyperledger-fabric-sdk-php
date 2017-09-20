@@ -1,8 +1,8 @@
 <?php
 
-namespace org\amex\fabric_client;
+namespace fabric\sdk;
 
-use org\amex\fabric_client;
+use fabric\sdk;
 
 use Protos;
 use Common;
@@ -14,8 +14,7 @@ class Channel
     function queryByChainCode(Protos\EndorserClient $connect, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion)
     {
 
-        $utils = new \org\amex\fabric_client\Utils();
-        $nounce = $utils::getNonce();
+        $utils = new \fabric\sdk\Utils();
 
         $fabricProposal = $this->createFabricProposal($utils, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion);
 
@@ -36,12 +35,12 @@ class Channel
 
         $ccType = new Protos\ChaincodeSpec();
 
-        $ccType->setType(1); //1 for GOLANG
+        $ccType->setType(Constants::$GoLang);
 
         $chaincodeHeaderExtension = new Protos\ChaincodeHeaderExtension();
         $chaincodeHeaderExtension->setChaincodeId($chaincodeID);
 
-        $ENDORSER_TRANSACTION = 3;
+        $ENDORSER_TRANSACTION = Constants::$Endorsor;
         $txID = $TransactionID->getTxId($nounce);
         $TimeStamp = $clientUtils->buildCurrentTimestamp();
 

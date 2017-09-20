@@ -1,6 +1,6 @@
 <?php
 
-namespace org\amex\fabric_client;
+namespace fabric\sdk;
 
 class Utils
 {
