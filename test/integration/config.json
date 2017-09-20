@@ -36,8 +36,9 @@
 	},
 	"members": [
 		{
-			"admin_certs": "resources/Admin@org1.example.com-cert.pem",
+			"admin_certs": "test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem",
 			"sample_msp_id": "Org1MSP"
 		}
-	]
+	],
+	"private_key_path": "../../test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/6b32e59640c594cf633ad8c64b5958ef7e5ba2a205cfeefd44a9e982ce624d93_sk"
 }
