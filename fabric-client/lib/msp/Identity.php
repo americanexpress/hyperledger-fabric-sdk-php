@@ -6,7 +6,7 @@ class Identity
 
     function createSerializedIdentity($certs, $mspID)
     {
-        $currDirectory = __DIR__ . "/../../../" . $certs;
+        $currDirectory = __DIR__ . $certs;
 
         $data = file_get_contents($currDirectory);
 

@@ -5,7 +5,6 @@ use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Serializer\PrivateKey\PemPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\PrivateKey\DerPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
-use fabric\sdk;
 
 class Hash
 {
@@ -15,11 +14,9 @@ class Hash
         if (strlen($string) > 0) {
             $bytearray = array();
             foreach (str_split($string) as $i => $char) {
-                //echo "There were $val instance(s) of \"" , $i , "\" in the string.\n";
                 $bytearray[] = $this->ordutf8($char);
             }
             $bytestring = implode("", $bytearray);
-            //print_r($bytearray);
             return $bytestring;
         }
     }
@@ -54,7 +51,6 @@ class Hash
     function generateByteArray($string)
     {
         $bytearray = unpack('c*', $string);
-        //print_r($bytearray);
         return $bytearray;
     }
 
@@ -74,11 +70,7 @@ class Hash
 
         ## You'll be restoring from a key, as opposed to generating one.
         $keyData = file_get_contents($privateKeyPath);
-        /*$keyData = "-----BEGIN EC PRIVATE KEY-----
-        MHcCAQEEIIZwO63YG2Yv8J3brIl48n9CoBOjimY0PuSDY8HpUQAuoAoGCCqGSM49
-        AwEHoUQDQgAEm97voWPlPxWb4WAzendPBydb+elCVMs/59jR8iYE4OpAtOQGiTHh
-        iIpxBdCXibUQzVUBs6ECUGI581E0vRbxoQ==
-        -----END EC PRIVATE KEY-----";*/
+
         openssl_pkey_export($keyData, $privateKey);
         $pemSerializer = new PemPrivateKeySerializer(new DerPrivateKeySerializer($adapter));
         $key = $pemSerializer->parse($privateKey);
@@ -111,13 +103,9 @@ class Hash
 
         $randomK = $random->generate($generator->getOrder());
         $signature = $signer->sign($key, $hash, $randomK);
-        //print_r($signature);die();
 
         $serializer = new DerSignatureSerializer();
         $serializedSig = $serializer->serialize($signature);
         return $serializedSig;
-        //    return base64_encode($serializedSig) . PHP_EOL;
-        //    return base64_encode($serializedSig) . PHP_EOL;
-        //die();
     }
 }
