@@ -9,6 +9,12 @@ if (!file_exists($loader_path)) {
 }
 $loader = include $loader_path;
 
+if (!extension_loaded('gmp')) {
+    echo "Please install php-gmp extension:\n\n";
+    echo "See http://php.net/manual/en/book.gmp.php for help with installing gmp extension\n";
+    exit(1);
+}
+
 $dir = dirname(__FILE__).'/lib';
 
 //$loader->add('', __DIR__. "/../fabric-client/lib/");
