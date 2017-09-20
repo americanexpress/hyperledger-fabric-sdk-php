@@ -1,5 +1,10 @@
 <?php
 
+if(phpversion()<7){
+    echo "Please upgrade your php version to 7+.";
+    exit (1);
+}
+
 $loader_path = __DIR__ . '/../vendor/autoload.php';
 if (!file_exists($loader_path)) {
     echo "Dependencies must be installed using composer:\n\n";
