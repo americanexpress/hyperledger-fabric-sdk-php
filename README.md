@@ -32,6 +32,7 @@ You can clone these projects by going to the [Hyperledger repository](https://ge
 
 ### Prerequisites
 
+* [Latest Docker](https://docs.docker.com/engine/installation)
 * [PHP version 7+](http://php.net/manual/en/install.php)
 * [PHP GMP extension](http://php.net/manual/en/gmp.installation.php)
 * [Composer tool](https://getcomposer.org/doc/00-intro.md)
@@ -39,9 +40,6 @@ You can clone these projects by going to the [Hyperledger repository](https://ge
 
 <p &nbsp; />
 
-### Bringing up the fabric network
-
-//TODO
 
 ### Installing SDK
 
@@ -55,6 +53,10 @@ You can clone these projects by going to the [Hyperledger repository](https://ge
 <p &nbsp; />
 
 ### Running the End2End test case
+
+Before running the testcase, we need to bring up the fabric network along with that example channel creation and chaincode installation is also required. We are providing a script to perform all this setup which can be locate at
+
+`./fabric-sdk-php/browse/test/fixture/sdkintegration/init.sh'
 
 At present we are providing example test case for Querying a chaincode, which can be run as below.
 
