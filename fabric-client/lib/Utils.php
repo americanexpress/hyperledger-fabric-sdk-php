@@ -7,7 +7,7 @@ class Utils
 
     /**
      * Function for getting random nounce value
-     * @return
+     * @return Random 24 bytes noune value
      */
     public static function getNonce()
     {

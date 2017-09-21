@@ -8,7 +8,11 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 
 class Hash
 {
-
+    /**
+    * Function to generate Byte Array for binary string
+    * @param Binary string
+    * @return Byte Array
+    */
     function generateByteArray($string)
     {
         $bytearray = unpack('c*', $string);

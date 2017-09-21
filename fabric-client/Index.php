@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 * Check for latest version of PHP
 */
 if(phpversion()<7){
@@ -7,7 +7,7 @@ if(phpversion()<7){
     exit (1);
 }
 
-/*
+/**
 * Check for autoloader, if not setup asking user to install composer
 */
 $autoloader_path = __DIR__ . '/../vendor/autoload.php';
@@ -19,7 +19,7 @@ if (!file_exists($autoloader_path)) {
 }
 $loader = include $autoloader_path;
 
-/*
+/**
 * Check for php-gmp extension
 */
 if (!extension_loaded('gmp')) {
@@ -31,7 +31,7 @@ if (!extension_loaded('gmp')) {
 /* SDK directory path */
 $dir = dirname(__FILE__).'/lib';
 
-/*
+/**
 * function to get list of all files in SDK directory
 */
 function getFilesToInclude($rootDir, $allData=array()) {
