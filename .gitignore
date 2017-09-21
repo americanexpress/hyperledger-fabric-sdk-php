@@ -1,6 +1,6 @@
 vendor/
 .idea/
-
+.DS_Store
 composer.lock
 .buildpath
 .project
