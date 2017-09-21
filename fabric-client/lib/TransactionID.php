@@ -3,15 +3,15 @@
 namespace fabric\sdk;
 class TransactionID
 {
+    static $config = null;
 
-    public function getTxId($nounce)
+    public function getTxId($nounce, $org)
     {
-        $member = \Config::getConfig("members");
 
-        $ADMIN_CERTS = $member[0]->admin_certs;
-        $fixmspID = "Org1MSP";
+        self::$config = \Config::getOrgConfig($org);
+
         $identity = new Identity();
-        $identity = $identity->createSerializedIdentity($ADMIN_CERTS, $fixmspID);
+        $identity = $identity->createSerializedIdentity(self::$config["admin_certs"], self::$config["mspid"]);
         $identitystring = $identity->serializeToString();
 
         $utils = new Utils();

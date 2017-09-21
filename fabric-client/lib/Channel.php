@@ -10,11 +10,21 @@ use \Google\Protobuf\Internal;
 
 class Channel
 {
+    static  $config = null;
 
-    function queryByChainCode(Protos\EndorserClient $connect, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion)
+    static $org = null;
+
+    function __construct()
     {
 
+    }
+
+    function queryByChainCode($org, Protos\EndorserClient $connect, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion)
+    {
         $utils = new \fabric\sdk\Utils();
+
+        self::$config =  \Config::getOrgConfig($org);
+        self::$org  = $org;
 
         $fabricProposal = $this->createFabricProposal($utils, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion);
 
@@ -41,7 +51,7 @@ class Channel
         $chaincodeHeaderExtension->setChaincodeId($chaincodeID);
 
         $ENDORSER_TRANSACTION = Constants::$Endorsor;
-        $txID = $TransactionID->getTxId($nounce);
+        $txID = $TransactionID->getTxId($nounce, self::$org);
         $TimeStamp = $clientUtils->buildCurrentTimestamp();
 
         $chainHeader = $clientUtils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $channelId, \Config::loadDefaults("epoch"), $TimeStamp, $chainCodeName, $chainCodePath, $chainCodeVersion);
@@ -55,8 +65,7 @@ class Channel
         $payloadString = $payload->serializeToString();
 
 
-        $member = \Config::getConfig("members");
-        $identity = (new Identity())->createSerializedIdentity($member[0]->admin_certs, $member[0]->sample_msp_id);
+        $identity = (new Identity())->createSerializedIdentity(self::$config["admin_certs"], self::$config["mspid"]);
 
 
         $identitystring = $identity->serializeToString();
@@ -78,7 +87,7 @@ class Channel
     static function sendTransaction(Protos\Proposal $request, $name, $clientContext, Protos\EndorserClient $connect)
     {
         $clientUtil = new ClientUtils();
-        $request = $clientUtil->getSignedProposal($request);
+        $request = $clientUtil->getSignedProposal($request, self::$org);
 
         list($proposalResponse, $status) = $connect->ProcessProposal($request)->wait();
         $status = ((array)$status);

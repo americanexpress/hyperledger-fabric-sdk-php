@@ -26,13 +26,13 @@ class ClientUtils
         return $TimeStamp;
     }
 
-    function getSignedProposal(Protos\Proposal $proposal)
+    function getSignedProposal(Protos\Proposal $proposal, $org)
     {
         $signedProposal = new Protos\SignedProposal();
         $proposalString = $proposal->serializeToString();
         $signedProposal->setProposalBytes($proposalString);
 
-        $signatureString = (new \Hash())->signByteString($proposal);
+        $signatureString = (new \Hash())->signByteString($proposal, $org);
         $signedProposal->setSignature($signatureString);
 
         return $signedProposal;
