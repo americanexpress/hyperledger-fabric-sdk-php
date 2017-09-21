@@ -12,6 +12,11 @@ class E2EUtils
 
     public function queryChaincode($org, $version, $value, $t, $transientMap)
     {
+        $args = array();
+        $args[] = "invoke";
+        $args[] = "query";
+        $args[] = "a";
+
         $utils = new fabric\sdk\Utils();
 
         Config::setAppConfigPath("/../test/integration/config.json");
@@ -20,7 +25,7 @@ class E2EUtils
 
         $channel = new fabric\sdk\Channel();
 
-        $fabricProposal = $channel->queryByChainCode($org, $connect, self::$chainChannelId,self::$chainCodeName,self::$chainCodePath,self::$chainCodeVersion);
+        $fabricProposal = $channel->queryByChainCode($org, $connect, self::$chainChannelId,self::$chainCodeName,self::$chainCodePath,self::$chainCodeVersion, $args);
 
 
     }
