@@ -4,6 +4,8 @@ class Config
 {
     static $org = null;
 
+    static $appConfigPath = null;
+
     function __construct()
     {
 
@@ -26,10 +28,15 @@ class Config
      **/
     public static function getOrgConfig($org)
     {
-        $jsonStr = file_get_contents("../../test/integration/config.json");
+        $configPath = trim(ROOTPATH . self::$appConfigPath);
+        $jsonStr = file_get_contents($configPath);
         $config = json_decode($jsonStr, true);
 
         self::$org = $org;
         return $config["test-network"][$org];
+    }
+
+    public static function setAppConfigPath($path){
+        self::$appConfigPath = $path . "  ";
     }
 }

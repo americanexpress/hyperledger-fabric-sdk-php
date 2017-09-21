@@ -14,6 +14,8 @@ class E2EUtils
     {
         $utils = new fabric\sdk\Utils();
 
+        Config::setAppConfigPath("/../test/integration/config.json");
+
         $connect = $utils->FabricConnect($org);
 
         $channel = new fabric\sdk\Channel();
