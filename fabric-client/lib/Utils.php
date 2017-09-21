@@ -5,9 +5,22 @@ namespace fabric\sdk;
 class Utils
 {
 
+    static $config = null;
+
+    function __construct()
+    {
+
+    }
+
+
+    public static function addConfigFile($path)
+    {
+
+    }
+
     /**
      * Function for getting random nounce value
-     * @return Random 24 bytes noune value
+     * @return
      */
     public static function getNonce()
     {
@@ -31,10 +44,12 @@ class Utils
         return $str;
     }
 
-    function FabricConnect()
+    function FabricConnect($org)
     {
-        
-        $host = \Config::getConfig("connection");
+
+        self::$config = \Config::getOrgConfig($org);
+
+        $host = self::$config["peer1"]["requests"];
 
         $connect = new \Protos\EndorserClient($host, [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
@@ -48,8 +63,8 @@ class Utils
         $chaincodeInput = new \Protos\ChaincodeInput();
 
         $args = array();
-        $args[] = "getTransactionHistory";
-        $args[] = "bhai";
+        $args[] = "query";
+        $args[] = "a";
 
         $chaincodeInput->setArgs($args);
 

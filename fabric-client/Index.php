@@ -1,4 +1,6 @@
 <?php
+
+define('ROOTPATH', __DIR__);
 /**
 * Check for latest version of PHP
 */
