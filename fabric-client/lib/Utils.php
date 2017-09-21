@@ -58,14 +58,9 @@ class Utils
         return $connect;
     }
 
-    public function createChaincodeInvocationSpec($chaincodeID, $ccType)
+    public function createChaincodeInvocationSpec($chaincodeID, $args)
     {
         $chaincodeInput = new \Protos\ChaincodeInput();
-
-        $args = array();
-        $args[] = "invoke";
-        $args[] = "query";
-        $args[] = "a";
 
         $chaincodeInput->setArgs($args);
 

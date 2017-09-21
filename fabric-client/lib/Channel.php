@@ -19,14 +19,14 @@ class Channel
 
     }
 
-    function queryByChainCode($org, Protos\EndorserClient $connect, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion)
+    function queryByChainCode($org, Protos\EndorserClient $connect, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion, $args)
     {
         $utils = new \fabric\sdk\Utils();
 
         self::$config =  \Config::getOrgConfig($org);
         self::$org  = $org;
 
-        $fabricProposal = $this->createFabricProposal($utils, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion);
+        $fabricProposal = $this->createFabricProposal($utils, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion, $args);
 
         self::sendTransactionProposal($fabricProposal, \Config::loadDefaults("timeout"), $connect);
 
@@ -34,7 +34,7 @@ class Channel
         // Set User Context
     }
 
-    public function createFabricProposal(Utils $utils, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion)
+    public function createFabricProposal(Utils $utils, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion, $args)
     {
 
         $clientUtils = new ClientUtils();
@@ -57,7 +57,7 @@ class Channel
         $chainHeader = $clientUtils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $channelId, \Config::loadDefaults("epoch"), $TimeStamp, $chainCodeName, $chainCodePath, $chainCodeVersion);
         $chainHeaderString = $chainHeader->serializeToString();
 
-        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($chaincodeID, $ccType);
+        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($chaincodeID, $args);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
 
         $payload = new Protos\ChaincodeProposalPayload();
