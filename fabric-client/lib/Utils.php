@@ -63,6 +63,7 @@ class Utils
         $chaincodeInput = new \Protos\ChaincodeInput();
 
         $args = array();
+        $args[] = "invoke";
         $args[] = "query";
         $args[] = "a";
 

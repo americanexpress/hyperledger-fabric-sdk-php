@@ -31,7 +31,6 @@ class Config
         $configPath = trim(ROOTPATH . self::$appConfigPath);
         $jsonStr = file_get_contents($configPath);
         $config = json_decode($jsonStr, true);
-
         self::$org = $org;
         return $config["test-network"][$org];
     }

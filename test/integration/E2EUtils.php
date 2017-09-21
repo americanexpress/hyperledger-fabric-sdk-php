@@ -5,8 +5,8 @@ use fabric\sdk;
 class E2EUtils
 {
 
-    private static $chainCodeName =  "mycc";
-    private static $chainCodePath =  "go/chaincode_example02";
+    private static $chainCodeName =  "example_cc";
+    private static $chainCodePath =  "github.com/example_cc";
     private static $chainCodeVersion ="1";
     private static  $chainChannelId = "foo";
 
