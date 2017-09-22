@@ -16,7 +16,7 @@ class Config
      **/
     public static function loadDefaults($key)
     {
-        $jsonStr = file_get_contents("../../fabric-client/config/default.json");
+        $jsonStr = file_get_contents(DEFAULT_JSON_PATH);
         $config = json_decode($jsonStr);
 
 
@@ -32,7 +32,7 @@ class Config
         $jsonStr = file_get_contents($configPath);
         $config = json_decode($jsonStr, true);
         self::$org = $org;
-        return $config["test-network"][$org];
+        return $config[TEST_NETWORK][$org];
     }
 
     public static function setAppConfigPath($path){

@@ -32,7 +32,7 @@ class Channel
         self::$org  = $org;
         $fabricProposal = $this->createFabricProposal($utils, $queyParam);
 
-        return self::sendTransactionProposal($fabricProposal, \Config::loadDefaults("timeout"), $connect);
+        return self::sendTransactionProposal($fabricProposal, \Config::loadDefaults(CONFIG_LOAD_TIMEOUT), $connect);
 
         // TODO
         // Set User Context
@@ -64,10 +64,10 @@ class Channel
         $txID = $TransactionID->getTxId($nounce, self::$org);
         $TimeStamp = $clientUtils->buildCurrentTimestamp();
 
-        $chainHeader = $clientUtils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $queyParam, \Config::loadDefaults("epoch"), $TimeStamp);
+        $chainHeader = $clientUtils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $queyParam, \Config::loadDefaults(EPOCH), $TimeStamp);
         $chainHeaderString = $chainHeader->serializeToString();
 
-        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($queyParam['args']);
+        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($queyParam[ARGS]);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
 
         $payload = new Protos\ChaincodeProposalPayload();
@@ -75,7 +75,7 @@ class Channel
         $payloadString = $payload->serializeToString();
 
 
-        $identity = (new Identity())->createSerializedIdentity(self::$config["admin_certs"], self::$config["mspid"]);
+        $identity = (new Identity())->createSerializedIdentity(self::$config[ADMIN_CERTS], self::$config[MSP_ID]);
 
         $identitystring = $identity->serializeToString();
 
@@ -113,7 +113,7 @@ class Channel
         list($proposalResponse, $status) = $connect->ProcessProposal($request)->wait();
         $status = ((array)$status);
         sleep(1);
-        if (isset($status["code"]) && $status["code"] == 0) {
+        if (isset($status[STATUS_CODE]) && $status[STATUS_CODE] == 0) {
             return $proposalResponse->getPayload();
         }else{
             error_log("unable to get response");

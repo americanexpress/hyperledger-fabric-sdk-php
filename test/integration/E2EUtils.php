@@ -2,14 +2,8 @@
 
 use fabric\sdk;
 
-define("CHAINCODE_NAME","example_cc");
-define("CHAINCODE_PATH","github.com/example_cc");
-define("CHAINCODE_VERSION","1");
-define("CHANNELID","foo");
 class E2EUtils
 {
-    private static $args = ["invoke","query","a"];
-
     /**
      * @param $org
      * @param $version
@@ -35,11 +29,11 @@ class E2EUtils
      */
     public function getQueryParam(){
         $queryParams = array();
-        $queryParams['chainCodeName'] = CHAINCODE_NAME;
-        $queryParams['chainCodePath'] = CHAINCODE_PATH;
-        $queryParams['chainCodeVersion'] = CHAINCODE_VERSION;
-        $queryParams['channelId'] = CHANNELID;
-        $queryParams['args'] = ["invoke","query","a"];
+        $queryParams[CHAINCODE_NAME] = "example_cc";
+        $queryParams[CHAINCODE_PATH] = "github.com/example_cc";
+        $queryParams[CHAINCODE_VERSION] = "1";
+        $queryParams[CHANNEL_ID] = "foo";
+        $queryParams[ARGS] = ["invoke","query","a"];
         return $queryParams;
     }
 }

@@ -72,7 +72,7 @@ class Hash
         self::$config =  \Config::getOrgConfig($org);
         $proposalString = $proposal->serializeToString();
         $proposalArray = (new fabric\sdk\Utils())->toByteArray($proposalString);
-        $privateKeydata = $this->readPrivateKey(self::$config["private_key"]);
+        $privateKeydata = $this->readPrivateKey(self::$config[PRIVATE_KEY]);
         $signData = $this->signData($privateKeydata, $proposalArray);
         return $signData;
     }

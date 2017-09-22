@@ -17,7 +17,7 @@ class TransactionID
         self::$config = \Config::getOrgConfig($org);
 
         $identity = new Identity();
-        $identity = $identity->createSerializedIdentity(self::$config["admin_certs"], self::$config["mspid"]);
+        $identity = $identity->createSerializedIdentity(self::$config[ADMIN_CERTS], self::$config[MSP_ID]);
         $identitystring = $identity->serializeToString();
 
         $utils = new Utils();

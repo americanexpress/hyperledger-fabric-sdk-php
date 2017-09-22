@@ -37,7 +37,7 @@ class Utils
     function FabricConnect($org)
     {
         self::$config = \Config::getOrgConfig($org);
-        $host = self::$config["peer1"]["requests"];
+        $host = self::$config[PEER1][REQUESTS];
         $connect = new \Protos\EndorserClient($host, [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
@@ -58,7 +58,6 @@ class Utils
         $chaincodeInput->setArgs($args);
 
         $chaincodeSpec = new \Protos\ChaincodeSpec();
-        $chaincodeSpec->setType("1");
         $chaincodeSpec->setInput($chaincodeInput);
         $chaincodeInvocationSpec = new \Protos\ChaincodeInvocationSpec();
         $chaincodeInvocationSpec->setChaincodeSpec($chaincodeSpec);
