@@ -18,7 +18,7 @@ class TransactionID
         $noArray = $utils->toByteArray($nounce);
         $identtyArray = $utils->toByteArray($identitystring);
         $comp = array_merge($noArray, $identtyArray);
-        $compString = $utils->arrayToBinaryString($comp);
+        $compString = $utils->proposalArrayToBinaryString($comp);
 
         $txID = hash('sha256', $compString);
 

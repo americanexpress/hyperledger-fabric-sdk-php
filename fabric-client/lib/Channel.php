@@ -14,27 +14,40 @@ class Channel
 
     static $org = null;
 
-    function __construct()
-    {
-
-    }
-
-    function queryByChainCode($org, Protos\EndorserClient $connect, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion, $args)
+    /**
+     * @param $org
+     * @param Protos\EndorserClient $connect
+     * @param $channelId
+     * @param $chainCodeName
+     * @param $chainCodePath
+     * @param $chainCodeVersion
+     * @param $args
+     * query chaincode installed on particular channel.
+     */
+    function queryByChainCode($org, Protos\EndorserClient $connect,$queyParam)
     {
         $utils = new \fabric\sdk\Utils();
 
         self::$config =  \Config::getOrgConfig($org);
         self::$org  = $org;
+        $fabricProposal = $this->createFabricProposal($utils, $queyParam);
 
-        $fabricProposal = $this->createFabricProposal($utils, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion, $args);
-
-        self::sendTransactionProposal($fabricProposal, \Config::loadDefaults("timeout"), $connect);
+        return self::sendTransactionProposal($fabricProposal, \Config::loadDefaults("timeout"), $connect);
 
         // TODO
         // Set User Context
     }
 
-    public function createFabricProposal(Utils $utils, $channelId, $chainCodeName, $chainCodePath, $chainCodeVersion, $args)
+    /**
+     * @param Utils $utils
+     * @param $channelId
+     * @param $chainCodeName
+     * @param $chainCodePath
+     * @param $chainCodeVersion
+     * @param $args
+     * @return (Protos\Proposal) proposal using channelheader commonheader and chaincode invoke specification.
+     */
+    public function createFabricProposal(Utils $utils, $queyParam)
     {
 
         $clientUtils = new ClientUtils();
@@ -47,17 +60,14 @@ class Channel
 
         $ccType->setType(Constants::$GoLang);
 
-        $chaincodeHeaderExtension = new Protos\ChaincodeHeaderExtension();
-        $chaincodeHeaderExtension->setChaincodeId($chaincodeID);
-
         $ENDORSER_TRANSACTION = Constants::$Endorsor;
         $txID = $TransactionID->getTxId($nounce, self::$org);
         $TimeStamp = $clientUtils->buildCurrentTimestamp();
 
-        $chainHeader = $clientUtils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $channelId, \Config::loadDefaults("epoch"), $TimeStamp, $chainCodeName, $chainCodePath, $chainCodeVersion);
+        $chainHeader = $clientUtils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $queyParam, \Config::loadDefaults("epoch"), $TimeStamp);
         $chainHeaderString = $chainHeader->serializeToString();
 
-        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($chaincodeID, $args);
+        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($queyParam['args']);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
 
         $payload = new Protos\ChaincodeProposalPayload();
@@ -78,12 +88,24 @@ class Channel
         return $proposal;
     }
 
-
+    /**
+     * @param Protos\Proposal $request
+     * @param $timeout
+     * @param Protos\EndorserClient $connect
+     * Builds client context.
+     */
     function sendTransactionProposal(Protos\Proposal $request, $timeout, Protos\EndorserClient $connect)
     {
         return $this->sendTransaction($request, null, null, $connect);
     }
 
+    /**
+     * @param Protos\Proposal $request
+     * @param $name
+     * @param $clientContext
+     * @param Protos\EndorserClient $connect
+     * This method requests signed proposal and send transactional request to endorser.
+     */
     static function sendTransaction(Protos\Proposal $request, $name, $clientContext, Protos\EndorserClient $connect)
     {
         $clientUtil = new ClientUtils();
@@ -91,15 +113,20 @@ class Channel
 
         list($proposalResponse, $status) = $connect->ProcessProposal($request)->wait();
         $status = ((array)$status);
+        sleep(1);
         if (isset($status["code"]) && $status["code"] == 0) {
-            print_r($proposalResponse->getPayload());
-        } else {
-            echo 'status is not 0';
-            sleep(5);
+            return $proposalResponse->getPayload();
+        }else{
+            error_log("unable to get response");
         }
+
     }
 
-
+    /**
+     * @param $protoUtils
+     * @param $nounce
+     * @return mixed
+     */
     function getTransactionId($protoUtils, $nounce)
     {
         $common = new Common();

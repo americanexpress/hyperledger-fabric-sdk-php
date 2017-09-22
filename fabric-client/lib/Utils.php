@@ -7,20 +7,9 @@ class Utils
 
     static $config = null;
 
-    function __construct()
-    {
-
-    }
-
-
-    public static function addConfigFile($path)
-    {
-
-    }
-
     /**
      * Function for getting random nounce value
-     * @return
+     * @return random number(nounce) which in turn used to generate txId.
      */
     public static function getNonce()
     {
@@ -28,6 +17,11 @@ class Utils
         return $random;
     }
 
+    /**
+     * @param $proposalString
+     * @return array
+     * convert string to byte array
+     */
     public function toByteArray($proposalString)
     {
         $hashing = new \Hash();
@@ -35,22 +29,15 @@ class Utils
         return $array;
     }
 
-    public function arrayToBinaryString(array $arr)
-    {
-        $str = "";
-        foreach ($arr as $elm) {
-            $str .= chr((int)$elm);
-        }
-        return $str;
-    }
-
+    /**
+     * @param $org
+     * @return \Protos\EndorserClient
+     * Read connection configuration.
+     */
     function FabricConnect($org)
     {
-
         self::$config = \Config::getOrgConfig($org);
-
         $host = self::$config["peer1"]["requests"];
-
         $connect = new \Protos\EndorserClient($host, [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
@@ -58,7 +45,13 @@ class Utils
         return $connect;
     }
 
-    public function createChaincodeInvocationSpec($chaincodeID, $args)
+    /**
+     * @param $chaincodeID
+     * @param $args
+     * @return \Protos\ChaincodeInvocationSpec
+     * specify parameters of chaincode to be invoked during transaction.
+     */
+    public function createChaincodeInvocationSpec($args)
     {
         $chaincodeInput = new \Protos\ChaincodeInput();
 
@@ -66,16 +59,18 @@ class Utils
 
         $chaincodeSpec = new \Protos\ChaincodeSpec();
         $chaincodeSpec->setType("1");
-        $chaincodeSpec->setChaincodeId($chaincodeID);
         $chaincodeSpec->setInput($chaincodeInput);
-
         $chaincodeInvocationSpec = new \Protos\ChaincodeInvocationSpec();
         $chaincodeInvocationSpec->setChaincodeSpec($chaincodeSpec);
 
         return $chaincodeInvocationSpec;
     }
 
-
+    /**
+     * @param array $arr
+     * @return string
+     * convert array to binary string
+     */
     public function proposalArrayToBinaryString(Array $arr)
     {
         $str = "";

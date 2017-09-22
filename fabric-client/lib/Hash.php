@@ -10,10 +10,10 @@ class Hash
 {
     static $config = null;
 
-    function __construct()
-    {
-    }
-
+    /**
+     * @param $string
+     * @return string
+     */
     function generateBytes($string)
     {
         if (strlen($string) > 0) {
@@ -26,6 +26,10 @@ class Hash
         }
     }
 
+    /**
+     * @param $string
+     * @return int
+     */
     function ordutf8($string)
     {
         $offset = 0;
@@ -53,6 +57,10 @@ class Hash
         return $code;
     }
 
+    /**
+     * @param $string
+     * @return array
+     */
     function generateByteArray($string)
     {
         $bytearray = unpack('c*', $string);
@@ -69,6 +77,11 @@ class Hash
         return $signData;
     }
 
+    /**
+     * @param $privateKeyPath
+     * @return \Mdanter\Ecc\Crypto\Key\PrivateKey|\Mdanter\Ecc\Crypto\Key\PrivateKeyInterface
+     *
+     */
     function readPrivateKey($privateKeyPath)
     {
 
@@ -84,6 +97,11 @@ class Hash
         return $key;
     }
 
+    /**
+     * @param $privateKeyData
+     * @param $dataArray
+     * @return string
+     */
     function signData($privateKeyData, $dataArray)
     {
         $adapter = EccFactory::getAdapter();

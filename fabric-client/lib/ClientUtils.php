@@ -11,6 +11,7 @@ class ClientUtils
     /**
      * Function for getting current timestamp
      * @return Object containing Seconds & Nanoseconds
+     * This function will create a timestamp from the current time
      */
     public static function buildCurrentTimestamp()
     {
@@ -26,6 +27,12 @@ class ClientUtils
         return $TimeStamp;
     }
 
+    /**
+     * @param Protos\Proposal $proposal
+     * @param $org
+     * @return Protos\SignedProposal
+     * This function will sign proposal
+     */
     function getSignedProposal(Protos\Proposal $proposal, $org)
     {
         $signedProposal = new Protos\SignedProposal();
@@ -38,20 +45,32 @@ class ClientUtils
         return $signedProposal;
     }
 
-    public function createChannelHeader($type, $txID, $channelID, $epoch, $TimeStamp, $chainCodeName, $chainCodePath, $chainCodeVersion)
+    /**
+     * @param $type
+     * @param $txID
+     * @param $channelID
+     * @param $epoch
+     * @param $TimeStamp
+     * @param $chainCodeName
+     * @param $chainCodePath
+     * @param $chainCodeVersion
+     * @return Common\ChannelHeader
+     *This function will build a common channel header
+     */
+    public function createChannelHeader($type, $txID, $queryParam, $epoch, $TimeStamp)
     {
         $channelHeader = new \Common\ChannelHeader();
         $channelHeader->setType($type);
         $channelHeader->setVersion(1);
         $channelHeader->setTxId($txID);
-        $channelHeader->setChannelId($channelID);
+        $channelHeader->setChannelId($queryParam['channelId']);
         $channelHeader->setEpoch($epoch);
         $channelHeader->setTimestamp($TimeStamp);
 
         $chainCodeId = new Protos\ChaincodeID();
-        $chainCodeId->setPath($chainCodePath);
-        $chainCodeId->setName($chainCodeName);
-        $chainCodeId->setVersion($chainCodeVersion);
+        $chainCodeId->setPath($queryParam['chainCodePath']);
+        $chainCodeId->setName($queryParam['chainCodeName']);
+        $chainCodeId->setVersion($queryParam['chainCodeVersion']);
         $chaincodeHeaderExtension = new Protos\ChaincodeHeaderExtension();
         $chaincodeHeaderExtension->setChaincodeId($chainCodeId);
         $chaincodeHeaderExtensionString = $chaincodeHeaderExtension->serializeToString();
@@ -60,6 +79,13 @@ class ClientUtils
         return $channelHeader;
     }
 
+    /**
+     * @param $creator
+     * @param $channelHeader
+     * @param $nounce
+     * @return string
+     *  This function will build the common header
+     */
     function buildHeader($creator, $channelHeader, $nounce)
     {
         $signatureHeader = new Common\SignatureHeader();
