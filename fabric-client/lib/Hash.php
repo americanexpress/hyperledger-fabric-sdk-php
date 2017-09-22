@@ -101,6 +101,7 @@ class Hash
      * @param $privateKeyData
      * @param $dataArray
      * @return string
+     * sign private key of node
      */
     function signData($privateKeyData, $dataArray)
     {

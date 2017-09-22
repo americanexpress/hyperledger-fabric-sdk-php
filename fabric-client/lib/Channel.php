@@ -77,7 +77,6 @@ class Channel
 
         $identity = (new Identity())->createSerializedIdentity(self::$config["admin_certs"], self::$config["mspid"]);
 
-
         $identitystring = $identity->serializeToString();
 
         $headerString = $clientUtils->buildHeader($identitystring, $chainHeaderString, $nounce);
@@ -120,16 +119,5 @@ class Channel
             error_log("unable to get response");
         }
 
-    }
-
-    /**
-     * @param $protoUtils
-     * @param $nounce
-     * @return mixed
-     */
-    function getTransactionId($protoUtils, $nounce)
-    {
-        $common = new Common();
-        return $common->getTxId($protoUtils, $nounce);
     }
 }

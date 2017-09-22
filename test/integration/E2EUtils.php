@@ -29,6 +29,10 @@ class E2EUtils
        print_r($fabricProposal);
     }
 
+    /**
+     * @return array
+     * set Query parameters
+     */
     public function getQueryParam(){
         $queryParams = array();
         $queryParams['chainCodeName'] = CHAINCODE_NAME;

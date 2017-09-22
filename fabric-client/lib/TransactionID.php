@@ -5,6 +5,12 @@ class TransactionID
 {
     static $config = null;
 
+    /**
+     * @param $nounce
+     * @param $org
+     * @return string
+     * Generate transaction Id using Ecert of member.
+     */
     public function getTxId($nounce, $org)
     {
 
