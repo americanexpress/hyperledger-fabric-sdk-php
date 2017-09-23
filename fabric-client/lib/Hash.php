@@ -106,7 +106,7 @@ class Hash
     function signData($privateKeyData, $dataArray)
     {
         $adapter = EccFactory::getAdapter();
-        $generator = EccFactory::getSecgCurves()->generator256k1();
+        $generator = EccFactory::getNistCurves()->generator256();
         $useDerandomizedSignatures = true;
         $algorithm = 'sha256';
 
@@ -128,9 +128,20 @@ class Hash
 
         $randomK = $random->generate($generator->getOrder());
         $signature = $signer->sign($key, $hash, $randomK);
+        
+        $r = $signature->getR();
+        $s = $signature->getS();
+        $halfOrder = $adapter->rightShift($generator->getOrder(), 1);
+        $math=new \Mdanter\Ecc\Math\GmpMath();
+
+        if ($math->cmp($s, $halfOrder) > 0) {
+            $s = $adapter->sub($generator->getOrder(), $s);
+        }
+
+        $eccSignature= new \Mdanter\Ecc\Crypto\Signature\Signature($signature->getR(), $s);
 
         $serializer = new DerSignatureSerializer();
-        $serializedSig = $serializer->serialize($signature);
+        $serializedSig = $serializer->serialize($eccSignature);
         return $serializedSig;
     }
 }
