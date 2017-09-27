@@ -1,7 +1,5 @@
-# Hyperledger Fabric Client SDK for PHP #
+# Hyperledger Fabric Client SDK for PHP
 - - - - - - - - 
-
-===============
 
 Welcome to PHP SDK for Hyperledger project. The main objective of this SDK is to facilitate a client to perform basic chaincode related operations like: creating a channel, installing and accessing a chaincode etc.
 
@@ -31,22 +29,21 @@ You can clone these projects by going to the [Hyperledger repository](https://ge
 
 
 
-### Prerequisites ###
 
+
+### Prerequisites ###
+- - - - - - -
 
 #### [Latest Docker](https://docs.docker.com/engine/installation)
 Check docker version (it should be 17+)
 `docker --version`
 
-
 #### [PHP version 7+](http://php.net/manual/en/install.php)
 Check version of PHP
 `php --version`
 
-
 #### [PHP GMP extension](http://php.net/manual/en/gmp.installation.php)
 Check PHP-GMP setup in php.ini
-
 
 #### [Composer tool](https://getcomposer.org/doc/00-intro.md)
 Check composer version (it should be 1.5 or plus)
