@@ -30,9 +30,9 @@ You can clone these projects by going to the [Hyperledger repository](https://ge
 
 
 
+- - - - - - -
 
 ### Prerequisites ###
-- - - - - - -
 
 #### [Latest Docker](https://docs.docker.com/engine/installation)
 Check docker version (it should be 17+)
