@@ -1,4 +1,7 @@
 # Hyperledger Fabric Client SDK for PHP #
+- - - - - - - - 
+
+===============
 
 Welcome to PHP SDK for Hyperledger project. The main objective of this SDK is to facilitate a client to perform basic chaincode related operations like: creating a channel, installing and accessing a chaincode etc.
 
