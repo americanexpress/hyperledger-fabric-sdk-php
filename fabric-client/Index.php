@@ -30,13 +30,22 @@ if (!extension_loaded('gmp')) {
     exit(1);
 }
 
+/**
+* Loading source and protobuf PHP files via autoloader
+*/
+$loader->add('', __DIR__. "/../fabric-client/protos/PHP/");
+$loader->add('', __DIR__. "/../fabric-client/lib/");
+
+
+/* Old code to be removed when above code will work properly */
+
 /* SDK directory path */
-$dir = dirname(__FILE__).'/lib';
+//$dir = dirname(__FILE__).'/lib';
 
 /**
 * function to get list of all files in SDK directory
 */
-function getFilesToInclude($rootDir, $allData=array()) {
+/*function getFilesToInclude($rootDir, $allData=array()) {
     // set filenames invisible if you want
     $invisibleFileNames = array(".", "..", ".htaccess", ".htpasswd");
     // run through content of root directory
@@ -64,11 +73,11 @@ function getFilesToInclude($rootDir, $allData=array()) {
     }
     return $allData;
 }
-
+*/
 /* Getting list of all files */
-$files = getFilesToInclude($dir);
+//$files = getFilesToInclude($dir);
 
 /* Loop to load all files */
-foreach($files as $filename){
+/*foreach($files as $filename){
     include_once($filename);
-}
+}*/
