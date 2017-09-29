@@ -1,5 +1,7 @@
 <?php
 
+namespace AmericanExpress\FabricClient;
+
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Serializer\PrivateKey\PemPrivateKeySerializer;
@@ -69,9 +71,9 @@ class Hash
 
     function signByteString(\Protos\Proposal $proposal, $org)
     {
-        self::$config =  \Config::getOrgConfig($org);
+        self::$config =  Config::getOrgConfig($org);
         $proposalString = $proposal->serializeToString();
-        $proposalArray = (new fabric\sdk\Utils())->toByteArray($proposalString);
+        $proposalArray = (new Utils())->toByteArray($proposalString);
         $privateKeydata = $this->readPrivateKey(self::$config[PRIVATE_KEY]);
         $signData = $this->signData($privateKeydata, $proposalArray);
         return $signData;
@@ -113,7 +115,7 @@ class Hash
 
         $key = $privateKeyData;
 
-        $dataString = (new fabric\sdk\Utils())->proposalArrayToBinaryString($dataArray);
+        $dataString = (new Utils())->proposalArrayToBinaryString($dataArray);
 
         $signer = new Signer($adapter);
         $hash = $signer->hashData($generator, $algorithm, $dataString);

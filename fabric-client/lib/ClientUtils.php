@@ -1,6 +1,6 @@
 <?php
 
-namespace fabric\sdk;
+namespace AmericanExpress\FabricClient;
 
 use Protos;
 use Common;
@@ -39,7 +39,7 @@ class ClientUtils
         $proposalString = $proposal->serializeToString();
         $signedProposal->setProposalBytes($proposalString);
 
-        $signatureString = (new \Hash())->signByteString($proposal, $org);
+        $signatureString = (new Hash())->signByteString($proposal, $org);
         $signedProposal->setSignature($signatureString);
 
         return $signedProposal;

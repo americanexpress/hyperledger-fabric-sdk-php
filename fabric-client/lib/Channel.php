@@ -1,8 +1,6 @@
 <?php
 
-namespace fabric\sdk;
-
-use fabric\sdk;
+namespace AmericanExpress\FabricClient;
 
 use Protos;
 use Common;
@@ -26,13 +24,13 @@ class Channel
      */
     function queryByChainCode($org, Protos\EndorserClient $connect,$queyParam)
     {
-        $utils = new \fabric\sdk\Utils();
+        $utils = new Utils();
 
-        self::$config =  \Config::getOrgConfig($org);
+        self::$config =  Config::getOrgConfig($org);
         self::$org  = $org;
         $fabricProposal = $this->createFabricProposal($utils, $queyParam);
 
-        return self::sendTransactionProposal($fabricProposal, \Config::loadDefaults(CONFIG_LOAD_TIMEOUT), $connect);
+        return self::sendTransactionProposal($fabricProposal, Config::loadDefaults(CONFIG_LOAD_TIMEOUT), $connect);
 
         // TODO
         // Set User Context

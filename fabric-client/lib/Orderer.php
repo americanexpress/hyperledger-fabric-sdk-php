@@ -1,6 +1,6 @@
 <?php
+namespace AmericanExpress\FabricClient;
 
-namespace fabric\sdk;
 class Orderer
 {
 }

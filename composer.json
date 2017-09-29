@@ -1,13 +1,25 @@
 {
-    "name": "fabric-sdk-php",
-    "description": "Hyperledger fabric client SDK in PHP",
-    "type": "library",
-    "homepage": "http://americanexpress.io/",
-    "keywords": ["hyperledger", "fabric", "sdk", "php", "grpc", "protobuf"],
-    "license": "Apache-2.0",
-    "require": {
-      "grpc/grpc": "^v1.3.0",
-      "google/protobuf": "^v3.3.0",
-      "mdanter/ecc": "^v0.4.2"
+  "name": "fabric-sdk-php",
+  "description": "Hyperledger fabric client SDK in PHP",
+  "type": "library",
+  "homepage": "http://americanexpress.io/",
+  "keywords": ["hyperledger", "fabric", "sdk", "php", "grpc", "protobuf"],
+  "license": "Apache-2.0",
+  "autoload": {
+    "psr-4": {
+      "AmericanExpress\\FabricClient\\msp\\": "fabric-client/msp",
+      "AmericanExpress\\FabricClient\\": "fabric-client/lib",
+      "Common\\": "fabric-client/lib/protosPHP/Common",
+      "Google\\": "fabric-client/lib/protosPHP/Google",
+      "GPBMetadata\\": "fabric-client/lib/protosPHP/GPBMetadata",
+      "Msp\\": "fabric-client/lib/protosPHP/Msp",
+      "Orderer\\": "fabric-client/lib/protosPHP/Orderer",
+      "Protos\\": "fabric-client/lib/protosPHP/Protos"
     }
+  },
+  "require": {
+    "grpc/grpc": "^v1.3.0",
+    "google/protobuf": "^v3.3.0",
+    "mdanter/ecc": "^v0.4.2"
+  }
 }

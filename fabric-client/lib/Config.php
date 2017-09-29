@@ -1,15 +1,11 @@
 <?php
+namespace AmericanExpress\FabricClient;
 
 class Config
 {
     static $org = null;
 
     static $appConfigPath = null;
-
-    function __construct()
-    {
-
-    }
 
     /**
      * Method to set default SDK configuration.
