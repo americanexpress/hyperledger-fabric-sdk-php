@@ -1,6 +1,7 @@
 <?php
-
-use fabric\sdk;
+use AmericanExpress\FabricClient\Utils;
+use AmericanExpress\FabricClient\Config as AppConfig;
+use AmericanExpress\FabricClient\Channel;
 
 class E2EUtils
 {
@@ -15,25 +16,24 @@ class E2EUtils
     public function queryChaincode($org, $version, $value, $t, $transientMap)
     {
         $queryParams = $this->getQueryParam();
-        $utils = new fabric\sdk\Utils();
-        Config::setAppConfigPath("/../test/integration/config.json");
+        $utils = new Utils();
+        AppConfig::setAppConfigPath("/../test/integration/config.json");
         $connect = $utils->FabricConnect($org);
-        $channel = new fabric\sdk\Channel();
+        $channel = new AmericanExpress\FabricClient\Channel();
         $fabricProposal = $channel->queryByChainCode($org, $connect, $queryParams);
-       print_r($fabricProposal);
+        print_r($fabricProposal);
     }
 
     /**
      * @return array
      * set Query parameters
      */
-    public function getQueryParam(){
-        $queryParams = array();
-        $queryParams[CHAINCODE_NAME] = "example_cc";
-        $queryParams[CHAINCODE_PATH] = "github.com/example_cc";
-        $queryParams[CHAINCODE_VERSION] = "1";
-        $queryParams[CHANNEL_ID] = "foo";
-        $queryParams[ARGS] = ["invoke","query","a"];
+    public function getQueryParam()
+    {
+        $queryParams = array(
+            "CHAINCODE_NAME" => "example_cc", "CHAINCODE_PATH" => "github.com/example_cc", "CHAINCODE_VERSION" => "1", "CHANNEL_ID" => "foo",
+            "ARGS" => "[\"invoke\",\"query\",\"a\"]"
+        );
         return $queryParams;
     }
 }
