@@ -1,7 +1,7 @@
 <?php
-use AmericanExpress\FabricClient\Utils;
 use AmericanExpress\FabricClient\AppConf as AppConfig;
 use AmericanExpress\FabricClient\Channel;
+use AmericanExpress\FabricClient\Utils;
 
 class E2EUtils
 {
@@ -19,7 +19,7 @@ class E2EUtils
         $utils = new Utils();
         AppConfig::setAppConfigPath("/../test/integration/config.json");
         $connect = $utils->FabricConnect($org);
-        $channel = new AmericanExpress\FabricClient\Channel();
+        $channel = new Channel();
         $fabricProposal = $channel->queryByChainCode($org, $connect, $queryParams);
         print_r($fabricProposal);
     }
