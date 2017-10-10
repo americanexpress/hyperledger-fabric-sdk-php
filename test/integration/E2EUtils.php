@@ -1,6 +1,6 @@
 <?php
 use AmericanExpress\FabricClient\Utils;
-use AmericanExpress\FabricClient\Config as AppConfig;
+use AmericanExpress\FabricClient\AppConf as AppConfig;
 use AmericanExpress\FabricClient\Channel;
 
 class E2EUtils
@@ -30,10 +30,12 @@ class E2EUtils
      */
     public function getQueryParam()
     {
-        $queryParams = array(
-            "CHAINCODE_NAME" => "example_cc", "CHAINCODE_PATH" => "github.com/example_cc", "CHAINCODE_VERSION" => "1", "CHANNEL_ID" => "foo",
-            "ARGS" => "[\"invoke\",\"query\",\"a\"]"
-        );
+        $queryParams = array();
+        $queryParams["CHAINCODE_NAME"] = "example_cc";
+        $queryParams["CHAINCODE_PATH"] = "github.com/example_cc";
+        $queryParams["CHAINCODE_VERSION"] = "1";
+        $queryParams["CHANNEL_ID"] = "foo";
+        $queryParams["ARGS"] = ["invoke","query","a"];
         return $queryParams;
     }
 }

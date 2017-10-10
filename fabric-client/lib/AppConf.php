@@ -1,7 +1,7 @@
 <?php
 namespace AmericanExpress\FabricClient;
 
-class Config
+class AppConf
 {
     static $org = null;
 
@@ -12,7 +12,7 @@ class Config
      **/
     public static function loadDefaults($key)
     {
-        $jsonStr = file_get_contents(DEFAULT_JSON_PATH);
+        $jsonStr = file_get_contents("../../fabric-client/config/default.json");
         $config = json_decode($jsonStr);
 
 
@@ -28,7 +28,7 @@ class Config
         $jsonStr = file_get_contents($configPath);
         $config = json_decode($jsonStr, true);
         self::$org = $org;
-        return $config[TEST_NETWORK][$org];
+        return $config["test-network"][$org];
     }
 
     public static function setAppConfigPath($path){

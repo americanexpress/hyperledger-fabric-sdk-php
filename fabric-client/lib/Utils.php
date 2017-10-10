@@ -24,7 +24,7 @@ class Utils
      */
     public function toByteArray($proposalString)
     {
-        $hashing = new \Hash();
+        $hashing = new Hash();
         $array = $hashing->generateByteArray($proposalString);
         return $array;
     }
@@ -36,8 +36,8 @@ class Utils
      */
     function FabricConnect($org)
     {
-        self::$config = \Config::getOrgConfig($org);
-        $host = self::$config[PEER1][REQUESTS];
+        self::$config = AppConf::getOrgConfig($org);
+        $host = self::$config["peer1"]["requests"];
         $connect = new \Protos\EndorserClient($host, [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
@@ -54,7 +54,7 @@ class Utils
     public function createChaincodeInvocationSpec($args)
     {
         $chaincodeInput = new \Protos\ChaincodeInput();
-
+        print_r($args);
         $chaincodeInput->setArgs($args);
 
         $chaincodeSpec = new \Protos\ChaincodeSpec();

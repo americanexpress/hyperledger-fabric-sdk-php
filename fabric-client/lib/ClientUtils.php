@@ -63,14 +63,14 @@ class ClientUtils
         $channelHeader->setType($type);
         $channelHeader->setVersion(1);
         $channelHeader->setTxId($txID);
-        $channelHeader->setChannelId($queryParam[CHANNEL_ID]);
+        $channelHeader->setChannelId($queryParam["CHANNEL_ID"]);
         $channelHeader->setEpoch($epoch);
         $channelHeader->setTimestamp($TimeStamp);
 
         $chainCodeId = new Protos\ChaincodeID();
-        $chainCodeId->setPath($queryParam[CHAINCODE_PATH]);
-        $chainCodeId->setName($queryParam[CHAINCODE_NAME]);
-        $chainCodeId->setVersion($queryParam[CHAINCODE_VERSION]);
+        $chainCodeId->setPath($queryParam["CHAINCODE_PATH"]);
+        $chainCodeId->setName($queryParam["CHAINCODE_NAME"]);
+        $chainCodeId->setVersion($queryParam["CHAINCODE_VERSION"]);
         $chaincodeHeaderExtension = new Protos\ChaincodeHeaderExtension();
         $chaincodeHeaderExtension->setChaincodeId($chainCodeId);
         $chaincodeHeaderExtensionString = $chaincodeHeaderExtension->serializeToString();

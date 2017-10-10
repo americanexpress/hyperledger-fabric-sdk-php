@@ -71,10 +71,10 @@ class Hash
 
     function signByteString(\Protos\Proposal $proposal, $org)
     {
-        self::$config =  Config::getOrgConfig($org);
+        self::$config =  AppConf::getOrgConfig($org);
         $proposalString = $proposal->serializeToString();
         $proposalArray = (new Utils())->toByteArray($proposalString);
-        $privateKeydata = $this->readPrivateKey(self::$config[PRIVATE_KEY]);
+        $privateKeydata = $this->readPrivateKey(self::$config["private_key"]);
         $signData = $this->signData($privateKeydata, $proposalArray);
         return $signData;
     }

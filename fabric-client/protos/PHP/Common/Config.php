@@ -10,10 +10,10 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * <pre>
- * Config represents the config for a particular channel
+ * Configs represents the config for a particular channel
  * </pre>
  *
- * Protobuf type <code>common.Config</code>
+ * Protobuf type <code>common.Configs</code>
  */
 class Config extends \Google\Protobuf\Internal\Message
 {

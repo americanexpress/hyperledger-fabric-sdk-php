@@ -11,7 +11,7 @@ use Google\Protobuf\Internal\GPBUtil;
 /**
  * <pre>
  * MSPConfig collects all the configuration information for
- * an MSP. The Config field should be unmarshalled in a way
+ * an MSP. The Configs field should be unmarshalled in a way
  * that depends on the Type
  * </pre>
  *
@@ -30,7 +30,7 @@ class MSPConfig extends \Google\Protobuf\Internal\Message
     private $type = 0;
     /**
      * <pre>
-     * Config is MSP dependent configuration info
+     * Configs is MSP dependent configuration info
      * </pre>
      *
      * <code>bytes config = 2;</code>
@@ -71,7 +71,7 @@ class MSPConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * <pre>
-     * Config is MSP dependent configuration info
+     * Configs is MSP dependent configuration info
      * </pre>
      *
      * <code>bytes config = 2;</code>
@@ -83,7 +83,7 @@ class MSPConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * <pre>
-     * Config is MSP dependent configuration info
+     * Configs is MSP dependent configuration info
      * </pre>
      *
      * <code>bytes config = 2;</code>

@@ -22,7 +22,7 @@ use Google\Protobuf\Internal\GPBUtil;
  *   6. Create ConfigUpdate message and marshal it into ConfigUpdateEnvelope.update and encode the required signatures
  *     a) Each signature is of type ConfigSignature
  *     b) The ConfigSignature signature is over the concatenation of signature_header and the ConfigUpdate bytes (which includes a ChainHeader)
- *   5. Submit new Config for ordering in Envelope signed by submitter
+ *   5. Submit new Configs for ordering in Envelope signed by submitter
  *     a) The Envelope Payload has data set to the marshaled ConfigEnvelope
  *     b) The Envelope Payload has a header of type Header.Type.CONFIG_UPDATE
  * The configuration manager will verify:
@@ -37,10 +37,10 @@ class ConfigEnvelope extends \Google\Protobuf\Internal\Message
 {
     /**
      * <pre>
-     * A marshaled Config structure
+     * A marshaled Configs structure
      * </pre>
      *
-     * <code>.common.Config config = 1;</code>
+     * <code>.common.Configs config = 1;</code>
      */
     private $config = null;
     /**
@@ -59,10 +59,10 @@ class ConfigEnvelope extends \Google\Protobuf\Internal\Message
 
     /**
      * <pre>
-     * A marshaled Config structure
+     * A marshaled Configs structure
      * </pre>
      *
-     * <code>.common.Config config = 1;</code>
+     * <code>.common.Configs config = 1;</code>
      */
     public function getConfig()
     {
@@ -71,10 +71,10 @@ class ConfigEnvelope extends \Google\Protobuf\Internal\Message
 
     /**
      * <pre>
-     * A marshaled Config structure
+     * A marshaled Configs structure
      * </pre>
      *
-     * <code>.common.Config config = 1;</code>
+     * <code>.common.Configs config = 1;</code>
      */
     public function setConfig(&$var)
     {

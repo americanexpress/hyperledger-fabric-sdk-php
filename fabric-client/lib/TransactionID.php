@@ -1,6 +1,8 @@
 <?php
 
 namespace AmericanExpress\FabricClient;
+use AmericanExpress\FabricClient\msp\Identity;
+
 class TransactionID
 {
     static $config = null;
@@ -14,10 +16,10 @@ class TransactionID
     public function getTxId($nounce, $org)
     {
 
-        self::$config = \Config::getOrgConfig($org);
+        self::$config = AppConf::getOrgConfig($org);
 
         $identity = new Identity();
-        $identity = $identity->createSerializedIdentity(self::$config[ADMIN_CERTS], self::$config[MSP_ID]);
+        $identity = $identity->createSerializedIdentity(self::$config["admin_certs"], self::$config["mspid"]);
         $identitystring = $identity->serializeToString();
 
         $utils = new Utils();

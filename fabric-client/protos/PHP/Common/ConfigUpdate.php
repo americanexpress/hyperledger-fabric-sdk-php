@@ -10,7 +10,7 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * <pre>
- * ConfigUpdate is used to submit a subset of config and to have the orderer apply to Config
+ * ConfigUpdate is used to submit a subset of config and to have the orderer apply to Configs
  * it is always submitted inside a ConfigUpdateEnvelope which allows the addition of signatures
  * resulting in a new total configuration.  The update is applied as follows:
  * 1. The versions from all of the elements in the read_set is verified against the versions in the existing config.
@@ -18,7 +18,7 @@ use Google\Protobuf\Internal\GPBUtil;
  * 2. Any elements in the write_set with the same version as the read_set are ignored.
  * 3. The corresponding mod_policy for every remaining element in the write_set is collected.
  * 4. Each policy is checked against the signatures from the ConfigUpdateEnvelope, any failing to verify are rejected
- * 5. The write_set is applied to the Config and the ConfigGroupSchema verifies that the updates were legal
+ * 5. The write_set is applied to the Configs and the ConfigGroupSchema verifies that the updates were legal
  * </pre>
  *
  * Protobuf type <code>common.ConfigUpdate</code>
