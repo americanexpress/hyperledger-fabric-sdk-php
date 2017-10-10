@@ -34,7 +34,7 @@ if (!extension_loaded('gmp')) {
 * Loading source and protobuf PHP files via autoloader
 */
 $loader->add('', __DIR__. "/../fabric-client/protos/PHP/");
-$loader->add('', __DIR__. "/../fabric-client/lib/");
+$loader->add('', __DIR__ . "/../fabric-client/lib/");
 
 
 /* Old code to be removed when above code will work properly */

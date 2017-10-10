@@ -7,8 +7,8 @@
   "license": "Apache-2.0",
   "autoload": {
     "psr-4": {
-      "AmericanExpress\\FabricClient\\msp\\": "fabric-client/msp",
-      "AmericanExpress\\FabricClient\\": "fabric-client/lib",
+      "AmericanExpress\\FabricClient\\msp\\": "fabric-client/src/lib/msp",
+      "AmericanExpress\\FabricClient\\": "fabric-client/src/lib",
       "Common\\": "fabric-client/lib/protosPHP/Common",
       "Google\\": "fabric-client/lib/protosPHP/Google",
       "GPBMetadata\\": "fabric-client/lib/protosPHP/GPBMetadata",
