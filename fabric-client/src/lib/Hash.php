@@ -2,11 +2,15 @@
 
 namespace AmericanExpress\FabricClient;
 
+use Mdanter\Ecc\Crypto\Signature\Signature;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Crypto\Signature\Signer;
+use Mdanter\Ecc\Math\GmpMath;
+use Mdanter\Ecc\Random\RandomGeneratorFactory;
 use Mdanter\Ecc\Serializer\PrivateKey\PemPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\PrivateKey\DerPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
+use Protos\Proposal;
 
 class Hash
 {
@@ -26,6 +30,8 @@ class Hash
             $bytestring = implode("", $bytearray);
             return $bytestring;
         }
+
+        return null;
     }
 
     /**
@@ -35,27 +41,26 @@ class Hash
     function ordutf8($string)
     {
         $offset = 0;
+        $bytesNumber = 2;
         $code = ord(substr($string, $offset, 1));
         if ($code >= 128) {        //otherwise 0xxxxxxx
             if ($code < 224) {
-                $bytesnumber = 2;                //110xxxxx
+                $bytesNumber = 2;                //110xxxxx
             } elseif ($code < 240) {
-                $bytesnumber = 3;        //1110xxxx
+                $bytesNumber = 3;        //1110xxxx
             } elseif ($code < 248) {
-                $bytesnumber = 4;    //11110xxx
+                $bytesNumber = 4;    //11110xxx
             }
-            $codetemp = $code - 192 - ($bytesnumber > 2 ? 32 : 0) - ($bytesnumber > 3 ? 16 : 0);
-            for ($i = 2; $i <= $bytesnumber; $i++) {
+
+            $codeTemp = $code - 192 - ($bytesNumber > 2 ? 32 : 0) - ($bytesNumber > 3 ? 16 : 0);
+            for ($i = 2; $i <= $bytesNumber; $i++) {
                 $offset++;
                 $code2 = ord(substr($string, $offset, 1)) - 128;        //10xxxxxx
-                $codetemp = $codetemp * 64 + $code2;
+                $codeTemp = $codeTemp * 64 + $code2;
             }
-            $code = $codetemp;
+            $code = $codeTemp;
         }
-        $offset += 1;
-        if ($offset >= strlen($string)) {
-            $offset = -1;
-        }
+
         return $code;
     }
 
@@ -69,13 +74,14 @@ class Hash
         return $bytearray;
     }
 
-    function signByteString(\Protos\Proposal $proposal, $org)
+    function signByteString(Proposal $proposal, $org)
     {
-        self::$config =  AppConf::getOrgConfig($org);
+        self::$config = AppConf::getOrgConfig($org);
         $proposalString = $proposal->serializeToString();
         $proposalArray = (new Utils())->toByteArray($proposalString);
         $privateKeydata = $this->readPrivateKey(self::$config["private_key"]);
         $signData = $this->signData($privateKeydata, $proposalArray);
+
         return $signData;
     }
 
@@ -91,7 +97,6 @@ class Hash
 
         ## You'll be restoring from a key, as opposed to generating one.
         $keyData = file_get_contents(ROOTPATH . $privateKeyPath);
-
         openssl_pkey_export($keyData, $privateKey);
         $pemSerializer = new PemPrivateKeySerializer(new DerPrivateKeySerializer($adapter));
         $key = $pemSerializer->parse($privateKey);
@@ -112,7 +117,6 @@ class Hash
         $useDerandomizedSignatures = true;
         $algorithm = 'sha256';
 
-
         $key = $privateKeyData;
 
         $dataString = (new Utils())->proposalArrayToBinaryString($dataArray);
@@ -123,27 +127,25 @@ class Hash
         # Derandomized signatures are not necessary, but can reduce
         # the attack surface for a private key that is to be used often.
         if ($useDerandomizedSignatures) {
-            $random = \Mdanter\Ecc\Random\RandomGeneratorFactory::getHmacRandomGenerator($key, $hash, $algorithm);
+            $random = RandomGeneratorFactory::getHmacRandomGenerator($key, $hash, $algorithm);
         } else {
-            $random = \Mdanter\Ecc\Random\RandomGeneratorFactory::getRandomGenerator();
+            $random = RandomGeneratorFactory::getRandomGenerator();
         }
 
         $randomK = $random->generate($generator->getOrder());
         $signature = $signer->sign($key, $hash, $randomK);
-        
-        $r = $signature->getR();
         $s = $signature->getS();
         $halfOrder = $adapter->rightShift($generator->getOrder(), 1);
-        $math=new \Mdanter\Ecc\Math\GmpMath();
+        $math = new GmpMath();
 
         if ($math->cmp($s, $halfOrder) > 0) {
             $s = $adapter->sub($generator->getOrder(), $s);
         }
 
-        $eccSignature= new \Mdanter\Ecc\Crypto\Signature\Signature($signature->getR(), $s);
-
+        $eccSignature = new Signature($signature->getR(), $s);
         $serializer = new DerSignatureSerializer();
         $serializedSig = $serializer->serialize($eccSignature);
+
         return $serializedSig;
     }
 }

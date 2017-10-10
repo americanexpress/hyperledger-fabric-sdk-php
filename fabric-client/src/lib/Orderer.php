@@ -4,5 +4,3 @@ namespace AmericanExpress\FabricClient;
 class Orderer
 {
 }
-
-?>

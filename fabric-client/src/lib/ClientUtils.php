@@ -1,7 +1,8 @@
 <?php
-
 namespace AmericanExpress\FabricClient;
 
+use Common\ChannelHeader;
+use Google\Protobuf\Timestamp;
 use Protos;
 use Common;
 
@@ -10,21 +11,21 @@ class ClientUtils
 
     /**
      * Function for getting current timestamp
-     * @return Object containing Seconds & Nanoseconds
+     * @return Timestamp
      * This function will create a timestamp from the current time
      */
     public static function buildCurrentTimestamp()
     {
-        $TimeStamp = new \Google\Protobuf\Timestamp();
+        $timestamp = new Timestamp();
         $microtime = microtime(true);
         $time = explode(".", $microtime);
         $seconds = $time[0];
         $nanos = (($microtime * 1000) % 1000) * 1000000;
 
-        $TimeStamp->setSeconds($seconds);
-        $TimeStamp->setNanos($nanos);
+        $timestamp->setSeconds($seconds);
+        $timestamp->setNanos($nanos);
 
-        return $TimeStamp;
+        return $timestamp;
     }
 
     /**
@@ -48,18 +49,19 @@ class ClientUtils
     /**
      * @param $type
      * @param $txID
-     * @param $channelID
+     * @param $queryParam
      * @param $epoch
      * @param $TimeStamp
-     * @param $chainCodeName
-     * @param $chainCodePath
-     * @param $chainCodeVersion
-     * @return Common\ChannelHeader
-     *This function will build a common channel header
+     * @return ChannelHeader This function will build a common channel header
+     * This function will build a common channel header
+     * @internal param $channelID
+     * @internal param $chainCodeName
+     * @internal param $chainCodePath
+     * @internal param $chainCodeVersion
      */
     public function createChannelHeader($type, $txID, $queryParam, $epoch, $TimeStamp)
     {
-        $channelHeader = new \Common\ChannelHeader();
+        $channelHeader = new ChannelHeader();
         $channelHeader->setType($type);
         $channelHeader->setVersion(1);
         $channelHeader->setTxId($txID);

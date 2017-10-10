@@ -1,6 +1,6 @@
 <?php
-
 namespace AmericanExpress\FabricClient;
+
 use AmericanExpress\FabricClient\msp\Identity;
 
 class TransactionID
@@ -15,7 +15,6 @@ class TransactionID
      */
     public function getTxId($nounce, $org)
     {
-
         self::$config = AppConf::getOrgConfig($org);
 
         $identity = new Identity();
@@ -27,7 +26,6 @@ class TransactionID
         $identtyArray = $utils->toByteArray($identitystring);
         $comp = array_merge($noArray, $identtyArray);
         $compString = $utils->proposalArrayToBinaryString($comp);
-
         $txID = hash('sha256', $compString);
 
         return $txID;

@@ -5,5 +5,3 @@ namespace AmericanExpress\FabricClient;
 class BlockDecoder
 {
 }
-
-?>

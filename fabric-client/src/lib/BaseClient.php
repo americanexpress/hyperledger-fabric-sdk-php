@@ -1,5 +1,4 @@
 <?php
-
 namespace AmericanExpress\FabricClient;
 
 class BaseClient
@@ -8,5 +7,3 @@ class BaseClient
 
     }
 }
-
-?>

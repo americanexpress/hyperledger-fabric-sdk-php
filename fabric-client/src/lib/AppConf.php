@@ -4,22 +4,22 @@ namespace AmericanExpress\FabricClient;
 class AppConf
 {
     static $org = null;
-
     static $appConfigPath = null;
 
     /**
+     * @param $key
      * Method to set default SDK configuration.
-     **/
+     */
     public static function loadDefaults($key)
     {
         $jsonStr = file_get_contents("../../fabric-client/src/config/default.json");
         $config = json_decode($jsonStr);
 
-
         return $config->$key;
     }
 
     /**
+     * @param $org
      * Method to set org configuration.
      **/
     public static function getOrgConfig($org)
@@ -31,7 +31,8 @@ class AppConf
         return $config["test-network"][$org];
     }
 
-    public static function setAppConfigPath($path){
+    public static function setAppConfigPath($path)
+    {
         self::$appConfigPath = $path . "  ";
     }
 }
