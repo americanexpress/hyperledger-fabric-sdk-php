@@ -12,7 +12,7 @@ class AppConf
      */
     public static function loadDefaults($key)
     {
-        $jsonStr = file_get_contents("../../fabric-client/src/config/default.json");
+        $jsonStr = file_get_contents(__DIR__."/../config/default.json");
         $config = json_decode($jsonStr);
 
         return $config->$key;

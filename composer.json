@@ -21,5 +21,8 @@
     "grpc/grpc": "^v1.3.0",
     "google/protobuf": "^v3.3.0",
     "mdanter/ecc": "^v0.4.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "6.0.*"
   }
 }

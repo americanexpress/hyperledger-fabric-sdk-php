@@ -13,7 +13,7 @@ class E2EUtils
      * @param $transientMap
      * Query given chaincode with given args.
      */
-    public function queryChaincode($org, $version, $value, $t, $transientMap)
+    public function queryChaincode($org)
     {
         $queryParams = $this->getQueryParam();
         $utils = new Utils();
@@ -21,7 +21,8 @@ class E2EUtils
         $connect = $utils->FabricConnect($org);
         $channel = new Channel();
         $fabricProposal = $channel->queryByChainCode($org, $connect, $queryParams);
-        print_r($fabricProposal);
+        print_r($fabricProposal->getPayload());
+        return $fabricProposal->getPayload();
     }
 
     /**

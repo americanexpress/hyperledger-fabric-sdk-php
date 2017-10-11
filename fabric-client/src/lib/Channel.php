@@ -92,11 +92,10 @@ class Channel
         $status = ((array)$status);
         sleep(1);
         if (isset($status["code"]) && $status["code"] == 0) {
-            return $proposalResponse->getPayload();
+            return $proposalResponse;
         } else {
             error_log("unable to get response");
         }
-
         return null;
     }
 }
