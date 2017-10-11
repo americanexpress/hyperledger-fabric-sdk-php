@@ -79,7 +79,7 @@ Before running the testcase, we need to bring up the fabric network along with t
 
 At present we are providing example test case for Querying a chaincode, which can be run as below.
 
-`php test/integration/Query.php`
+`./vendor/bin/phpunit`
 
 
 
