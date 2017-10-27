@@ -21,7 +21,6 @@ class E2EUtils
         $connect = $utils->FabricConnect($org);
         $channel = new Channel();
         $fabricProposal = $channel->queryByChainCode($org, $connect, $queryParams);
-        print_r($fabricProposal->getPayload());
         return $fabricProposal->getPayload();
     }
 

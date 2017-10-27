@@ -1,8 +1,5 @@
 <?php
 
-require __DIR__ . "/../../../fabric-client/Index.php";
-require __DIR__ . "/../E2EUtils.php";
-
 class QueryTest extends PHPUnit\Framework\TestCase {
 
     public function testQueryChainCode(){

@@ -17,12 +17,25 @@
       "Protos\\": "fabric-client/src/lib/protosPHP/Protos"
     }
   },
+  "autoload-dev": {
+    "classmap": [
+      "test"
+    ],
+    "files": [
+      "fabric-client/Index.php"
+    ]
+  },
   "require": {
+    "ext-grpc": "*",
     "grpc/grpc": "^v1.3.0",
     "google/protobuf": "^v3.3.0",
     "mdanter/ecc": "^v0.4.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "6.0.*"
+    "phpunit/phpunit": "^6.0"
+  },
+  "scripts": {
+    "coverage": "vendor/bin/phpunit --coverage-text",
+    "test": "vendor/bin/phpunit"
   }
 }

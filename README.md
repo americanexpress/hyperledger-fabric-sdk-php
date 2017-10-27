@@ -75,7 +75,7 @@ Check composer version (it should be 1.5 or plus)
 
 Before running the testcase, we need to bring up the fabric network along with that example channel creation and chaincode installation is also required. We are providing a script to perform all this setup which can be locate at
 
-`./fabric-sdk-php/browse/test/fixture/sdkintegration/init.sh`
+`cd ./test/fixture/sdkintegration && ./init.sh`
 
 At present we are providing example test case for Querying a chaincode, which can be run as below.
 
