@@ -1,5 +1,5 @@
 {
-  "name": "americanexpress/fabric-sdk-php",
+  "name": "americanexpress/hyperledger-fabric-sdk-php",
   "description": "Hyperledger fabric client SDK in PHP",
   "type": "library",
   "homepage": "http://americanexpress.io/",
