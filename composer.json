@@ -7,14 +7,13 @@
   "license": "Apache-2.0",
   "autoload": {
     "psr-4": {
-      "AmericanExpress\\FabricClient\\msp\\": "fabric-client/src/lib/msp",
       "AmericanExpress\\FabricClient\\": "fabric-client/src/lib",
-      "Common\\": "fabric-client/protos/PHP/Common",
-      "Google\\": "fabric-client/protos/PHP/Google",
-      "GPBMetadata\\": "fabric-client/protos/PHP/GPBMetadata",
-      "Msp\\": "fabric-client/protos/PHP/Msp",
-      "Orderer\\": "fabric-client/protos/PHP/Orderer",
-      "Protos\\": "fabric-client/protos/PHP/Protos"
+      "Common\\": "protobuf/dist/Common",
+      "Google\\": "protobuf/dist/Google",
+      "GPBMetadata\\": "protobuf/dist/GPBMetadata",
+      "Msp\\": "protobuf/dist/Msp",
+      "Orderer\\": "protobuf/dist/Orderer",
+      "Protos\\": "protobuf/dist/Protos"
     }
   },
   "autoload-dev": {
