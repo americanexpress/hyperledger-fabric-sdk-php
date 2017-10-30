@@ -5,6 +5,9 @@
   "homepage": "http://americanexpress.io/",
   "keywords": ["hyperledger", "fabric", "sdk", "php", "grpc", "protobuf"],
   "license": "Apache-2.0",
+  "config": {
+    "sort-packages": true
+  },
   "autoload": {
     "psr-4": {
       "AmericanExpress\\FabricClient\\": "fabric-client/src/lib",
@@ -32,9 +35,18 @@
     "mdanter/ecc": "^v0.4.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6.0"
+    "humbug/humbug": "1.0.x-dev",
+    "jakub-onderka/php-parallel-lint": "*",
+    "phpunit/phpunit": "*",
+    "squizlabs/php_codesniffer": "*"
   },
   "scripts": {
+    "build": "composer lint:syntax && composer lint:style && composer coverage && composer test:mutations",
+    "lint:beautify": "vendor/bin/phpcbf --standard=PSR2 --extensions=php -v fabric-client/src/ test/",
+    "lint:style": "vendor/bin/phpcs --standard=PSR2 --extensions=php -v fabric-client/src/ test/",
+    "lint:syntax": "vendor/bin/parallel-lint fabric-client/ test/",
+    "test:integration": "vendor/bin/phpunit --testsuite integration",
+    "test:mutations": "vendor/bin/humbug",
     "coverage": "vendor/bin/phpunit --coverage-text",
     "test": "vendor/bin/phpunit"
   }

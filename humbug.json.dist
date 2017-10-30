@@ -1,0 +1,11 @@
+{
+  "source": {
+    "directories": [
+      "fabric-client/src"
+    ]
+  },
+  "timeout": 10,
+  "logs": {
+    "text": "humbuglog.txt"
+  }
+}
