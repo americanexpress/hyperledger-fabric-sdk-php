@@ -9,12 +9,12 @@
     "psr-4": {
       "AmericanExpress\\FabricClient\\msp\\": "fabric-client/src/lib/msp",
       "AmericanExpress\\FabricClient\\": "fabric-client/src/lib",
-      "Common\\": "fabric-client/src/lib/protosPHP/Common",
-      "Google\\": "fabric-client/src/lib/protosPHP/Google",
-      "GPBMetadata\\": "fabric-client/src/lib/protosPHP/GPBMetadata",
-      "Msp\\": "fabric-client/src/lib/protosPHP/Msp",
-      "Orderer\\": "fabric-client/src/lib/protosPHP/Orderer",
-      "Protos\\": "fabric-client/src/lib/protosPHP/Protos"
+      "Common\\": "fabric-client/protos/PHP/Common",
+      "Google\\": "fabric-client/protos/PHP/Google",
+      "GPBMetadata\\": "fabric-client/protos/PHP/GPBMetadata",
+      "Msp\\": "fabric-client/protos/PHP/Msp",
+      "Orderer\\": "fabric-client/protos/PHP/Orderer",
+      "Protos\\": "fabric-client/protos/PHP/Protos"
     }
   },
   "autoload-dev": {
@@ -26,6 +26,7 @@
     ]
   },
   "require": {
+    "php": "^7.1",
     "ext-grpc": "*",
     "grpc/grpc": "^v1.3.0",
     "google/protobuf": "^v3.3.0",
