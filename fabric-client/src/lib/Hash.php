@@ -18,54 +18,6 @@ class Hash
 
     /**
      * @param $string
-     * @return string
-     */
-    function generateBytes($string)
-    {
-        if (strlen($string) > 0) {
-            $bytearray = array();
-            foreach (str_split($string) as $i => $char) {
-                $bytearray[] = $this->ordutf8($char);
-            }
-            $bytestring = implode("", $bytearray);
-            return $bytestring;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param $string
-     * @return int
-     */
-    function ordutf8($string)
-    {
-        $offset = 0;
-        $bytesNumber = 2;
-        $code = ord(substr($string, $offset, 1));
-        if ($code >= 128) {        //otherwise 0xxxxxxx
-            if ($code < 224) {
-                $bytesNumber = 2;                //110xxxxx
-            } elseif ($code < 240) {
-                $bytesNumber = 3;        //1110xxxx
-            } elseif ($code < 248) {
-                $bytesNumber = 4;    //11110xxx
-            }
-
-            $codeTemp = $code - 192 - ($bytesNumber > 2 ? 32 : 0) - ($bytesNumber > 3 ? 16 : 0);
-            for ($i = 2; $i <= $bytesNumber; $i++) {
-                $offset++;
-                $code2 = ord(substr($string, $offset, 1)) - 128;        //10xxxxxx
-                $codeTemp = $codeTemp * 64 + $code2;
-            }
-            $code = $codeTemp;
-        }
-
-        return $code;
-    }
-
-    /**
-     * @param $string
      * @return array
      */
     function generateByteArray($string)
