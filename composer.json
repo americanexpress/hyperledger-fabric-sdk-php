@@ -11,12 +11,9 @@
   "autoload": {
     "psr-4": {
       "AmericanExpress\\FabricClient\\": "fabric-client/src/lib",
-      "Common\\": "protobuf/dist/Common",
       "Google\\": "protobuf/dist/Google",
       "GPBMetadata\\": "protobuf/dist/GPBMetadata",
-      "Msp\\": "protobuf/dist/Msp",
-      "Orderer\\": "protobuf/dist/Orderer",
-      "Protos\\": "protobuf/dist/Protos"
+      "Hyperledger\\": "protobuf/dist/Hyperledger"
     }
   },
   "autoload-dev": {
@@ -45,6 +42,7 @@
     "lint:beautify": "vendor/bin/phpcbf --standard=PSR2 --extensions=php -v fabric-client/src/ test/",
     "lint:style": "vendor/bin/phpcs --standard=PSR2 --extensions=php -v fabric-client/src/ test/",
     "lint:syntax": "vendor/bin/parallel-lint fabric-client/ test/",
+    "protoc": "bin/compile-protos.sh",
     "test:integration": "vendor/bin/phpunit --testsuite integration",
     "test:mutations": "vendor/bin/humbug",
     "coverage": "vendor/bin/phpunit --coverage-text",

@@ -2,6 +2,7 @@
 
 namespace AmericanExpress\FabricClient;
 
+use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Mdanter\Ecc\Crypto\Signature\Signature;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Crypto\Signature\Signer;
@@ -10,7 +11,6 @@ use Mdanter\Ecc\Random\RandomGeneratorFactory;
 use Mdanter\Ecc\Serializer\PrivateKey\PemPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\PrivateKey\DerPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
-use Protos\Proposal;
 
 class Hash
 {

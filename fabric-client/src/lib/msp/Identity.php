@@ -1,6 +1,9 @@
 <?php
 
 namespace AmericanExpress\FabricClient\msp;
+
+use Hyperledger\Fabric\Protos\MSP as Msp;
+
 class Identity
 {
 
@@ -14,7 +17,7 @@ class Identity
 
         $data = file_get_contents($currDirectory);
         //echo $data; die();
-        $SerializedIdentity = new \Msp\SerializedIdentity();
+        $SerializedIdentity = new Msp\SerializedIdentity();
         $SerializedIdentity->setMspid($mspID);
         $SerializedIdentity->setIdBytes($data);
 

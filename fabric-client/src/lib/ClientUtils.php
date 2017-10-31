@@ -1,10 +1,9 @@
 <?php
 namespace AmericanExpress\FabricClient;
 
-use Common\ChannelHeader;
+use Hyperledger\Fabric\Protos\Common;
 use Google\Protobuf\Timestamp;
-use Protos;
-use Common;
+use Hyperledger\Fabric\Protos\Peer as Protos;
 
 class ClientUtils
 {
@@ -52,7 +51,7 @@ class ClientUtils
      * @param $queryParam
      * @param $epoch
      * @param $TimeStamp
-     * @return ChannelHeader This function will build a common channel header
+     * @return Common\ChannelHeader This function will build a common channel header
      * This function will build a common channel header
      * @internal param $channelID
      * @internal param $chainCodeName
@@ -61,7 +60,7 @@ class ClientUtils
      */
     public function createChannelHeader($type, $txID, $queryParam, $epoch, $TimeStamp)
     {
-        $channelHeader = new ChannelHeader();
+        $channelHeader = new Common\ChannelHeader();
         $channelHeader->setType($type);
         $channelHeader->setVersion(1);
         $channelHeader->setTxId($txID);

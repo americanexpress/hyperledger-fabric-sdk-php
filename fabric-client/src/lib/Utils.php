@@ -2,10 +2,10 @@
 namespace AmericanExpress\FabricClient;
 
 use Grpc\ChannelCredentials;
-use Protos\ChaincodeInput;
-use Protos\ChaincodeInvocationSpec;
-use Protos\ChaincodeSpec;
-use Protos\EndorserClient;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeInput;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeInvocationSpec;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeSpec;
+use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 
 class Utils
 {

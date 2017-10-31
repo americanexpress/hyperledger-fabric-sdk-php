@@ -3,7 +3,7 @@
 namespace AmericanExpress\FabricClient;
 
 use AmericanExpress\FabricClient\msp\Identity;
-use Protos;
+use Hyperledger\Fabric\Protos\Peer as Protos;
 
 class Channel
 {

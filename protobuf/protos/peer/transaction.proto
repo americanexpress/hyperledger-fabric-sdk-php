@@ -23,7 +23,6 @@ option java_outer_classname = "TransactionPackage";
 
 package protos;
 
-import "google/protobuf/timestamp.proto";
 import "peer/proposal_response.proto";
 import "common/common.proto";
 

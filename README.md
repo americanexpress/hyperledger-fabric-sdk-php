@@ -125,4 +125,8 @@ Read more about [Docker Compose](https://docs.docker.com/compose/overview/)
 
 ## Regenerating PHP Class files from `.proto` files
 
-[Go here](docs/compile-hyperledger-fabric-proto-files.md).
+```bash
+composer protoc
+```
+
+Read more about [compiling PHP code from proto files](docs/compile-hyperledger-fabric-proto-files.md).

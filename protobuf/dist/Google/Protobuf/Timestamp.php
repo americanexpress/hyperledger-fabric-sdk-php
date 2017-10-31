@@ -9,7 +9,6 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * <pre>
  * A Timestamp represents a point in time independent of any time zone
  * or calendar, represented as seconds and fractions of seconds at
  * nanosecond resolution in UTC Epoch time. It is encoded using the
@@ -27,14 +26,14 @@ use Google\Protobuf\Internal\GPBUtil;
  *     timestamp.set_nanos(0);
  * Example 2: Compute Timestamp from POSIX `gettimeofday()`.
  *     struct timeval tv;
- *     gettimeofday(&amp;tv, NULL);
+ *     gettimeofday(&tv, NULL);
  *     Timestamp timestamp;
  *     timestamp.set_seconds(tv.tv_sec);
  *     timestamp.set_nanos(tv.tv_usec * 1000);
  * Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.
  *     FILETIME ft;
- *     GetSystemTimeAsFileTime(&amp;ft);
- *     UINT64 ticks = (((UINT64)ft.dwHighDateTime) &lt;&lt; 32) | ft.dwLowDateTime;
+ *     GetSystemTimeAsFileTime(&ft);
+ *     UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
  *     // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z
  *     // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.
  *     Timestamp timestamp;
@@ -49,31 +48,26 @@ use Google\Protobuf\Internal\GPBUtil;
  *     seconds = int(now)
  *     nanos = int((now - seconds) * 10**9)
  *     timestamp = Timestamp(seconds=seconds, nanos=nanos)
- * </pre>
  *
- * Protobuf type <code>google.protobuf.Timestamp</code>
+ * Generated from protobuf message <code>google.protobuf.Timestamp</code>
  */
 class Timestamp extends \Google\Protobuf\Internal\Message
 {
     /**
-     * <pre>
      * Represents seconds of UTC time since Unix epoch
      * 1970-01-01T00:00:00Z. Must be from from 0001-01-01T00:00:00Z to
      * 9999-12-31T23:59:59Z inclusive.
-     * </pre>
      *
-     * <code>int64 seconds = 1;</code>
+     * Generated from protobuf field <code>int64 seconds = 1;</code>
      */
     private $seconds = 0;
     /**
-     * <pre>
      * Non-negative fractions of a second at nanosecond resolution. Negative
      * second values with fractions must still have non-negative nanos values
      * that count forward in time. Must be from 0 to 999,999,999
      * inclusive.
-     * </pre>
      *
-     * <code>int32 nanos = 2;</code>
+     * Generated from protobuf field <code>int32 nanos = 2;</code>
      */
     private $nanos = 0;
 
@@ -83,13 +77,12 @@ class Timestamp extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * <pre>
      * Represents seconds of UTC time since Unix epoch
      * 1970-01-01T00:00:00Z. Must be from from 0001-01-01T00:00:00Z to
      * 9999-12-31T23:59:59Z inclusive.
-     * </pre>
      *
-     * <code>int64 seconds = 1;</code>
+     * Generated from protobuf field <code>int64 seconds = 1;</code>
+     * @return int|string
      */
     public function getSeconds()
     {
@@ -97,29 +90,30 @@ class Timestamp extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * <pre>
      * Represents seconds of UTC time since Unix epoch
      * 1970-01-01T00:00:00Z. Must be from from 0001-01-01T00:00:00Z to
      * 9999-12-31T23:59:59Z inclusive.
-     * </pre>
      *
-     * <code>int64 seconds = 1;</code>
+     * Generated from protobuf field <code>int64 seconds = 1;</code>
+     * @param int|string $var
+     * @return $this
      */
     public function setSeconds($var)
     {
         GPBUtil::checkInt64($var);
         $this->seconds = $var;
+
+        return $this;
     }
 
     /**
-     * <pre>
      * Non-negative fractions of a second at nanosecond resolution. Negative
      * second values with fractions must still have non-negative nanos values
      * that count forward in time. Must be from 0 to 999,999,999
      * inclusive.
-     * </pre>
      *
-     * <code>int32 nanos = 2;</code>
+     * Generated from protobuf field <code>int32 nanos = 2;</code>
+     * @return int
      */
     public function getNanos()
     {
@@ -127,19 +121,21 @@ class Timestamp extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * <pre>
      * Non-negative fractions of a second at nanosecond resolution. Negative
      * second values with fractions must still have non-negative nanos values
      * that count forward in time. Must be from 0 to 999,999,999
      * inclusive.
-     * </pre>
      *
-     * <code>int32 nanos = 2;</code>
+     * Generated from protobuf field <code>int32 nanos = 2;</code>
+     * @param int $var
+     * @return $this
      */
     public function setNanos($var)
     {
         GPBUtil::checkInt32($var);
         $this->nanos = $var;
+
+        return $this;
     }
 
 }
