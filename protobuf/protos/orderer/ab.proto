@@ -18,6 +18,7 @@ syntax = "proto3";
 
 import "common/common.proto";
 
+option php_namespace = "Hyperledger\\Fabric\\Protos\\Orderer";
 option go_package = "github.com/hyperledger/fabric/protos/orderer";
 option java_package = "org.hyperledger.fabric.protos.orderer";
 

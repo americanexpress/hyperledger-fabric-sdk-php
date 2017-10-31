@@ -15,6 +15,8 @@ limitations under the License.
 */
 syntax = "proto3";
 package protos;
+
+option php_namespace = "Hyperledger\\Fabric\\Protos\\Peer";
 option java_package = "org.hyperledger.fabric.protos.peer";
 option java_outer_classname = "ChaincodeEventPackage";
 option go_package = "github.com/hyperledger/fabric/protos/peer";

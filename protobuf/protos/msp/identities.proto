@@ -16,6 +16,7 @@ limitations under the License.
 
 syntax = "proto3";
 
+option php_namespace = "Hyperledger\\Fabric\\Protos\\MSP";
 option go_package = "github.com/hyperledger/fabric/protos/msp";
 option java_package = "org.hyperledger.fabric.protos.msp";
 

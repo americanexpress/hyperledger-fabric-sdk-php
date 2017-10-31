@@ -15,6 +15,7 @@ limitations under the License.
 */
 syntax = "proto3";
 
+option php_namespace = "Hyperledger\\Fabric\\Protos\\Common";
 option go_package = "github.com/hyperledger/fabric/protos/common";
 option java_package = "org.hyperledger.fabric.protos.common";
 

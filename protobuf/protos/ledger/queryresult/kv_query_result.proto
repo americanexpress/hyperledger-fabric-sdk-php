@@ -18,6 +18,7 @@ syntax = "proto3";
 
 package queryresult;
 
+option php_namespace = "Hyperledger\\Fabric\\Protos\\Ledger\\QueryResult";
 option go_package = "github.com/hyperledger/fabric/protos/ledger/queryresult";
 option java_package = "org.hyperledger.fabric.protos.ledger.queryresult";
 
