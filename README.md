@@ -111,12 +111,4 @@ At present we are providing example test case for Querying a chaincode, which ca
 
 ## Regenerating PHP Class files from `.proto` files
 
-Install `protoc` via `protobuf`, e.g. on OSX:
-```bash
-brew install protobuf
-```
-
-Run this command to generate PHP classes from `.proto` files: 
-```bash
-find ./fabric-client/protos -name "*.proto" -exec protoc --proto_path=./fabric-client/protos/base --php_out=./fabric-client/protos/PHP {} \;
-```
+[Go here](docs/compile-hyperledger-fabric-proto-files.md).
