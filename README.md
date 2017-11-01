@@ -5,6 +5,10 @@ Welcome to PHP SDK for Hyperledger project. The main objective of this SDK is to
 
 Note, the fabric-sdk-php is a standalone client side interface to access the network information and ledger data over running blockchain network, it cannot be used as a persistence medium for application defined channels data.
 
+## Installation
+```
+composer require americanexpress/hyperledger-fabric-sdk-php
+```
 
 ## Phase 1
 
@@ -58,7 +62,7 @@ Check composer version (it should be 1.5 or plus)
 
 
 
-### Installing SDK
+### Installing SDK (for development)
 
 
 `git clone {fabric-sdk-php}`
