@@ -38,56 +38,55 @@ PHP is a great option for many reasons; here are some reasons why the language m
 
 This installation showcase is performed on a Mac machine, which has brew installed. We are going to install PHP version 7.1 because protocol buffers only support up to version 7.1 thusfar.
 
-Step 1: Install PHP 7.1 via following brew commands.
+### Install and verify PHP 7.1
 ```bash
-brew search php71
-brew install homebrew/php/php71
+brew install php71
+php -v
 ```
 
-Step 2: Install `php-grpc` extension via following brew commands.
+If not php71, unlink your current version, link php71, and check the version again. For example:
 ```bash
-brew search grpc
-brew install grpc
-brew install homebrew/php/php71-grpc
+brew unlink php56
+brew link php71
+php -v
 ```
 
-Step 3: Install protobuf compiler via following brew commands.
+### Install and verify php-grpc extension
 ```bash
-brew search protobuf
-brew install protobuf
-brew install homebrew/php/php71-protobuf
+brew install grpc php71-grpc
+which grpc_php_plugin
 ```
 
-Step 4: Check your current version of PHP via `php -version` and if it's not php71, unlink your current version via `brew unlink php56`.
+### Install and verify protobuf compiler
+```bash
+brew install protobuf php71-protobuf
+protoc --version
+```
 
-Now link your 7.1 version of PHP `brew link php71` and check your version again.
+## Hello, World!
 
-Step 5: Check that the protobuf compiler installed properly, `protoc -version`.
-
-Step 6: Create a directory named `protos` and download `helloworld.proto` file inside it; download sample proto file from [helloworld.proto](https://raw.githubusercontent.com/grpc/grpc-go/master/examples/helloworld/helloworld/helloworld.proto).
-
-Commands to run:
-
+Create a directory named `protos` and download `helloworld.proto` file inside it; download sample proto file from [helloworld.proto](https://raw.githubusercontent.com/grpc/grpc-go/master/examples/helloworld/helloworld/helloworld.proto):
 ```bash
 mkdir protos
 touch protos/helloworld.proto
+mkdir php
 ```
 
-Step 7: Create a `php` directory: `mkdir php`
-
-Step 8: Check for the grpc-php plugin path at `/usr/local/bin/grpc_php_plugin`
-
-Step 9: Generate `grpc-protobuf-php` files from proto file:
+Generate PHP classes from proto file:
 ```bash
-protoc --proto_path=protos/ --php_out=php/ --grpc_out=php/ --plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin protos/helloworld.proto
+protoc --proto_path=protos/ --php_out=php/ --grpc_out=php/ --plugin=protoc-gen-grpc=`which grpc_php_plugin` protos/helloworld.proto
 ```
 
 Additional commands on the [PHP/gRPC site](https://grpc.io/docs/tutorials/basic/php.html).
 
-Step 10: Check that your generated folder structure is similar to:
+Check your generated folder structure:
+```bash
 tree php/
+```
+
+Output:
 ```text
-Output: php/
+php/
 ├── GPBMetadata
 │   └── Helloworld.php
 └── Helloworld
@@ -102,64 +101,12 @@ Now, you are all setup for generating PHP files for Hyperledger-fabric proto fil
 
 Hyperledger-fabric provides proto files to generate gRPC files in the supported language. We will download standard proto files given by Hyperledger community and compile them.
 
-Step 1: Get the [proto folder](https://github.com/hyperledger/fabric-sdk-node/tree/release/fabric-client/lib/protos).
+Step 1: Get the [proto folder](https://github.com/hyperledger/fabric/tree/release/protos).
 
 Step 2: Run above with `protoc` or create a bash file with the code to generate.
+
 ```bash
-# Generate PHP files for protos of common directory.
-protoc --proto_path=protos/ \
-        --php_out=php/ \
-        --grpc_out=php/ \
-        --plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin \
-        protos/common/common.proto \
-        protos/common/configtx.proto \
-        protos/common/configuration.proto \
-        protos/common/ledger.proto \
-        protos/common/policies.proto
-
-protoc --proto_path=protos/ \
-        --php_out=php/ \
-        --grpc_out=php/ \
-        --plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin \
-        protos/google/protobuf/empty.proto \
-        protos/google/protobuf/timestamp.proto 
-
-# Generate PHP files for protos of msp directory.
-protoc --proto_path=protos/ \
-        --php_out=php/ \
-        --grpc_out=php/ \
-        --plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin \
-        protos/msp/identities.proto \
-        protos/msp/msp_config.proto \
-        protos/msp/msp_principal.proto
-
-
-# Generate PHP files for protos of orderer directory.
-protoc --proto_path=protos/ \
-        --php_out=php/ \
-        --grpc_out=php/ \
-        --plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin \
-        protos/orderer/ab.proto \
-        protos/orderer/configuration.proto
-
-
-# Generate PHP files for protos of peer directory.
-protoc --proto_path=protos/ \
-        --php_out=php/ \
-        --grpc_out=php/ \
-        --plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin \
-        protos/peer/admin.proto \
-        protos/peer/chaincode_event.proto \
-        protos/peer/chaincode_shim.proto \
-        protos/peer/chaincode.proto \
-        protos/peer/configuration.proto \
-        protos/peer/events.proto \
-        protos/peer/peer.proto \
-        protos/peer/proposal_response.proto \
-        protos/peer/proposal.proto \
-        protos/peer/query.proto \
-        protos/peer/signed_cc_dep_spec.proto \
-        protos/peer/transaction.proto
+find ./protobuf/protos -name "*.proto" -exec protoc --proto_path=protobuf/protos/ --php_out=protobuf/dist/ --grpc_out=protobuf/dist/ --plugin=protoc-gen-grpc=`which grpc_php_plugin` {} \;
 ```
 
 ## Conclusion
