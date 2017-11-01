@@ -101,13 +101,27 @@ Check composer version (it should be 1.5 or plus)
 ### Running the End2End test case
 
 
-Before running the testcase, we need to bring up the fabric network along with that example channel creation and chaincode installation is also required. We are providing a script to perform all this setup which can be locate at
+Before running the tests, we need to bring up the fabric network and fixture(s):
+```bash
+(cd ./test/fixture/sdkintegration && docker-compose up -d)
+```
 
-`cd ./test/fixture/sdkintegration && ./init.sh`
+Stream the logs:
+```bash
+(cd ./test/fixture/sdkintegration && docker-compose logs -f)
+```
 
-At present we are providing example test case for Querying a chaincode, which can be run as below.
+At present we are providing example test case for Querying a chaincode, which can be run as below:
+```bash
+./vendor/bin/phpunit
+```
 
-`./vendor/bin/phpunit`
+After running the tests, you can bring down the fabric network:
+```bash
+(cd ./test/fixture/sdkintegration && docker-compose down)
+```
+
+Read more about [Docker Compose](https://docs.docker.com/compose/overview/)
 
 ## Regenerating PHP Class files from `.proto` files
 
