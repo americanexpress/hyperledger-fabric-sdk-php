@@ -10,6 +10,30 @@ Note, the fabric-sdk-php is a standalone client side interface to access the net
 composer require americanexpress/hyperledger-fabric-sdk-php
 ```
 
+## Usage
+
+Below, you will find high-level and concise snippets of code demonstrating how to interact with this SDK.
+
+### Channel::queryByChaincode
+```php
+$org = 'org1';
+$fabricProposal = (new Channel())->queryByChainCode(
+    $org,
+    (new Utils())->FabricConnect($org),
+    [
+        'CHAINCODE_NAME' => 'example_cc',
+        'CHAINCODE_PATH' => 'github.com/example_cc',
+        'CHAINCODE_VERSION' => '1',
+        'CHANNEL_ID' => 'foo',
+        'ARGS' => [
+            'invoke',
+            'query',
+            'a',
+        ],
+    ]
+);
+```
+
 ## Phase 1
 
 * For phase 1, we are providing client access for basic chaincode operations like query by chain code.
