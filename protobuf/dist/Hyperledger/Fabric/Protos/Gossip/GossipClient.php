@@ -35,15 +35,15 @@ class GossipClient extends \Grpc\BaseStub {
 
     /**
      * Ping is used to probe a remote peer's aliveness
-     * @param \Gossip\Empty $argument input argument
+     * @param \Google\Protobuf\GPBEmpty $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
      */
-    public function Ping(\Gossip\Empty $argument,
+    public function Ping(\Google\Protobuf\GPBEmpty $argument,
       $metadata = [], $options = []) {
         return $this->_simpleRequest('/gossip.Gossip/Ping',
         $argument,
-        ['\Gossip\Empty', 'decode'],
+        ['\Google\Protobuf\GPBEmpty', 'decode'],
         $metadata, $options);
     }
 

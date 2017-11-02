@@ -9,6 +9,7 @@ option go_package = "github.com/hyperledger/fabric/protos/gossip" ;
 
 package gossip;
 
+import "google/protobuf/empty.proto";
 
 // Gossip
 service Gossip {
@@ -17,7 +18,7 @@ service Gossip {
     rpc GossipStream (stream Envelope) returns (stream Envelope) {}
 
     // Ping is used to probe a remote peer's aliveness
-    rpc Ping (Empty) returns (Empty) {}
+    rpc Ping (google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 
