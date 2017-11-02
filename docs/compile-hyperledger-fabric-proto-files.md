@@ -101,9 +101,9 @@ Now, you are all setup for generating PHP files for Hyperledger-fabric proto fil
 
 Hyperledger-fabric provides proto files to generate gRPC files in the supported language. We will download standard proto files given by Hyperledger community and compile them.
 
-Step 1: Get the [proto folder](https://github.com/hyperledger/fabric/tree/release/protos).
-
-Step 2: Run above with `protoc` or create a bash file with the code to generate.
+1. Get the [proto folder](https://github.com/hyperledger/fabric/tree/release/protos).
+1. Add/adjust local copy `php_namespace` (and other options) as necessary, until they are updated upstream.
+1. Run above with `protoc` or create a bash file with the code to generate.
 
 ```bash
 find ./protobuf/protos -name "*.proto" -exec protoc --proto_path=protobuf/protos/ --php_out=protobuf/dist/ --grpc_out=protobuf/dist/ --plugin=protoc-gen-grpc=`which grpc_php_plugin` {} \;

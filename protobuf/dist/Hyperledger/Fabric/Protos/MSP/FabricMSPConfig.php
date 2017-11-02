@@ -88,6 +88,20 @@ class FabricMSPConfig extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.msp.FabricCryptoConfig crypto_config = 8;</code>
      */
     private $crypto_config = null;
+    /**
+     * List of TLS root certificates trusted by this MSP.
+     * They are returned by GetTLSRootCerts.
+     *
+     * Generated from protobuf field <code>repeated bytes tls_root_certs = 9;</code>
+     */
+    private $tls_root_certs;
+    /**
+     * List of TLS intermediate certificates trusted by this MSP;
+     * They are returned by GetTLSIntermediateCerts.
+     *
+     * Generated from protobuf field <code>repeated bytes tls_intermediate_certs = 10;</code>
+     */
+    private $tls_intermediate_certs;
 
     public function __construct() {
         \GPBMetadata\Msp\MspConfig::initOnce();
@@ -334,6 +348,62 @@ class FabricMSPConfig extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Hyperledger\Fabric\Protos\MSP\FabricCryptoConfig::class);
         $this->crypto_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * List of TLS root certificates trusted by this MSP.
+     * They are returned by GetTLSRootCerts.
+     *
+     * Generated from protobuf field <code>repeated bytes tls_root_certs = 9;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getTlsRootCerts()
+    {
+        return $this->tls_root_certs;
+    }
+
+    /**
+     * List of TLS root certificates trusted by this MSP.
+     * They are returned by GetTLSRootCerts.
+     *
+     * Generated from protobuf field <code>repeated bytes tls_root_certs = 9;</code>
+     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setTlsRootCerts($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::BYTES);
+        $this->tls_root_certs = $arr;
+
+        return $this;
+    }
+
+    /**
+     * List of TLS intermediate certificates trusted by this MSP;
+     * They are returned by GetTLSIntermediateCerts.
+     *
+     * Generated from protobuf field <code>repeated bytes tls_intermediate_certs = 10;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getTlsIntermediateCerts()
+    {
+        return $this->tls_intermediate_certs;
+    }
+
+    /**
+     * List of TLS intermediate certificates trusted by this MSP;
+     * They are returned by GetTLSIntermediateCerts.
+     *
+     * Generated from protobuf field <code>repeated bytes tls_intermediate_certs = 10;</code>
+     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setTlsIntermediateCerts($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::BYTES);
+        $this->tls_intermediate_certs = $arr;
 
         return $this;
     }

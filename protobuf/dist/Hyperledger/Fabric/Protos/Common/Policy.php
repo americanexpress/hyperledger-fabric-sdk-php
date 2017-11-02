@@ -23,9 +23,9 @@ class Policy extends \Google\Protobuf\Internal\Message
      */
     private $type = 0;
     /**
-     * Generated from protobuf field <code>bytes policy = 2;</code>
+     * Generated from protobuf field <code>bytes value = 2;</code>
      */
-    private $policy = '';
+    private $value = '';
 
     public function __construct() {
         \GPBMetadata\Common\Policies::initOnce();
@@ -59,23 +59,23 @@ class Policy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bytes policy = 2;</code>
+     * Generated from protobuf field <code>bytes value = 2;</code>
      * @return string
      */
-    public function getPolicy()
+    public function getValue()
     {
-        return $this->policy;
+        return $this->value;
     }
 
     /**
-     * Generated from protobuf field <code>bytes policy = 2;</code>
+     * Generated from protobuf field <code>bytes value = 2;</code>
      * @param string $var
      * @return $this
      */
-    public function setPolicy($var)
+    public function setValue($var)
     {
         GPBUtil::checkString($var, False);
-        $this->policy = $var;
+        $this->value = $var;
 
         return $this;
     }

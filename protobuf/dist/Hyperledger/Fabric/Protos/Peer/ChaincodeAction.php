@@ -36,6 +36,16 @@ class ChaincodeAction extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.protos.Response response = 3;</code>
      */
     private $response = null;
+    /**
+     * This field contains the ChaincodeID of executing this invocation. Endorser
+     * will set it with the ChaincodeID called by endorser while simulating proposal.
+     * Committer will validate the version matching with latest chaincode version.
+     * Adding ChaincodeID to keep version opens up the possibility of multiple
+     * ChaincodeAction per transaction.
+     *
+     * Generated from protobuf field <code>.protos.ChaincodeID chaincode_id = 4;</code>
+     */
+    private $chaincode_id = null;
 
     public function __construct() {
         \GPBMetadata\Peer\Proposal::initOnce();
@@ -120,6 +130,40 @@ class ChaincodeAction extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Hyperledger\Fabric\Protos\Peer\Response::class);
         $this->response = $var;
+
+        return $this;
+    }
+
+    /**
+     * This field contains the ChaincodeID of executing this invocation. Endorser
+     * will set it with the ChaincodeID called by endorser while simulating proposal.
+     * Committer will validate the version matching with latest chaincode version.
+     * Adding ChaincodeID to keep version opens up the possibility of multiple
+     * ChaincodeAction per transaction.
+     *
+     * Generated from protobuf field <code>.protos.ChaincodeID chaincode_id = 4;</code>
+     * @return \Hyperledger\Fabric\Protos\Peer\ChaincodeID
+     */
+    public function getChaincodeId()
+    {
+        return $this->chaincode_id;
+    }
+
+    /**
+     * This field contains the ChaincodeID of executing this invocation. Endorser
+     * will set it with the ChaincodeID called by endorser while simulating proposal.
+     * Committer will validate the version matching with latest chaincode version.
+     * Adding ChaincodeID to keep version opens up the possibility of multiple
+     * ChaincodeAction per transaction.
+     *
+     * Generated from protobuf field <code>.protos.ChaincodeID chaincode_id = 4;</code>
+     * @param \Hyperledger\Fabric\Protos\Peer\ChaincodeID $var
+     * @return $this
+     */
+    public function setChaincodeId($var)
+    {
+        GPBUtil::checkMessage($var, \Hyperledger\Fabric\Protos\Peer\ChaincodeID::class);
+        $this->chaincode_id = $var;
 
         return $this;
     }

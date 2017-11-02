@@ -61,19 +61,6 @@ class AdminClient extends \Grpc\BaseStub {
     }
 
     /**
-     * @param \Google\Protobuf\GPBEmpty $argument input argument
-     * @param array $metadata metadata
-     * @param array $options call options
-     */
-    public function StopServer(\Google\Protobuf\GPBEmpty $argument,
-      $metadata = [], $options = []) {
-        return $this->_simpleRequest('/protos.Admin/StopServer',
-        $argument,
-        ['\Hyperledger\Fabric\Protos\Peer\ServerStatus', 'decode'],
-        $metadata, $options);
-    }
-
-    /**
      * @param \Hyperledger\Fabric\Protos\Peer\LogLevelRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options

@@ -18,9 +18,9 @@ class SignaturePolicy_NOutOf extends \Google\Protobuf\Internal\Message
      */
     private $n = 0;
     /**
-     * Generated from protobuf field <code>repeated .common.SignaturePolicy policies = 2;</code>
+     * Generated from protobuf field <code>repeated .common.SignaturePolicy rules = 2;</code>
      */
-    private $policies;
+    private $rules;
 
     public function __construct() {
         \GPBMetadata\Common\Policies::initOnce();
@@ -50,23 +50,23 @@ class SignaturePolicy_NOutOf extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .common.SignaturePolicy policies = 2;</code>
+     * Generated from protobuf field <code>repeated .common.SignaturePolicy rules = 2;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
-    public function getPolicies()
+    public function getRules()
     {
-        return $this->policies;
+        return $this->rules;
     }
 
     /**
-     * Generated from protobuf field <code>repeated .common.SignaturePolicy policies = 2;</code>
+     * Generated from protobuf field <code>repeated .common.SignaturePolicy rules = 2;</code>
      * @param \Hyperledger\Fabric\Protos\Common\SignaturePolicy[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
-    public function setPolicies($var)
+    public function setRules($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Hyperledger\Fabric\Protos\Common\SignaturePolicy::class);
-        $this->policies = $arr;
+        $this->rules = $arr;
 
         return $this;
     }

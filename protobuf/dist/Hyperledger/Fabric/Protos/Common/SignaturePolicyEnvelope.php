@@ -20,9 +20,9 @@ class SignaturePolicyEnvelope extends \Google\Protobuf\Internal\Message
      */
     private $version = 0;
     /**
-     * Generated from protobuf field <code>.common.SignaturePolicy policy = 2;</code>
+     * Generated from protobuf field <code>.common.SignaturePolicy rule = 2;</code>
      */
-    private $policy = null;
+    private $rule = null;
     /**
      * Generated from protobuf field <code>repeated .common.MSPPrincipal identities = 3;</code>
      */
@@ -56,23 +56,23 @@ class SignaturePolicyEnvelope extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.common.SignaturePolicy policy = 2;</code>
+     * Generated from protobuf field <code>.common.SignaturePolicy rule = 2;</code>
      * @return \Hyperledger\Fabric\Protos\Common\SignaturePolicy
      */
-    public function getPolicy()
+    public function getRule()
     {
-        return $this->policy;
+        return $this->rule;
     }
 
     /**
-     * Generated from protobuf field <code>.common.SignaturePolicy policy = 2;</code>
+     * Generated from protobuf field <code>.common.SignaturePolicy rule = 2;</code>
      * @param \Hyperledger\Fabric\Protos\Common\SignaturePolicy $var
      * @return $this
      */
-    public function setPolicy($var)
+    public function setRule($var)
     {
         GPBUtil::checkMessage($var, \Hyperledger\Fabric\Protos\Common\SignaturePolicy::class);
-        $this->policy = $var;
+        $this->rule = $var;
 
         return $this;
     }
