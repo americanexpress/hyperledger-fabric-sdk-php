@@ -5,7 +5,7 @@ use AmericanExpress\FabricClient\msp\Identity;
 
 class TransactionID
 {
-    static $config = null;
+    private static $config = null;
 
     /**
      * @param $nounce

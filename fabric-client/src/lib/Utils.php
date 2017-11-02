@@ -10,7 +10,7 @@ use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 class Utils
 {
 
-    static $config = null;
+    private static $config = null;
 
     /**
      * Function for getting random nounce value
@@ -41,7 +41,7 @@ class Utils
      * @return EndorserClient
      * Read connection configuration.
      */
-    function FabricConnect($org)
+    public function fabricConnect($org)
     {
         self::$config = AppConf::getOrgConfig($org);
         $host = self::$config["peer1"]["requests"];

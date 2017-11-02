@@ -14,19 +14,19 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 
 class Hash
 {
-    static $config = null;
+    private static $config = null;
 
     /**
      * @param $string
      * @return array
      */
-    function generateByteArray($string)
+    public function generateByteArray($string)
     {
         $bytearray = unpack('c*', $string);
         return $bytearray;
     }
 
-    function signByteString(Proposal $proposal, $org)
+    public function signByteString(Proposal $proposal, $org)
     {
         self::$config = AppConf::getOrgConfig($org);
         $proposalString = $proposal->serializeToString();
@@ -42,7 +42,7 @@ class Hash
      * @return \Mdanter\Ecc\Crypto\Key\PrivateKey|\Mdanter\Ecc\Crypto\Key\PrivateKeyInterface
      *
      */
-    function readPrivateKey($privateKeyPath)
+    private function readPrivateKey($privateKeyPath)
     {
 
         $adapter = EccFactory::getAdapter();
@@ -62,7 +62,7 @@ class Hash
      * @return string
      * sign private key of node
      */
-    function signData($privateKeyData, $dataArray)
+    private function signData($privateKeyData, $dataArray)
     {
         $adapter = EccFactory::getAdapter();
         $generator = EccFactory::getNistCurves()->generator256();

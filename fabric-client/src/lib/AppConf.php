@@ -3,8 +3,8 @@ namespace AmericanExpress\FabricClient;
 
 class AppConf
 {
-    static $org = null;
-    static $appConfigPath = null;
+    private static $org = null;
+    private static $appConfigPath = null;
 
     /**
      * @param $key

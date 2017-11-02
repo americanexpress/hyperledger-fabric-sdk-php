@@ -7,7 +7,7 @@ use Hyperledger\Fabric\Protos\MSP as Msp;
 class Identity
 {
 
-    function createSerializedIdentity($certs, $mspID)
+    public function createSerializedIdentity($certs, $mspID)
     {
         $currDirectory = ROOTPATH . $certs;
 

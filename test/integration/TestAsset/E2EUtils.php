@@ -1,4 +1,7 @@
 <?php
+
+namespace AmericanExpressTest\Integration\TestAsset;
+
 use AmericanExpress\FabricClient\AppConf as AppConfig;
 use AmericanExpress\FabricClient\Channel;
 use AmericanExpress\FabricClient\Utils;
@@ -18,7 +21,7 @@ class E2EUtils
         $queryParams = $this->getQueryParam();
         $utils = new Utils();
         AppConfig::setAppConfigPath("/../test/integration/config.json");
-        $connect = $utils->FabricConnect($org);
+        $connect = $utils->fabricConnect($org);
         $channel = new Channel();
         $fabricProposal = $channel->queryByChainCode($org, $connect, $queryParams);
         return $fabricProposal->getPayload();

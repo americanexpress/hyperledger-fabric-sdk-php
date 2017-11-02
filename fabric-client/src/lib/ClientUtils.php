@@ -33,7 +33,7 @@ class ClientUtils
      * @return Protos\SignedProposal
      * This function will sign proposal
      */
-    function getSignedProposal(Protos\Proposal $proposal, $org)
+    public function getSignedProposal(Protos\Proposal $proposal, $org)
     {
         $signedProposal = new Protos\SignedProposal();
         $proposalString = $proposal->serializeToString();
@@ -87,7 +87,7 @@ class ClientUtils
      * @return string
      *  This function will build the common header
      */
-    function buildHeader($creator, $channelHeader, $nounce)
+    public function buildHeader($creator, $channelHeader, $nounce)
     {
         $signatureHeader = new Common\SignatureHeader();
         $signatureHeader->setCreator($creator);

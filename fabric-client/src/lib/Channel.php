@@ -7,8 +7,8 @@ use Hyperledger\Fabric\Protos\Peer as Protos;
 
 class Channel
 {
-    static $config = null;
-    static $org = null;
+    private static $config = null;
+    private static $org = null;
 
     /**
      * @param $org
@@ -17,7 +17,7 @@ class Channel
      * @param $queyParam
      * @returns Protos\Proposal
      */
-    function queryByChainCode($org, Protos\EndorserClient $connect, $queyParam)
+    public function queryByChainCode($org, Protos\EndorserClient $connect, $queyParam)
     {
         $utils = new Utils();
 
@@ -77,7 +77,7 @@ class Channel
      * Builds client context.
      * @return null
      */
-    function sendTransactionProposal(Protos\Proposal $request, Protos\EndorserClient $connect)
+    private function sendTransactionProposal(Protos\Proposal $request, Protos\EndorserClient $connect)
     {
         return $this->sendTransaction($request, $connect);
     }
@@ -88,7 +88,7 @@ class Channel
      * This method requests signed proposal and send transactional request to endorser.
      * @return null
      */
-    static function sendTransaction(Protos\Proposal $request, Protos\EndorserClient $connect)
+    private static function sendTransaction(Protos\Proposal $request, Protos\EndorserClient $connect)
     {
         $clientUtil = new ClientUtils();
         $request = $clientUtil->getSignedProposal($request, self::$org);

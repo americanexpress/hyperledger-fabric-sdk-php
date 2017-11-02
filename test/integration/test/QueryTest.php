@@ -1,6 +1,11 @@
 <?php
 
-class QueryTest extends PHPUnit\Framework\TestCase
+namespace AmericanExpressTest\Integration\Test;
+
+use AmericanExpressTest\Integration\TestAsset\E2EUtils;
+use PHPUnit\Framework\TestCase;
+
+class QueryTest extends TestCase
 {
 
     public function testQueryChainCode()
