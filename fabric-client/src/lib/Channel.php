@@ -45,8 +45,13 @@ class Channel
         $ENDORSER_TRANSACTION = Constants::$Endorsor;
         $txID = $TransactionID->getTxId($nounce, self::$org);
         $TimeStamp = $clientUtils->buildCurrentTimestamp();
-        $chainHeader = $clientUtils->createChannelHeader($ENDORSER_TRANSACTION, $txID, $queyParam,
-            AppConf::loadDefaults("epoch"), $TimeStamp);
+        $chainHeader = $clientUtils->createChannelHeader(
+            $ENDORSER_TRANSACTION,
+            $txID,
+            $queyParam,
+            AppConf::loadDefaults("epoch"),
+            $TimeStamp
+        );
         $chainHeaderString = $chainHeader->serializeToString();
         $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($queyParam["ARGS"]);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();

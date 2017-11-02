@@ -76,7 +76,7 @@ class Utils
      * @return string
      * convert array to binary string
      */
-    public function proposalArrayToBinaryString(Array $arr)
+    public function proposalArrayToBinaryString(array $arr)
     {
         $str = "";
         foreach ($arr as $elm) {
