@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace AmericanExpress\FabricClient\msp;
 
@@ -6,22 +7,19 @@ use Hyperledger\Fabric\Protos\MSP as Msp;
 
 class Identity
 {
-
-    public function createSerializedIdentity($certs, $mspID)
+    /**
+     * @param string $certs
+     * @param string $mspID
+     * @return Msp\SerializedIdentity
+     */
+    public function createSerializedIdentity(string $certs, string $mspID): Msp\SerializedIdentity
     {
         $currDirectory = ROOTPATH . $certs;
-
-        //echo $currDirectory;
-
-//        die();
-
         $data = file_get_contents($currDirectory);
-        //echo $data; die();
-        $SerializedIdentity = new Msp\SerializedIdentity();
-        $SerializedIdentity->setMspid($mspID);
-        $SerializedIdentity->setIdBytes($data);
+        $serializedIdentity = new Msp\SerializedIdentity();
+        $serializedIdentity->setMspid($mspID);
+        $serializedIdentity->setIdBytes($data);
 
-
-        return $SerializedIdentity;
+        return $serializedIdentity;
     }
 }

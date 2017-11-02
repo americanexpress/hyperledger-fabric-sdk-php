@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace AmericanExpress\FabricClient;
 
 use Grpc\ChannelCredentials;
@@ -9,14 +11,11 @@ use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 
 class Utils
 {
-
-    private static $config = null;
-
     /**
-     * Function for getting random nounce value
-     *  random number(nounce) which in turn used to generate txId.
+     * Function for getting random nonce value
+     *  random number(nonce) which in turn used to generate txId.
      */
-    public static function getNonce()
+    public function getNonce(): string
     {
         $random = random_bytes(24); // read 24 from sdk default.json
 
@@ -24,11 +23,11 @@ class Utils
     }
 
     /**
-     * @param $proposalString
+     * @param string $proposalString
      * @return array
      * convert string to byte array
      */
-    public function toByteArray($proposalString)
+    public function toByteArray(string $proposalString): array
     {
         $hashing = new Hash();
         $array = $hashing->generateByteArray($proposalString);
@@ -37,14 +36,14 @@ class Utils
     }
 
     /**
-     * @param $org
+     * @param string $org
      * @return EndorserClient
      * Read connection configuration.
      */
-    public function fabricConnect($org)
+    public function fabricConnect(string $org): EndorserClient
     {
-        self::$config = AppConf::getOrgConfig($org);
-        $host = self::$config["peer1"]["requests"];
+        $config = AppConf::getOrgConfig($org);
+        $host = $config["peer1"]["requests"];
         $connect = new EndorserClient($host, [
             'credentials' => ChannelCredentials::createInsecure(),
         ]);
@@ -53,12 +52,11 @@ class Utils
     }
 
     /**
-     * @param $args
+     * @param string[]|\Google\Protobuf\Internal\RepeatedField $args
      * @return ChaincodeInvocationSpec specify parameters of chaincode to be invoked during transaction.
      * specify parameters of chaincode to be invoked during transaction.
-     * @internal param $chaincodeID
      */
-    public function createChaincodeInvocationSpec($args)
+    public function createChaincodeInvocationSpec($args): ChaincodeInvocationSpec
     {
         $chaincodeInput = new ChaincodeInput();
         $chaincodeInput->setArgs($args);
@@ -76,7 +74,7 @@ class Utils
      * @return string
      * convert array to binary string
      */
-    public function proposalArrayToBinaryString(array $arr)
+    public function proposalArrayToBinaryString(array $arr): string
     {
         $str = "";
         foreach ($arr as $elm) {

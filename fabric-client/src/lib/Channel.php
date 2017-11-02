@@ -1,69 +1,71 @@
 <?php
+declare(strict_types=1);
 
 namespace AmericanExpress\FabricClient;
 
 use AmericanExpress\FabricClient\msp\Identity;
+use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer as Protos;
 
 class Channel
 {
-    private static $config = null;
-    private static $org = null;
+    private const DEFAULT_CHAINCODE_SPEC_TYPE = 1;
+    private const DEFAULT_CHANNEL_HEADER_TYPE = 3;
+
+    private $config = [];
+    private $org = '';
 
     /**
-     * @param $org
+     * @param string $org
      * @param Protos\EndorserClient $connect
-     * @param $connect
-     * @param $queyParam
-     * @returns Protos\Proposal
+     * @param mixed[] $queryParams
+     * @returns Protos\ProposalResponse
      */
-    public function queryByChainCode($org, Protos\EndorserClient $connect, $queyParam)
+    public function queryByChainCode(string $org, Protos\EndorserClient $connect, array $queryParams): Protos\ProposalResponse
     {
         $utils = new Utils();
 
-        self::$config = AppConf::getOrgConfig($org);
-        self::$org = $org;
-        $fabricProposal = $this->createFabricProposal($utils, $queyParam);
+        $this->config = AppConf::getOrgConfig($org);
+        $this->org = $org;
+        $fabricProposal = $this->createFabricProposal($utils, $queryParams);
 
         return self::sendTransactionProposal($fabricProposal, $connect);
     }
 
     /**
      * @param Utils $utils
-     * @param $queyParam
+     * @param mixed[] $queryParams
      * returns proposal using channelheader commonheader and chaincode invoke specification.
      * @return Protos\Proposal
      */
-    public function createFabricProposal(Utils $utils, $queyParam)
+    private function createFabricProposal(Utils $utils, array $queryParams): Protos\Proposal
     {
-
         $clientUtils = new ClientUtils();
-        $nounce = $utils::getNonce();
+        $nonce = $utils->getNonce();
         $TransactionID = new TransactionID();
         $ccType = new Protos\ChaincodeSpec();
-        $ccType->setType(Constants::$GoLang);
-        $ENDORSER_TRANSACTION = Constants::$Endorsor;
-        $txID = $TransactionID->getTxId($nounce, self::$org);
+        $ccType->setType(self::DEFAULT_CHAINCODE_SPEC_TYPE);
+        $txID = $TransactionID->getTxId($nonce, $this->org);
         $TimeStamp = $clientUtils->buildCurrentTimestamp();
         $chainHeader = $clientUtils->createChannelHeader(
-            $ENDORSER_TRANSACTION,
+            self::DEFAULT_CHANNEL_HEADER_TYPE,
             $txID,
-            $queyParam,
+            $queryParams,
             AppConf::loadDefaults("epoch"),
             $TimeStamp
         );
         $chainHeaderString = $chainHeader->serializeToString();
-        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($queyParam["ARGS"]);
+        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($queryParams["ARGS"]);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
 
         $payload = new Protos\ChaincodeProposalPayload();
         $payload->setInput($chaincodeInvocationSpecString);
         $payloadString = $payload->serializeToString();
-        $identity = (new Identity())->createSerializedIdentity(self::$config["admin_certs"], self::$config["mspid"]);
+        $identity = (new Identity())->createSerializedIdentity($this->config["admin_certs"], $this->config["mspid"]);
 
-        $identitystring = $identity->serializeToString();
+        $identityString = $identity->serializeToString();
 
-        $headerString = $clientUtils->buildHeader($identitystring, $chainHeaderString, $nounce);
+        $headerString = $clientUtils->buildHeader($identityString, $chainHeaderString, $nonce);
         $proposal = new Protos\Proposal();
         $proposal->setHeader($headerString);
         $proposal->setPayload($payloadString);
@@ -75,9 +77,9 @@ class Channel
      * @param Protos\Proposal $request
      * @param Protos\EndorserClient $connect
      * Builds client context.
-     * @return null
+     * @return Protos\ProposalResponse
      */
-    private function sendTransactionProposal(Protos\Proposal $request, Protos\EndorserClient $connect)
+    private function sendTransactionProposal(Protos\Proposal $request, Protos\EndorserClient $connect): Protos\ProposalResponse
     {
         return $this->sendTransaction($request, $connect);
     }
@@ -86,16 +88,17 @@ class Channel
      * @param Protos\Proposal $request
      * @param Protos\EndorserClient $connect
      * This method requests signed proposal and send transactional request to endorser.
-     * @return null
+     * @return Protos\ProposalResponse
      */
-    private static function sendTransaction(Protos\Proposal $request, Protos\EndorserClient $connect)
+    private function sendTransaction(Protos\Proposal $request, Protos\EndorserClient $connect): Protos\ProposalResponse
     {
         $clientUtil = new ClientUtils();
-        $request = $clientUtil->getSignedProposal($request, self::$org);
+        $request = $clientUtil->getSignedProposal($request, $this->org);
 
-        list($proposalResponse, $status) = $connect->ProcessProposal($request)->wait();
-        $status = ((array)$status);
-        sleep(1);
+        /** @var UnaryCall $simpleSurfaceActiveCall */
+        $simpleSurfaceActiveCall = $connect->ProcessProposal($request);
+        list($proposalResponse, $status) = $simpleSurfaceActiveCall->wait();
+        $status = (array)$status;
         if (isset($status["code"]) && $status["code"] == 0) {
             return $proposalResponse;
         } else {

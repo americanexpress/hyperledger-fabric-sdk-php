@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace AmericanExpress\FabricClient;
 
 use Hyperledger\Fabric\Protos\Common;
@@ -7,17 +9,16 @@ use Hyperledger\Fabric\Protos\Peer as Protos;
 
 class ClientUtils
 {
-
     /**
      * Function for getting current timestamp
      * @return Timestamp
      * This function will create a timestamp from the current time
      */
-    public static function buildCurrentTimestamp()
+    public function buildCurrentTimestamp(): Timestamp
     {
         $timestamp = new Timestamp();
         $microtime = microtime(true);
-        $time = explode(".", $microtime);
+        $time = explode(".", (string) $microtime);
         $seconds = $time[0];
         $nanos = (($microtime * 1000) % 1000) * 1000000;
 
@@ -29,11 +30,11 @@ class ClientUtils
 
     /**
      * @param Protos\Proposal $proposal
-     * @param $org
+     * @param string $org
      * @return Protos\SignedProposal
      * This function will sign proposal
      */
-    public function getSignedProposal(Protos\Proposal $proposal, $org)
+    public function getSignedProposal(Protos\Proposal $proposal, string $org): Protos\SignedProposal
     {
         $signedProposal = new Protos\SignedProposal();
         $proposalString = $proposal->serializeToString();
@@ -46,19 +47,15 @@ class ClientUtils
     }
 
     /**
-     * @param $type
-     * @param $txID
-     * @param $queryParam
-     * @param $epoch
-     * @param $TimeStamp
+     * @param int $type
+     * @param string $txID
+     * @param mixed[] $queryParam
+     * @param int|string $epoch
+     * @param Timestamp $timestamp
      * @return Common\ChannelHeader This function will build a common channel header
      * This function will build a common channel header
-     * @internal param $channelID
-     * @internal param $chainCodeName
-     * @internal param $chainCodePath
-     * @internal param $chainCodeVersion
      */
-    public function createChannelHeader($type, $txID, $queryParam, $epoch, $TimeStamp)
+    public function createChannelHeader(int $type, string $txID, array $queryParam, $epoch, Timestamp $timestamp): Common\ChannelHeader
     {
         $channelHeader = new Common\ChannelHeader();
         $channelHeader->setType($type);
@@ -66,7 +63,7 @@ class ClientUtils
         $channelHeader->setTxId($txID);
         $channelHeader->setChannelId($queryParam["CHANNEL_ID"]);
         $channelHeader->setEpoch($epoch);
-        $channelHeader->setTimestamp($TimeStamp);
+        $channelHeader->setTimestamp($timestamp);
 
         $chainCodeId = new Protos\ChaincodeID();
         $chainCodeId->setPath($queryParam["CHAINCODE_PATH"]);
@@ -81,17 +78,17 @@ class ClientUtils
     }
 
     /**
-     * @param $creator
-     * @param $channelHeader
-     * @param $nounce
+     * @param string $creator
+     * @param string $channelHeader
+     * @param string $nonce
      * @return string
      *  This function will build the common header
      */
-    public function buildHeader($creator, $channelHeader, $nounce)
+    public function buildHeader(string $creator, string $channelHeader, string $nonce): string
     {
         $signatureHeader = new Common\SignatureHeader();
         $signatureHeader->setCreator($creator);
-        $signatureHeader->setNonce($nounce);
+        $signatureHeader->setNonce($nonce);
 
         $signatureHeaderString = $signatureHeader->serializeToString();
         $header = new Common\Header();

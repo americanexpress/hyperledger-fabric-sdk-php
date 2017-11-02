@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace AmericanExpress\FabricClient;
 
 use Hyperledger\Fabric\Protos\Peer\Proposal;
+use Mdanter\Ecc\Crypto\Key\PrivateKeyInterface;
 use Mdanter\Ecc\Crypto\Signature\Signature;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Crypto\Signature\Signer;
@@ -14,35 +16,37 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 
 class Hash
 {
-    private static $config = null;
-
     /**
-     * @param $string
+     * @param string $string
      * @return array
      */
-    public function generateByteArray($string)
+    public function generateByteArray(string $string): array
     {
-        $bytearray = unpack('c*', $string);
-        return $bytearray;
+        return unpack('c*', $string);
     }
 
-    public function signByteString(Proposal $proposal, $org)
+    /**
+     * @param Proposal $proposal
+     * @param string $org
+     * @return string
+     */
+    public function signByteString(Proposal $proposal, string $org): string
     {
-        self::$config = AppConf::getOrgConfig($org);
+        $config = AppConf::getOrgConfig($org);
         $proposalString = $proposal->serializeToString();
         $proposalArray = (new Utils())->toByteArray($proposalString);
-        $privateKeydata = $this->readPrivateKey(self::$config["private_key"]);
-        $signData = $this->signData($privateKeydata, $proposalArray);
+        $privateKey = $this->readPrivateKey($config["private_key"]);
+        $signData = $this->signData($privateKey, $proposalArray);
 
         return $signData;
     }
 
     /**
-     * @param $privateKeyPath
-     * @return \Mdanter\Ecc\Crypto\Key\PrivateKey|\Mdanter\Ecc\Crypto\Key\PrivateKeyInterface
+     * @param string $privateKeyPath
+     * @return PrivateKeyInterface
      *
      */
-    private function readPrivateKey($privateKeyPath)
+    private function readPrivateKey(string $privateKeyPath): PrivateKeyInterface
     {
 
         $adapter = EccFactory::getAdapter();
@@ -57,16 +61,15 @@ class Hash
     }
 
     /**
-     * @param $privateKeyData
+     * @param PrivateKeyInterface $privateKeyData
      * @param $dataArray
      * @return string
      * sign private key of node
      */
-    private function signData($privateKeyData, $dataArray)
+    private function signData(PrivateKeyInterface $privateKeyData, array $dataArray)
     {
         $adapter = EccFactory::getAdapter();
         $generator = EccFactory::getNistCurves()->generator256();
-        $useDerandomizedSignatures = true;
         $algorithm = 'sha256';
 
         $key = $privateKeyData;
@@ -78,11 +81,7 @@ class Hash
 
         # Derandomized signatures are not necessary, but can reduce
         # the attack surface for a private key that is to be used often.
-        if ($useDerandomizedSignatures) {
-            $random = RandomGeneratorFactory::getHmacRandomGenerator($key, $hash, $algorithm);
-        } else {
-            $random = RandomGeneratorFactory::getRandomGenerator();
-        }
+        $random = RandomGeneratorFactory::getHmacRandomGenerator($key, $hash, $algorithm);
 
         $randomK = $random->generate($generator->getOrder());
         $signature = $signer->sign($key, $hash, $randomK);

@@ -1,30 +1,29 @@
 <?php
+declare(strict_types=1);
+
 namespace AmericanExpress\FabricClient;
 
 use AmericanExpress\FabricClient\msp\Identity;
 
 class TransactionID
 {
-    private static $config = null;
-
     /**
-     * @param $nounce
-     * @param $org
+     * @param string $nonce
+     * @param string $org
      * @return string
      * Generate transaction Id using Ecert of member.
      */
-    public function getTxId($nounce, $org)
+    public function getTxId(string $nonce, string $org): string
     {
-        self::$config = AppConf::getOrgConfig($org);
+        $config = AppConf::getOrgConfig($org);
 
-        $identity = new Identity();
-        $identity = $identity->createSerializedIdentity(self::$config["admin_certs"], self::$config["mspid"]);
-        $identitystring = $identity->serializeToString();
+        $identity = (new Identity)->createSerializedIdentity($config["admin_certs"], $config["mspid"]);
+        $identityString = $identity->serializeToString();
 
         $utils = new Utils();
-        $noArray = $utils->toByteArray($nounce);
-        $identtyArray = $utils->toByteArray($identitystring);
-        $comp = array_merge($noArray, $identtyArray);
+        $noArray = $utils->toByteArray($nonce);
+        $identityArray = $utils->toByteArray($identityString);
+        $comp = array_merge($noArray, $identityArray);
         $compString = $utils->proposalArrayToBinaryString($comp);
         $txID = hash('sha256', $compString);
 

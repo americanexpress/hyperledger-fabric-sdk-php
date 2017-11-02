@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\Test;
 
@@ -7,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class QueryTest extends TestCase
 {
-
     public function testQueryChainCode()
     {
         $e2e = new E2EUtils();

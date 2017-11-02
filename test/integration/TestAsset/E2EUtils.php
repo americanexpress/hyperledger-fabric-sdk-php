@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\TestAsset;
 
@@ -9,14 +10,10 @@ use AmericanExpress\FabricClient\Utils;
 class E2EUtils
 {
     /**
-     * @param $org
-     * @param $version
-     * @param $value
-     * @param $t
-     * @param $transientMap
-     * Query given chaincode with given args.
+     * @param string $org
+     * @return string
      */
-    public function queryChaincode($org)
+    public function queryChaincode(string $org)
     {
         $queryParams = $this->getQueryParam();
         $utils = new Utils();
@@ -28,17 +25,21 @@ class E2EUtils
     }
 
     /**
-     * @return array
+     * @return mixed[]
      * set Query parameters
      */
     public function getQueryParam()
     {
-        $queryParams = array();
-        $queryParams["CHAINCODE_NAME"] = "example_cc";
-        $queryParams["CHAINCODE_PATH"] = "github.com/example_cc";
-        $queryParams["CHAINCODE_VERSION"] = "1";
-        $queryParams["CHANNEL_ID"] = "foo";
-        $queryParams["ARGS"] = ["invoke","query","a"];
-        return $queryParams;
+        return [
+            'CHAINCODE_NAME' => 'example_cc',
+            'CHAINCODE_PATH' => 'github.com/example_cc',
+            'CHAINCODE_VERSION' => '1',
+            'CHANNEL_ID' => 'foo',
+            'ARGS' => [
+                'invoke',
+                'query',
+                'a',
+            ],
+        ];
     }
 }
