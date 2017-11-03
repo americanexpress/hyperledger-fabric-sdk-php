@@ -22,7 +22,7 @@
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory>fabric-client/src</directory>
+            <directory>src</directory>
         </whitelist>
     </filter>
 </phpunit>

@@ -14,7 +14,7 @@ class Identity
      */
     public function createSerializedIdentity(string $certs, string $mspID): SerializedIdentity
     {
-        $currDirectory = ROOTPATH . $certs;
+        $currDirectory = rtrim(ROOTPATH, '/') . '/' . ltrim($certs, '/');
         $data = file_get_contents($currDirectory);
         $serializedIdentity = new SerializedIdentity();
         $serializedIdentity->setMspid($mspID);

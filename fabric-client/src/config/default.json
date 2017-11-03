@@ -1,6 +1,0 @@
-{
-  "timeout": 5000,
-  "epoch":0,
-  "crypto-hash-algo": "sha256",
-  "nonce-size" : 24
-}

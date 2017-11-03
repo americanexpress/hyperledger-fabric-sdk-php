@@ -10,7 +10,7 @@
   },
   "autoload": {
     "psr-4": {
-      "AmericanExpress\\HyperledgerFabricClient\\": "fabric-client/src/lib",
+      "AmericanExpress\\HyperledgerFabricClient\\": "src",
       "Google\\": "protobuf/dist/Google",
       "GPBMetadata\\": "protobuf/dist/GPBMetadata",
       "Hyperledger\\": "protobuf/dist/Hyperledger"
@@ -21,7 +21,7 @@
       "test"
     ],
     "files": [
-      "fabric-client/Index.php"
+      "index.php"
     ]
   },
   "require": {

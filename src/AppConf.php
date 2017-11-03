@@ -5,6 +5,13 @@ namespace AmericanExpress\HyperledgerFabricClient;
 
 class AppConf
 {
+    private const DEFAULT_CONFIG = [
+        'timeout' => 5000,
+        'epoch' => 0,
+        'crypto-hash-algo' => 'sha256',
+        'nonce-size' => 24
+    ];
+
     private static $org = null;
     private static $appConfigPath = null;
 
@@ -15,10 +22,11 @@ class AppConf
      */
     public static function loadDefaults(string $key)
     {
-        $jsonStr = file_get_contents(__DIR__."/../config/default.json");
-        $config = json_decode($jsonStr);
+        if (array_key_exists($key, self::DEFAULT_CONFIG)) {
+            return self::DEFAULT_CONFIG[$key];
+        }
 
-        return $config->$key;
+        return null;
     }
 
     /**
@@ -28,7 +36,7 @@ class AppConf
      **/
     public static function getOrgConfig(string $org)
     {
-        $configPath = trim(ROOTPATH . self::$appConfigPath);
+        $configPath = rtrim(ROOTPATH, '/') . '/' . ltrim(self::$appConfigPath, '/');
         $jsonStr = file_get_contents($configPath);
         $config = json_decode($jsonStr, true);
         self::$org = $org;
@@ -40,6 +48,6 @@ class AppConf
      */
     public static function setAppConfigPath(string $path)
     {
-        self::$appConfigPath = $path . "  ";
+        self::$appConfigPath = $path;
     }
 }

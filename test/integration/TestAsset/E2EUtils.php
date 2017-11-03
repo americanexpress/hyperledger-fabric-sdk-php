@@ -17,7 +17,7 @@ class E2EUtils
     {
         $queryParams = $this->getQueryParam();
         $utils = new Utils();
-        AppConfig::setAppConfigPath("/../test/integration/config.json");
+        AppConfig::setAppConfigPath("test/integration/config.json");
         $connect = $utils->fabricConnect($org);
         $channel = new Channel();
         $fabricProposal = $channel->queryByChainCode($org, $connect, $queryParams);
