@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpress\FabricClient;
+namespace AmericanExpress\HyperledgerFabricClient;
 
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Mdanter\Ecc\Crypto\Key\PrivateKeyInterface;

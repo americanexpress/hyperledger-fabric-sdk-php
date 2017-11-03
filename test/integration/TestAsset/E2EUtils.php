@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\TestAsset;
 
-use AmericanExpress\FabricClient\AppConf as AppConfig;
-use AmericanExpress\FabricClient\Channel;
-use AmericanExpress\FabricClient\Utils;
+use AmericanExpress\HyperledgerFabricClient\AppConf as AppConfig;
+use AmericanExpress\HyperledgerFabricClient\Channel;
+use AmericanExpress\HyperledgerFabricClient\Utils;
 
 class E2EUtils
 {

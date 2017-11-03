@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpress\FabricClient;
+namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\FabricClient\msp\Identity;
+use AmericanExpress\HyperledgerFabricClient\MSP\Identity;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer as Protos;
 

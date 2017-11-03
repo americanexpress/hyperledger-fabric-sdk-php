@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpress\FabricClient\msp;
+namespace AmericanExpress\HyperledgerFabricClient\MSP;
 
 use Hyperledger\Fabric\Protos\MSP as Msp;
 
