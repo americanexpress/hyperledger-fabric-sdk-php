@@ -45,7 +45,8 @@
     "protoc": "bin/compile-protos.sh",
     "test:integration": "vendor/bin/phpunit --testsuite integration",
     "test:mutations": "vendor/bin/humbug",
-    "coverage": "vendor/bin/phpunit --coverage-text",
-    "test": "vendor/bin/phpunit"
+    "test:units": "vendor/bin/phpunit --testsuite unit",
+    "coverage": "vendor/bin/phpunit --testsuite unit --coverage-text",
+    "test": "vendor/bin/phpunit --testsuite unit"
   }
 }

@@ -13,6 +13,9 @@
          stopOnFailure="false"
          syntaxCheck="false">
     <testsuites>
+        <testsuite name="unit">
+            <directory suffix=".php">./test/unit/test</directory>
+        </testsuite>
         <testsuite name="integration">
             <directory suffix=".php">./test/integration/test</directory>
         </testsuite>
