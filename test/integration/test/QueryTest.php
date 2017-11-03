@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+//declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\Test;
 
@@ -11,6 +11,8 @@ class QueryTest extends TestCase
     public function testQueryChainCode()
     {
         $e2e = new E2EUtils();
-        $this->assertTrue($e2e->queryChaincode('org1') != null);
+        $result = $e2e->queryChaincode('org1');
+        echo $result;
+        $this->assertTrue($result != null);
     }
 }

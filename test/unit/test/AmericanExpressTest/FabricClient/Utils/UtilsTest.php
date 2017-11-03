@@ -2,17 +2,18 @@
 
 namespace AmericanExpressTest\FabricClient\Utils;
 
-use AmericanExpress\FabricClient\Utils;
+use AmericanExpress\HyperledgerFabricClient\Utils;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\FabricClient\Utils
+ * @covers \AmericanExpress\HyperledgerFabricClient\Utils
  */
 class UtilsTest extends TestCase
 {
     /**
      * @var Utils
      */
+
     private $sut;
 
     protected function setUp()
