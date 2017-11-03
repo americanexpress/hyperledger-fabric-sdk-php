@@ -5,7 +5,11 @@ namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\MSP\Identity;
 use Grpc\UnaryCall;
-use Hyperledger\Fabric\Protos\Peer as Protos;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeSpec;
+use Hyperledger\Fabric\Protos\Peer\EndorserClient;
+use Hyperledger\Fabric\Protos\Peer\Proposal;
+use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
 class Channel
 {
@@ -17,11 +21,11 @@ class Channel
 
     /**
      * @param string $org
-     * @param Protos\EndorserClient $connect
+     * @param EndorserClient $connect
      * @param mixed[] $queryParams
-     * @returns Protos\ProposalResponse
+     * @returns ProposalResponse
      */
-    public function queryByChainCode(string $org, Protos\EndorserClient $connect, array $queryParams): Protos\ProposalResponse
+    public function queryByChainCode(string $org, EndorserClient $connect, array $queryParams): ProposalResponse
     {
         $utils = new Utils();
 
@@ -36,14 +40,14 @@ class Channel
      * @param Utils $utils
      * @param mixed[] $queryParams
      * returns proposal using channelheader commonheader and chaincode invoke specification.
-     * @return Protos\Proposal
+     * @return Proposal
      */
-    private function createFabricProposal(Utils $utils, array $queryParams): Protos\Proposal
+    private function createFabricProposal(Utils $utils, array $queryParams): Proposal
     {
         $clientUtils = new ClientUtils();
         $nonce = $utils->getNonce();
         $TransactionID = new TransactionID();
-        $ccType = new Protos\ChaincodeSpec();
+        $ccType = new ChaincodeSpec();
         $ccType->setType(self::DEFAULT_CHAINCODE_SPEC_TYPE);
         $txID = $TransactionID->getTxId($nonce, $this->org);
         $TimeStamp = $clientUtils->buildCurrentTimestamp();
@@ -58,7 +62,7 @@ class Channel
         $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($queryParams["ARGS"]);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
 
-        $payload = new Protos\ChaincodeProposalPayload();
+        $payload = new ChaincodeProposalPayload();
         $payload->setInput($chaincodeInvocationSpecString);
         $payloadString = $payload->serializeToString();
         $identity = (new Identity())->createSerializedIdentity($this->config["admin_certs"], $this->config["mspid"]);
@@ -66,7 +70,7 @@ class Channel
         $identityString = $identity->serializeToString();
 
         $headerString = $clientUtils->buildHeader($identityString, $chainHeaderString, $nonce);
-        $proposal = new Protos\Proposal();
+        $proposal = new Proposal();
         $proposal->setHeader($headerString);
         $proposal->setPayload($payloadString);
 
@@ -74,23 +78,23 @@ class Channel
     }
 
     /**
-     * @param Protos\Proposal $request
-     * @param Protos\EndorserClient $connect
+     * @param Proposal $request
+     * @param EndorserClient $connect
      * Builds client context.
-     * @return Protos\ProposalResponse
+     * @return ProposalResponse
      */
-    private function sendTransactionProposal(Protos\Proposal $request, Protos\EndorserClient $connect): Protos\ProposalResponse
+    private function sendTransactionProposal(Proposal $request, EndorserClient $connect): ProposalResponse
     {
         return $this->sendTransaction($request, $connect);
     }
 
     /**
-     * @param Protos\Proposal $request
-     * @param Protos\EndorserClient $connect
+     * @param Proposal $request
+     * @param EndorserClient $connect
      * This method requests signed proposal and send transactional request to endorser.
-     * @return Protos\ProposalResponse
+     * @return ProposalResponse
      */
-    private function sendTransaction(Protos\Proposal $request, Protos\EndorserClient $connect): Protos\ProposalResponse
+    private function sendTransaction(Proposal $request, EndorserClient $connect): ProposalResponse
     {
         $clientUtil = new ClientUtils();
         $request = $clientUtil->getSignedProposal($request, $this->org);
