@@ -34,6 +34,7 @@
   "require-dev": {
     "humbug/humbug": "1.0.x-dev",
     "jakub-onderka/php-parallel-lint": "*",
+    "mikey179/vfsStream": "^1.6",
     "phpunit/phpunit": "*",
     "squizlabs/php_codesniffer": "*"
   },
