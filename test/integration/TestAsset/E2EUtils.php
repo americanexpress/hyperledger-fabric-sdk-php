@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\TestAsset;
 
-use AmericanExpress\HyperledgerFabricClient\ClientConfig as AppConfig;
+use AmericanExpress\HyperledgerFabricClient\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\Utils;
 
@@ -17,7 +17,7 @@ class E2EUtils
     {
         $queryParams = $this->getQueryParam();
         $utils = new Utils();
-        AppConfig::setAppConfigPath("test/integration/config.json");
+        ClientConfig::getInstance("/../test/integration/config.json");
         $connect = $utils->fabricConnect($org);
         $channel = new Channel();
         $fabricProposal = $channel->queryByChainCode($org, $connect, $queryParams);
