@@ -40,9 +40,9 @@
   },
   "scripts": {
     "build": "composer lint:syntax && composer lint:style && composer coverage && composer test:mutations",
-    "lint:beautify": "vendor/bin/phpcbf --standard=PSR2 --extensions=php -v fabric-client/src/ test/",
-    "lint:style": "vendor/bin/phpcs --standard=PSR2 --extensions=php -v fabric-client/src/ test/",
-    "lint:syntax": "vendor/bin/parallel-lint fabric-client/ protobuf/dist/ test/",
+    "lint:beautify": "vendor/bin/phpcbf --standard=PSR2 --extensions=php -v src/ test/",
+    "lint:style": "vendor/bin/phpcs --standard=PSR2 --extensions=php -v src/ test/",
+    "lint:syntax": "vendor/bin/parallel-lint src/ protobuf/dist/ test/",
     "protoc": "bin/compile-protos.sh",
     "test:integration": "vendor/bin/phpunit --testsuite integration",
     "test:mutations": "vendor/bin/humbug",
