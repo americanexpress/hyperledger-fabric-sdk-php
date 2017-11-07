@@ -15,7 +15,7 @@ class TransactionID
      */
     public function getTxId(string $nonce, string $org): string
     {
-        $config = AppConf::getOrgConfig($org);
+        $config = ClientConfig::getOrgConfig($org);
 
         $identity = (new Identity)->createSerializedIdentity($config["admin_certs"], $config["mspid"]);
         $identityString = $identity->serializeToString();

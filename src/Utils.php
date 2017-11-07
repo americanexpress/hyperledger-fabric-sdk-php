@@ -42,7 +42,7 @@ class Utils
      */
     public function fabricConnect(string $org): EndorserClient
     {
-        $config = AppConf::getOrgConfig($org);
+        $config = ClientConfig::getOrgConfig($org);
         $host = $config["peer1"]["requests"];
         $connect = new EndorserClient($host, [
             'credentials' => ChannelCredentials::createInsecure(),

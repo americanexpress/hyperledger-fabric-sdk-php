@@ -29,7 +29,7 @@ class Channel
     {
         $utils = new Utils();
 
-        $this->config = AppConf::getOrgConfig($org);
+        $this->config = ClientConfig::getOrgConfig($org);
         $this->org = $org;
         $fabricProposal = $this->createFabricProposal($utils, $queryParams);
 
@@ -55,7 +55,7 @@ class Channel
             self::DEFAULT_CHANNEL_HEADER_TYPE,
             $txID,
             $queryParams,
-            AppConf::loadDefaults("epoch"),
+            ClientConfig::loadDefaults("epoch"),
             $TimeStamp
         );
         $chainHeaderString = $chainHeader->serializeToString();

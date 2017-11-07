@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\TestAsset;
 
-use AmericanExpress\HyperledgerFabricClient\AppConf as AppConfig;
+use AmericanExpress\HyperledgerFabricClient\ClientConfig as AppConfig;
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\Utils;
 

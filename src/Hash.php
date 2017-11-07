@@ -32,7 +32,7 @@ class Hash
      */
     public function signByteString(Proposal $proposal, string $org): string
     {
-        $config = AppConf::getOrgConfig($org);
+        $config = ClientConfig::getOrgConfig($org);
         $proposalString = $proposal->serializeToString();
         $proposalArray = (new Utils())->toByteArray($proposalString);
         $privateKey = $this->readPrivateKey($config["private_key"]);
