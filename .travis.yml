@@ -1,0 +1,43 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+  - nightly
+
+env:
+  - DEPS=latest
+  - DEPS=lowest
+
+install:
+  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update --no-interaction --prefer-source ; fi
+  - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --no-interaction --prefer-source --prefer-lowest ; fi
+
+script:
+  - composer test
+
+jobs:
+  allow_failures:
+    - php: nightly
+  include:
+    - stage: lint
+      php: 7.1
+      script:
+        - composer install --no-interaction --prefer-source
+        - composer lint:syntax
+    - stage: lint
+      php: 7.1
+      script:
+        - composer install --no-interaction --prefer-source
+        - composer lint:style
+    - stage: big-test
+      php: 7.1
+      script:
+        - composer install --no-interaction --prefer-source
+        - composer coverage
+    - stage: big-test
+      php: 7.1
+      script:
+        - composer install --no-interaction --prefer-source
+        - composer require --dev humbug/humbug:^1.0@dev
+        - composer test:mutations
