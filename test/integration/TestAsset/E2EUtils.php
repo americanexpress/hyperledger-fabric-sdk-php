@@ -16,8 +16,8 @@ class E2EUtils
     public function queryChaincode(string $org)
     {
         $queryParams = $this->getQueryParam();
+        ClientConfig::getInstance("test/integration/config.json");
         $utils = new Utils();
-        ClientConfig::getInstance("/../test/integration/config.json");
         $connect = $utils->fabricConnect($org);
         $channel = new Channel();
         $fabricProposal = $channel->queryByChainCode($org, $connect, $queryParams);

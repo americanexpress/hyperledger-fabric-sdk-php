@@ -95,18 +95,6 @@ class ClientConfig implements ClientConfigInterface
     }
 
     /**
-     * TODO: Replace usages of this function with calls to `getIn` on an injected config instance.
-     * Method to set org configuration.
-     * @param string $org
-     * @param string $network
-     * @return mixed|null
-     */
-    public static function getOrgConfig(string $org, string $network = 'test-network')
-    {
-        return self::getInstance()->getIn([$network, $org], null);
-    }
-
-    /**
      * @param string $jsonFilePath
      * @param string $rootPath
      * @return ClientConfig

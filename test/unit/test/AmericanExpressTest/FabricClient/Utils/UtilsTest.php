@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\FabricClient\Utils;
 
+use AmericanExpress\HyperledgerFabricClient\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\Utils;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +20,7 @@ class UtilsTest extends TestCase
 
     protected function setUp()
     {
-        $this->sut = new Utils();
+        $this->sut = new Utils(new ClientConfig([]));
     }
 
     public function testDefaultNonceLength()

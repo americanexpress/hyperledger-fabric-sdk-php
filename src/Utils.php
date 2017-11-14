@@ -12,12 +12,28 @@ use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 class Utils
 {
     /**
+     * @var ClientConfigInterface
+     */
+    private $config;
+
+    /**
+     * Utils constructor.
+     * @param ClientConfigInterface $config
+     */
+    public function __construct(ClientConfigInterface $config = null)
+    {
+        $config = $config ?: ClientConfig::getInstance();
+
+        $this->config = $config;
+    }
+
+    /**
      * Function for getting random nonce value
      *  random number(nonce) which in turn used to generate txId.
      */
     public function getNonce(): string
     {
-        $random = random_bytes(24); // read 24 from sdk default.json
+        $random = random_bytes($this->config->getDefault('nonce-size'));
 
         return $random;
     }
@@ -29,21 +45,19 @@ class Utils
      */
     public function toByteArray(string $proposalString): array
     {
-        $hashing = new Hash();
-        $array = $hashing->generateByteArray($proposalString);
-
-        return $array;
+        return \unpack('c*', $proposalString);
     }
 
     /**
      * @param string $org
+     * @param string $network
+     * @param string $peer
      * @return EndorserClient
      * Read connection configuration.
      */
-    public function fabricConnect(string $org): EndorserClient
+    public function fabricConnect(string $org, string $network = 'test-network', string $peer = 'peer1'): EndorserClient
     {
-        $config = ClientConfig::getOrgConfig($org);
-        $host = $config["peer1"]["requests"];
+        $host = $this->config->getIn([$network, $org, $peer, 'requests'], null);
         $connect = new EndorserClient($host, [
             'credentials' => ChannelCredentials::createInsecure(),
         ]);

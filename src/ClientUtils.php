@@ -15,6 +15,28 @@ use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 class ClientUtils
 {
     /**
+     * @var ClientConfigInterface
+     */
+    private $config;
+
+    /**
+     * @var Hash
+     */
+    private $hash;
+
+    /**
+     * Utils constructor.
+     * @param ClientConfigInterface $config
+     */
+    public function __construct(ClientConfigInterface $config = null)
+    {
+        $config = $config ?: ClientConfig::getInstance();
+
+        $this->config = $config;
+        $this->hash = new Hash($config);
+    }
+
+    /**
      * Function for getting current timestamp
      * @return Timestamp
      * This function will create a timestamp from the current time
@@ -45,7 +67,7 @@ class ClientUtils
         $proposalString = $proposal->serializeToString();
         $signedProposal->setProposalBytes($proposalString);
 
-        $signatureString = (new Hash())->signByteString($proposal, $org);
+        $signatureString = $this->hash->signByteString($proposal, $org);
         $signedProposal->setSignature($signatureString);
 
         return $signedProposal;

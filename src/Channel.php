@@ -16,8 +16,45 @@ class Channel
     private const DEFAULT_CHAINCODE_SPEC_TYPE = 1;
     private const DEFAULT_CHANNEL_HEADER_TYPE = 3;
 
-    private $config = [];
-    private $org = '';
+    /**
+     * @var ClientConfigInterface
+     */
+    private $config;
+
+    /**
+     * @var Utils
+     */
+    private $utils;
+
+    /**
+     * @var Identity
+     */
+    private $identity;
+
+    /**
+     * @var ClientUtils
+     */
+    private $clientUtils;
+
+    /**
+     * @var TransactionID
+     */
+    private $transactionId;
+
+    /**
+     * Channel constructor.
+     * @param ClientConfigInterface $config
+     */
+    public function __construct(ClientConfigInterface $config = null)
+    {
+        $config = $config ?: ClientConfig::getInstance();
+
+        $this->config = $config;
+        $this->utils = new Utils($config);
+        $this->identity = new Identity();
+        $this->clientUtils = new ClientUtils($config);
+        $this->transactionId = new TransactionID($config);
+    }
 
     /**
      * @param string $org
@@ -27,49 +64,45 @@ class Channel
      */
     public function queryByChainCode(string $org, EndorserClient $connect, array $queryParams): ProposalResponse
     {
-        $utils = new Utils();
+        $fabricProposal = $this->createFabricProposal($org, $queryParams);
 
-        $this->config = ClientConfig::getOrgConfig($org);
-        $this->org = $org;
-        $fabricProposal = $this->createFabricProposal($utils, $queryParams);
-
-        return self::sendTransactionProposal($fabricProposal, $connect);
+        return $this->sendTransaction($fabricProposal, $connect, $org);
     }
 
     /**
-     * @param Utils $utils
+     * @param string $org
      * @param mixed[] $queryParams
+     * @param string $network
      * returns proposal using channelheader commonheader and chaincode invoke specification.
      * @return Proposal
      */
-    private function createFabricProposal(Utils $utils, array $queryParams): Proposal
+    private function createFabricProposal(string $org, array $queryParams, string $network = 'test-network'): Proposal
     {
-        $clientUtils = new ClientUtils();
-        $nonce = $utils->getNonce();
-        $TransactionID = new TransactionID();
+        $nonce = $this->utils->getNonce();
         $ccType = new ChaincodeSpec();
         $ccType->setType(self::DEFAULT_CHAINCODE_SPEC_TYPE);
-        $txID = $TransactionID->getTxId($nonce, $this->org);
-        $TimeStamp = $clientUtils->buildCurrentTimestamp();
-        $chainHeader = $clientUtils->createChannelHeader(
+        $txID = $this->transactionId->getTxId($nonce, $org);
+        $TimeStamp = $this->clientUtils->buildCurrentTimestamp();
+        $chainHeader = $this->clientUtils->createChannelHeader(
             self::DEFAULT_CHANNEL_HEADER_TYPE,
             $txID,
             $queryParams,
-            ClientConfig::loadDefaults("epoch"),
+            $this->config->getDefault('epoch'),
             $TimeStamp
         );
         $chainHeaderString = $chainHeader->serializeToString();
-        $chaincodeInvocationSpec = $utils->createChaincodeInvocationSpec($queryParams["ARGS"]);
+        $chaincodeInvocationSpec = $this->utils->createChaincodeInvocationSpec($queryParams["ARGS"]);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
 
         $payload = new ChaincodeProposalPayload();
         $payload->setInput($chaincodeInvocationSpecString);
         $payloadString = $payload->serializeToString();
-        $identity = (new Identity())->createSerializedIdentity($this->config["admin_certs"], $this->config["mspid"]);
+        $config = $this->config->getIn([$network, $org], null);
+        $identity = $this->identity->createSerializedIdentity($config['admin_certs'], $config['mspid']);
 
         $identityString = $identity->serializeToString();
 
-        $headerString = $clientUtils->buildHeader($identityString, $chainHeaderString, $nonce);
+        $headerString = $this->clientUtils->buildHeader($identityString, $chainHeaderString, $nonce);
         $proposal = new Proposal();
         $proposal->setHeader($headerString);
         $proposal->setPayload($payloadString);
@@ -80,24 +113,13 @@ class Channel
     /**
      * @param Proposal $request
      * @param EndorserClient $connect
-     * Builds client context.
-     * @return ProposalResponse
-     */
-    private function sendTransactionProposal(Proposal $request, EndorserClient $connect): ProposalResponse
-    {
-        return $this->sendTransaction($request, $connect);
-    }
-
-    /**
-     * @param Proposal $request
-     * @param EndorserClient $connect
+     * @param string $org
      * This method requests signed proposal and send transactional request to endorser.
      * @return ProposalResponse
      */
-    private function sendTransaction(Proposal $request, EndorserClient $connect): ProposalResponse
+    private function sendTransaction(Proposal $request, EndorserClient $connect, string $org): ProposalResponse
     {
-        $clientUtil = new ClientUtils();
-        $request = $clientUtil->getSignedProposal($request, $this->org);
+        $request = $this->clientUtils->getSignedProposal($request, $org);
 
         /** @var UnaryCall $simpleSurfaceActiveCall */
         $simpleSurfaceActiveCall = $connect->ProcessProposal($request);

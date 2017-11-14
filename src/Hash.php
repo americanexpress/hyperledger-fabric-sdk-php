@@ -16,25 +16,35 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 
 class Hash
 {
+    private $utils;
     /**
-     * @param string $string
-     * @return array
+     * @var ClientConfigInterface
      */
-    public function generateByteArray(string $string): array
+    private $config;
+
+    /**
+     * Utils constructor.
+     * @param ClientConfigInterface $config
+     */
+    public function __construct(ClientConfigInterface $config = null)
     {
-        return unpack('c*', $string);
+        $config = $config ?: ClientConfig::getInstance();
+
+        $this->config = $config;
+        $this->utils = new Utils($config);
     }
 
     /**
      * @param Proposal $proposal
      * @param string $org
+     * @param string $network
      * @return string
      */
-    public function signByteString(Proposal $proposal, string $org): string
+    public function signByteString(Proposal $proposal, string $org, string $network = 'test-network'): string
     {
-        $config = ClientConfig::getOrgConfig($org);
+        $config = $this->config->getIn([$network, $org], null);
         $proposalString = $proposal->serializeToString();
-        $proposalArray = (new Utils())->toByteArray($proposalString);
+        $proposalArray = $this->utils->toByteArray($proposalString);
         $privateKey = $this->readPrivateKey($config["private_key"]);
         $signData = $this->signData($privateKey, $proposalArray);
 
@@ -70,11 +80,11 @@ class Hash
     {
         $adapter = EccFactory::getAdapter();
         $generator = EccFactory::getNistCurves()->generator256();
-        $algorithm = 'sha256';
+        $algorithm = $this->config->getDefault('crypto-hash-algo');
 
         $key = $privateKeyData;
 
-        $dataString = (new Utils())->proposalArrayToBinaryString($dataArray);
+        $dataString = $this->utils->proposalArrayToBinaryString($dataArray);
 
         $signer = new Signer($adapter);
         $hash = $signer->hashData($generator, $algorithm, $dataString);
