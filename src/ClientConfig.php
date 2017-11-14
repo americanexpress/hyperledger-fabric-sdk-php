@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
+use function igorw\get_in;
+
 class ClientConfig implements ClientConfigInterface
 {
     // TODO These values should be overridable by consumers. Check config first before returning defaults.
@@ -80,18 +82,7 @@ class ClientConfig implements ClientConfigInterface
      */
     public function getIn(array $keys = [], $default = null)
     {
-        $config = $this->config;
-
-        while ($keys) {
-            $key = array_shift($keys);
-            if (!array_key_exists($key, $config)) {
-                return $default;
-            }
-
-            $config = $config[$key];
-        }
-
-        return $config;
+        return get_in($this->config, $keys, $default);
     }
 
     /**
