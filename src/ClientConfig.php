@@ -34,14 +34,14 @@ class ClientConfig implements ClientConfigInterface
     }
 
     /**
-     * @param string|null $jsonFilePath
+     * @param array $config
      * @return ClientConfig
      * Temporary function, to be used until static functions are removed from this class.
      */
-    public static function getInstance(string $jsonFilePath = null): ClientConfig
+    public static function getInstance(array $config = []): ClientConfig
     {
         if (!self::$instance) {
-            self::$instance = self::createFromJsonFile($jsonFilePath);
+            self::$instance = new ClientConfig($config);
         }
 
         return self::$instance;
@@ -109,5 +109,17 @@ class ClientConfig implements ClientConfigInterface
 
         // TODO Handle decoding errors.
         return new ClientConfig(json_decode($config, true) ?: []);
+    }
+
+    /**
+     * TODO: Replace usages of this function with calls to `getIn` on an injected config instance.
+     * Method to set org configuration.
+     * @param string $org
+     * @param string $network
+     * @return mixed|null
+     */
+    public static function getOrgConfig(string $org, string $network = 'test-network')
+    {
+        return self::getInstance()->getIn([$network, $org], null);
     }
 }

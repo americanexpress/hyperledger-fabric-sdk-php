@@ -62,7 +62,7 @@ class Hash
         $adapter = EccFactory::getAdapter();
 
         ## You'll be restoring from a key, as opposed to generating one.
-        $keyData = file_get_contents(rtrim(ROOTPATH, '/') . '/' . ltrim($privateKeyPath, '/'));
+        $keyData = \file_get_contents($privateKeyPath);
         openssl_pkey_export($keyData, $privateKey);
         $pemSerializer = new PemPrivateKeySerializer(new DerPrivateKeySerializer($adapter));
         $key = $pemSerializer->parse($privateKey);

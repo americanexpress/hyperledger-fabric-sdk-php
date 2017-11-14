@@ -52,45 +52,4 @@ class ClientConfigTest extends TestCase
         self::assertSame(24, $this->sut->getDefault('nonce-size'));
         self::assertSame(null, $this->sut->getDefault('FooBar'));
     }
-
-    public function testCreateFromValidJsonFile()
-    {
-        $file = vfsStream::newFile('json');
-        $file->setContent(json_encode([
-            'foo' => [
-                'bar' => 'FizBuz',
-            ],
-        ]));
-        $this->files->addChild($file);
-
-        $config = ClientConfig::createFromJsonFile($file->url());
-
-        self::assertSame('FizBuz', $config->getIn(['foo', 'bar']));
-    }
-
-    public function testCreateFromValidJsonFileAtRootPath()
-    {
-        $file = vfsStream::newFile('json');
-        $file->setContent(json_encode([
-            'foo' => [
-                'bar' => 'FizBuz',
-            ],
-        ]));
-        $this->files->addChild($file);
-
-        $config = ClientConfig::createFromJsonFile('json', $this->files->url());
-
-        self::assertSame('FizBuz', $config->getIn(['foo', 'bar']));
-    }
-
-    public function testCreateFromInvalidJsonFile()
-    {
-        $file = vfsStream::newFile('json');
-        $file->setContent('InvalidJsonString');
-        $this->files->addChild($file);
-
-        $config = ClientConfig::createFromJsonFile($file->url());
-
-        self::assertSame(null, $config->getIn(['foo', 'bar']));
-    }
 }

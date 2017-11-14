@@ -36,7 +36,7 @@ class IdentityTest extends TestCase
         $certs->setContent('FizBuz');
         $this->files->addChild($certs);
 
-        $identity = $this->sut->createSerializedIdentity('/foo', 'bar');
+        $identity = $this->sut->createSerializedIdentity($certs->url(), 'bar');
 
         self::assertInstanceOf(SerializedIdentity::class, $identity);
         self::assertSame('FizBuz', $identity->getIdBytes());
