@@ -38,18 +38,32 @@ class ClientConfigTest extends TestCase
     {
         self::assertSame('FizBuz', $this->sut->getIn(['foo', 'bar']));
         self::assertSame(['bar' => 'FizBuz'], $this->sut->getIn(['foo']));
-        self::assertSame(['foo' => ['bar' => 'FizBuz']], $this->sut->getIn([]));
-        self::assertSame(['foo' => ['bar' => 'FizBuz']], $this->sut->getIn());
         self::assertSame(null, $this->sut->getIn(['Alice', 'Bob']));
         self::assertSame('FizBuz', $this->sut->getIn(['Alice', 'Bob'], 'FizBuz'));
     }
 
-    public function testGetDefault()
+    public function testGetDefaults()
     {
-        self::assertSame(5000, $this->sut->getDefault('timeout'));
-        self::assertSame(0, $this->sut->getDefault('epoch'));
-        self::assertSame('sha256', $this->sut->getDefault('crypto-hash-algo'));
-        self::assertSame(24, $this->sut->getDefault('nonce-size'));
-        self::assertSame(null, $this->sut->getDefault('FooBar'));
+        $sut = new ClientConfig([]);
+
+        self::assertSame(5000, $sut->getIn(['timeout']));
+        self::assertSame(0, $sut->getIn(['epoch']));
+        self::assertSame('sha256', $sut->getIn(['crypto-hash-algo']));
+        self::assertSame(24, $sut->getIn(['nonce-size']));
+    }
+
+    public function testOverrideDefaults()
+    {
+        $sut = new ClientConfig([
+            'timeout' => 10,
+            'epoch' => -100,
+            'crypto-hash-algo' => 'md5',
+            'nonce-size'  => 3,
+        ]);
+
+        self::assertSame(10, $sut->getIn(['timeout']));
+        self::assertSame(-100, $sut->getIn(['epoch']));
+        self::assertSame('md5', $sut->getIn(['crypto-hash-algo']));
+        self::assertSame(3, $sut->getIn(['nonce-size']));
     }
 }

@@ -7,14 +7,6 @@ use function igorw\get_in;
 
 class ClientConfig implements ClientConfigInterface
 {
-    // TODO These values should be overridable by consumers. Check config first before returning defaults.
-    private const DEFAULT_CONFIG = [
-        'timeout' => 5000,
-        'epoch' => 0,
-        'crypto-hash-algo' => 'sha256',
-        'nonce-size'  => 24
-    ];
-
     /**
      * @var array
      */
@@ -32,7 +24,15 @@ class ClientConfig implements ClientConfigInterface
      */
     public function __construct(array $config)
     {
-        $this->config = $config;
+        $this->config = array_merge(
+            [
+                'timeout' => 5000,
+                'epoch' => 0,
+                'crypto-hash-algo' => 'sha256',
+                'nonce-size'  => 24,
+            ],
+            $config
+        );
     }
 
     /**
@@ -47,32 +47,6 @@ class ClientConfig implements ClientConfigInterface
         }
 
         return self::$instance;
-    }
-
-    /**
-     * TODO: Replace usages of this function with calls to `getDefault` on an injected config instance.
-     * @param string $key
-     * Method to get default SDK configuration.
-     * @return mixed|null
-     */
-    public static function loadDefaults(string $key)
-    {
-        return self::getInstance()->getDefault($key);
-    }
-
-    /**
-     * TODO: Merge default config before instantiating, and replace calls to getDefault with getIn.
-     * @param string $key
-     * Method to get default SDK configuration.
-     * @return mixed|null
-     */
-    public function getDefault(string $key)
-    {
-        if (array_key_exists($key, self::DEFAULT_CONFIG)) {
-            return self::DEFAULT_CONFIG[$key];
-        }
-
-        return null;
     }
 
     /**

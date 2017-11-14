@@ -87,7 +87,7 @@ class Channel
             self::DEFAULT_CHANNEL_HEADER_TYPE,
             $txID,
             $queryParams,
-            $this->config->getDefault('epoch'),
+            ClientConfig::getInstance()->getIn(['epoch']),
             $TimeStamp
         );
         $chainHeaderString = $chainHeader->serializeToString();
