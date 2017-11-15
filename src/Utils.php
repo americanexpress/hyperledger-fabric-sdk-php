@@ -17,13 +17,16 @@ class Utils
     private $config;
 
     /**
+     * @var EndorserClient[]
+     */
+    private $endorserClients = [];
+
+    /**
      * Utils constructor.
      * @param ClientConfigInterface $config
      */
-    public function __construct(ClientConfigInterface $config = null)
+    public function __construct(ClientConfigInterface $config)
     {
-        $config = $config ?: ClientConfig::getInstance();
-
         $this->config = $config;
     }
 
@@ -58,11 +61,14 @@ class Utils
     public function fabricConnect(string $org, string $network = 'test-network', string $peer = 'peer1'): EndorserClient
     {
         $host = $this->config->getIn([$network, $org, $peer, 'requests'], null);
-        $connect = new EndorserClient($host, [
-            'credentials' => ChannelCredentials::createInsecure(),
-        ]);
 
-        return $connect;
+        if (!\array_key_exists($host, $this->endorserClients)) {
+            $this->endorserClients[$host] = new EndorserClient($host, [
+                'credentials' => ChannelCredentials::createInsecure(),
+            ]);
+        }
+
+        return $this->endorserClients[$host];
     }
 
     /**

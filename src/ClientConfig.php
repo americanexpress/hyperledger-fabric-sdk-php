@@ -13,12 +13,6 @@ class ClientConfig implements ClientConfigInterface
     private $config;
 
     /**
-     * @var ClientConfig
-     * @deprecated Replace all static function calls ASAP, and drop this static reference.
-     */
-    private static $instance;
-
-    /**
      * ClientConfig constructor.
      * @param array $config
      */
@@ -33,20 +27,6 @@ class ClientConfig implements ClientConfigInterface
             ],
             $config
         );
-    }
-
-    /**
-     * @param array $config
-     * @return ClientConfig
-     * Temporary function, to be used until static functions are removed from this class.
-     */
-    public static function getInstance(array $config = []): ClientConfig
-    {
-        if (!self::$instance) {
-            self::$instance = new ClientConfig($config);
-        }
-
-        return self::$instance;
     }
 
     /**

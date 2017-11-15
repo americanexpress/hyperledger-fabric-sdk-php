@@ -45,10 +45,8 @@ class Channel
      * Channel constructor.
      * @param ClientConfigInterface $config
      */
-    public function __construct(ClientConfigInterface $config = null)
+    public function __construct(ClientConfigInterface $config)
     {
-        $config = $config ?: ClientConfig::getInstance();
-
         $this->config = $config;
         $this->utils = new Utils($config);
         $this->identity = new Identity();
@@ -58,12 +56,13 @@ class Channel
 
     /**
      * @param string $org
-     * @param EndorserClient $connect
      * @param mixed[] $queryParams
      * @returns ProposalResponse
      */
-    public function queryByChainCode(string $org, EndorserClient $connect, array $queryParams): ProposalResponse
+    public function queryByChainCode(string $org, array $queryParams): ProposalResponse
     {
+        $connect = $this->utils->fabricConnect($org);
+
         $fabricProposal = $this->createFabricProposal($org, $queryParams);
 
         return $this->sendTransaction($fabricProposal, $connect, $org);

@@ -28,10 +28,8 @@ class ClientUtils
      * Utils constructor.
      * @param ClientConfigInterface $config
      */
-    public function __construct(ClientConfigInterface $config = null)
+    public function __construct(ClientConfigInterface $config)
     {
-        $config = $config ?: ClientConfig::getInstance();
-
         $this->config = $config;
         $this->hash = new Hash($config);
     }
