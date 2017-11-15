@@ -25,12 +25,14 @@ class TransactionID
     /**
      * Utils constructor.
      * @param ClientConfigInterface $config
+     * @param Identity $identity
+     * @param Utils $utils
      */
-    public function __construct(ClientConfigInterface $config)
+    public function __construct(ClientConfigInterface $config, Identity $identity, Utils $utils)
     {
         $this->config = $config;
-        $this->identity = new Identity();
-        $this->utils = new Utils($config);
+        $this->identity = $identity;
+        $this->utils = $utils;
     }
 
     /**

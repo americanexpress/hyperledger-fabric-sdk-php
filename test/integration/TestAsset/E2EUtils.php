@@ -16,7 +16,7 @@ class E2EUtils
     {
         $queryParams = $this->getQueryParam();
         $config = new ClientConfig(require __DIR__ . '/../config.php');
-        $channel = new Channel($config);
+        $channel = Channel::fromConfig($config);
         $fabricProposal = $channel->queryByChainCode($org, $queryParams);
         return $fabricProposal->getPayload();
     }

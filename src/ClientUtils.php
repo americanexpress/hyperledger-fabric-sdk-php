@@ -27,11 +27,12 @@ class ClientUtils
     /**
      * Utils constructor.
      * @param ClientConfigInterface $config
+     * @param Hash $hash
      */
-    public function __construct(ClientConfigInterface $config)
+    public function __construct(ClientConfigInterface $config, Hash $hash)
     {
         $this->config = $config;
-        $this->hash = new Hash($config);
+        $this->hash = $hash;
     }
 
     /**

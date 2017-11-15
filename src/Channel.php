@@ -44,14 +44,38 @@ class Channel
     /**
      * Channel constructor.
      * @param ClientConfigInterface $config
+     * @param Utils $utils
+     * @param Identity $identity
+     * @param ClientUtils $clientUtils
+     * @param TransactionID $transactionId
      */
-    public function __construct(ClientConfigInterface $config)
-    {
+    public function __construct(
+        ClientConfigInterface $config,
+        Utils $utils,
+        Identity $identity,
+        ClientUtils $clientUtils,
+        TransactionID $transactionId
+    ) {
         $this->config = $config;
-        $this->utils = new Utils($config);
-        $this->identity = new Identity();
-        $this->clientUtils = new ClientUtils($config);
-        $this->transactionId = new TransactionID($config);
+        $this->utils = $utils;
+        $this->identity = $identity;
+        $this->clientUtils = $clientUtils;
+        $this->transactionId = $transactionId;
+    }
+
+    /**
+     * @param ClientConfigInterface $config
+     * @return Channel
+     */
+    public static function fromConfig(ClientConfigInterface $config): self
+    {
+        $utils = new Utils($config);
+        $hash = new Hash($config, $utils);
+        $clientUtils = new ClientUtils($config, $hash);
+        $identity = new Identity();
+        $transactionId = new TransactionID($config, $identity, $utils);
+
+        return new self($config, $utils, $identity, $clientUtils, $transactionId);
     }
 
     /**
