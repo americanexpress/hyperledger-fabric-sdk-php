@@ -1,28 +1,27 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient;
+namespace AmericanExpressTest\HyperledgerFabricClient\Security;
 
-use AmericanExpress\HyperledgerFabricClient\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory;
-use AmericanExpress\HyperledgerFabricClient\Hash;
+use AmericanExpress\HyperledgerFabricClient\Cryptography\MdanterEcc;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Hash
+ * @covers \AmericanExpress\HyperledgerFabricClient\Cryptography\MdanterEcc
  */
-class HashTest extends TestCase
+class MdanterEccTest extends TestCase
 {
     /**
-     * @var Hash
+     * @var MdanterEcc
      */
     private $sut;
 
     protected function setUp()
     {
-        $this->sut = new Hash(new ClientConfig([]));
+        $this->sut = new MdanterEcc();
     }
 
     public function testDefaultNonceLength()
@@ -34,7 +33,7 @@ class HashTest extends TestCase
 
     public function testConfigurableNonceLength()
     {
-        $nonce = (new Hash(new ClientConfig(['nonce-size' => 3])))->getNonce();
+        $nonce = (new MdanterEcc(3))->getNonce();
 
         self::assertSame(3, strlen($nonce));
     }
@@ -54,15 +53,7 @@ TAG
 );
         $files->addChild($certs);
 
-        $sut = new Hash(new ClientConfig([
-            'MyNetwork' => [
-                'MyOrg' => [
-                    'private_key' => $certs->url(),
-                ],
-            ],
-        ]));
-
-        $result = $sut->signByteString(new Proposal(), 'MyOrg', 'MyNetwork');
+        $result = $this->sut->signByteString(new Proposal(), new \SplFileObject($certs->url()));
 
         self::assertInternalType('string', $result);
         self::assertNotEmpty($result);
@@ -82,5 +73,21 @@ TAG
 
         self::assertInternalType('string', $result);
         self::assertNotEmpty($result);
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
+     */
+    public function testInvalidNonceSize()
+    {
+        new MdanterEcc(-1, 'md5');
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
+     */
+    public function testInvalidHashAlgorithm()
+    {
+        new MdanterEcc(24, 'invalidAlgorithm');
     }
 }

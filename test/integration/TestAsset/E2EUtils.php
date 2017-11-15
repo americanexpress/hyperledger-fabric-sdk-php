@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\TestAsset;
 
-use AmericanExpress\HyperledgerFabricClient\ClientConfig;
-use AmericanExpress\HyperledgerFabricClient\Channel;
+use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
 
 class E2EUtils
 {
@@ -15,8 +14,7 @@ class E2EUtils
     public function queryChaincode(string $org)
     {
         $queryParams = $this->getQueryParam();
-        $config = new ClientConfig(require __DIR__ . '/../config.php');
-        $channel = Channel::fromConfig($config);
+        $channel = ChannelFactory::fromConfigFile(new \SplFileObject(__DIR__ . '/../config.php'));
         $fabricProposal = $channel->queryByChainCode($queryParams, $org);
         return $fabricProposal->getPayload();
     }

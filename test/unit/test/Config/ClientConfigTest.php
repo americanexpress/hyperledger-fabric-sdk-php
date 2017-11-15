@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient;
+namespace AmericanExpressTest\HyperledgerFabricClient\Config;
 
-use AmericanExpress\HyperledgerFabricClient\ClientConfig;
+use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\ClientConfig
+ * @covers \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig
  */
 class ClientConfigTest extends TestCase
 {

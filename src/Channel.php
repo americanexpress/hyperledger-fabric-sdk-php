@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
+use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
+use AmericanExpress\HyperledgerFabricClient\Cryptography\CryptographyInterface;
 use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeInvocationSpecFactory;
 use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Factory\ChannelHeaderFactory;
@@ -24,9 +26,9 @@ class Channel
     private $config;
 
     /**
-     * @var Hash
+     * @var CryptographyInterface
      */
-    private $hash;
+    private $cryptography;
 
     /**
      * @var EndorserClientManagerInterface
@@ -37,28 +39,16 @@ class Channel
      * Channel constructor.
      * @param ClientConfigInterface $config
      * @param EndorserClientManagerInterface $endorserClients
-     * @param Hash $hash
+     * @param CryptographyInterface $cryptography
      */
     public function __construct(
         ClientConfigInterface $config,
         EndorserClientManagerInterface $endorserClients,
-        Hash $hash
+        CryptographyInterface $cryptography
     ) {
         $this->config = $config;
         $this->endorserClients = $endorserClients;
-        $this->hash = $hash;
-    }
-
-    /**
-     * @param ClientConfigInterface $config
-     * @return Channel
-     */
-    public static function fromConfig(ClientConfigInterface $config): self
-    {
-        $endorserClients = new EndorserClientManager();
-        $hash = new Hash($config);
-
-        return new self($config, $endorserClients, $hash);
+        $this->cryptography = $cryptography;
     }
 
     /**
@@ -78,19 +68,19 @@ class Channel
 
         $endorserClient = $this->endorserClients->get($host);
 
-        $proposal = $this->createFabricProposal($org, $queryParams);
+        $proposal = $this->createFabricProposal($queryParams, $org, $network);
 
-        return $this->sendTransaction($proposal, $endorserClient, $org);
+        return $this->sendTransaction($proposal, $endorserClient, $org, $network);
     }
 
     /**
-     * @param string $org
      * @param mixed[] $queryParams
+     * @param string $org
      * @param string $network
      * returns proposal using channelheader commonheader and chaincode invoke specification.
      * @return Proposal
      */
-    private function createFabricProposal(string $org, array $queryParams, string $network = 'test-network'): Proposal
+    private function createFabricProposal(array $queryParams, string $org, string $network = 'test-network'): Proposal
     {
         $config = $this->config->getIn([$network, $org], null);
 
@@ -99,9 +89,9 @@ class Channel
             new \SplFileObject(get_in($config, ['admin_certs']))
         );
 
-        $nonce = $this->hash->getNonce();
+        $nonce = $this->cryptography->getNonce();
 
-        $transactionId = $this->hash->createTxId($identity, $nonce);
+        $transactionId = $this->cryptography->createTxId($identity, $nonce);
 
         $chainHeader = ChannelHeaderFactory::create(
             $transactionId,
@@ -127,12 +117,20 @@ class Channel
      * @param Proposal $proposal
      * @param EndorserClient $endorserClient
      * @param string $org
-     * This method requests signed proposal and send transactional request to endorser.
+     * @param string $network
      * @return ProposalResponse
      */
-    private function sendTransaction(Proposal $proposal, EndorserClient $endorserClient, string $org): ProposalResponse
-    {
-        $signature = $this->hash->signByteString($proposal, $org);
+    private function sendTransaction(
+        Proposal $proposal,
+        EndorserClient $endorserClient,
+        string $org,
+        string $network = 'test-network'
+    ): ProposalResponse {
+        $config = $this->config->getIn([$network, $org], null);
+
+        $privateKey = new \SplFileObject(get_in($config, ['private_key']));
+
+        $signature = $this->cryptography->signByteString($proposal, $privateKey);
 
         $signedProposal = SignedProposalFactory::fromProposal($proposal, $signature);
 
