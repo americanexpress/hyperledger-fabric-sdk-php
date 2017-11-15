@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\EndorserClientFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\EndorserClientFactory;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 
 class EndorserClientManager implements EndorserClientManagerInterface

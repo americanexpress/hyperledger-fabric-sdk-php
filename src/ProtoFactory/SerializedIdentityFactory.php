@@ -1,6 +1,6 @@
 <?php
 
-namespace AmericanExpress\HyperledgerFabricClient\Factory;
+namespace AmericanExpress\HyperledgerFabricClient\ProtoFactory;
 
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 

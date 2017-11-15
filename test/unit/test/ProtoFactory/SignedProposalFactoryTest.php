@@ -1,20 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\Factory;
+namespace AmericanExpressTest\HyperledgerFabricClient\ProtoFactory;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeInvocationSpecFactory;
-use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeProposalPayloadFactory;
-use AmericanExpress\HyperledgerFabricClient\Factory\ChannelHeaderFactory;
-use AmericanExpress\HyperledgerFabricClient\Factory\HeaderFactory;
-use AmericanExpress\HyperledgerFabricClient\Factory\ProposalFactory;
-use AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory;
-use AmericanExpress\HyperledgerFabricClient\Factory\SignedProposalFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeInvocationSpecFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignedProposalFactory;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Factory\SignedProposalFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignedProposalFactory
  */
 class SignedProposalFactoryTest extends TestCase
 {

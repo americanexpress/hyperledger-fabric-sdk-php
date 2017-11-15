@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Factory;
+namespace AmericanExpress\HyperledgerFabricClient\ProtoFactory;
 
 use Hyperledger\Fabric\Protos\Common\Header;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;

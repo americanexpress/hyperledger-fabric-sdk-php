@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\Factory;
+namespace AmericanExpressTest\HyperledgerFabricClient\ProtoFactory;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\ChannelHeaderFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use Google\Protobuf\Timestamp;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Factory\ChannelHeaderFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory
  */
 class ChannelHeaderFactoryTest extends TestCase
 {

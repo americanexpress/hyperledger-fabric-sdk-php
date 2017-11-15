@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\Factory;
+namespace AmericanExpressTest\HyperledgerFabricClient\ProtoFactory;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory;
-use AmericanExpress\HyperledgerFabricClient\Factory\SignatureHeaderFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use Hyperledger\Fabric\Protos\Common\SignatureHeader;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Factory\SignatureHeaderFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory
  */
 class SignatureHeaderFactoryTest extends TestCase
 {

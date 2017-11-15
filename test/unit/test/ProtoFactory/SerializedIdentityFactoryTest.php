@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\MSP;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory
  */
 class SerializedIdentityFactoryTest extends TestCase
 {

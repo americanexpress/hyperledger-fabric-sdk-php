@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\Factory;
+namespace AmericanExpressTest\HyperledgerFabricClient\ProtoFactory;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeInvocationSpecFactory;
-use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeProposalPayloadFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeInvocationSpecFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeProposalPayloadFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory
  */
 class ChaincodeProposalPayloadFactoryTest extends TestCase
 {

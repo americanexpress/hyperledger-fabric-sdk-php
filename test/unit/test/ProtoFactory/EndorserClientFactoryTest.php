@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\Factory;
+namespace AmericanExpressTest\HyperledgerFabricClient\ProtoFactory;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\EndorserClientFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\EndorserClientFactory;
 use Grpc\ChannelCredentials;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Factory\EndorserClientFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\ProtoFactory\EndorserClientFactory
  */
 class EndorserClientFactoryTest extends TestCase
 {

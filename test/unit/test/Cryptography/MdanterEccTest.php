@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Security;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\Cryptography\MdanterEcc;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use org\bovigo\vfs\vfsStream;

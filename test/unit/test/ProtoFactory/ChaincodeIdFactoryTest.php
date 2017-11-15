@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\Factory;
+namespace AmericanExpressTest\HyperledgerFabricClient\ProtoFactory;
 
-use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeIdFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeIdFactory;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use PHPUnit\Framework\TestCase;
 
