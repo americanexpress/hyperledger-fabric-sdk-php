@@ -1,0 +1,63 @@
+<?php
+declare(strict_types=1);
+
+namespace AmericanExpressTest\HyperledgerFabricClient;
+
+use AmericanExpress\HyperledgerFabricClient\TimestampFactory;
+use Google\Protobuf\Timestamp;
+use PHPUnit\Framework\TestCase;
+
+class TimestampFactoryTest extends TestCase
+{
+    public function testBuildCurrentTimestamp()
+    {
+        $timestamp = TimestampFactory::fromDateTime();
+
+        self::assertInstanceOf(Timestamp::class, $timestamp);
+        self::assertNotNull($timestamp->getSeconds());
+        self::assertNotNull($timestamp->getNanos());
+    }
+
+    /**
+     * @param \DateTime $dateTime
+     * @param int $seconds
+     * @param int $nanos
+     * @dataProvider dataBuildTimestamp
+     */
+    public function testBuildTimestamp(\DateTime $dateTime, int $seconds, int $nanos)
+    {
+        $timestamp = TimestampFactory::fromDateTime($dateTime);
+
+        self::assertInstanceOf(Timestamp::class, $timestamp);
+        self::assertSame($seconds, $timestamp->getSeconds());
+        self::assertSame($nanos, $timestamp->getNanos());
+    }
+
+    public function dataBuildTimestamp(): array
+    {
+        return [
+            // Now-ish.
+            [new \DateTime('2017-11-14T11:23:45', timezone_open('UTC')), 1510658625, 0],
+            [new \DateTime('2017-11-14T11:23:45.6789', timezone_open('UTC')), 1510658625, 678900000],
+
+            // Epoch
+            [new \DateTime('1970-01-01T00:00:00', timezone_open('UTC')), 0, 0],
+            [new \DateTime('1970-01-01T00:00:00.1234', timezone_open('UTC')), 0, 123400000],
+
+            // Epoch -1
+
+            [new \DateTime('1969-12-31T23:59:59', timezone_open('UTC')), -1, 0],
+            [new \DateTime('1969-12-31T23:59:59.1234', timezone_open('UTC')), -1, 123400000],
+
+            // Epoch +1
+            [new \DateTime('1970-01-01T00:00:01', timezone_open('UTC')), 1, 0],
+            [new \DateTime('1970-01-01T00:00:01.1234', timezone_open('UTC')), 1, 123400000],
+
+            // Proto's lower limit
+            [new \DateTime('0001-01-01T00:00:00', timezone_open('UTC')), -62135596800, 0],
+
+            // Proto's upper limit
+            [new \DateTime('9999-12-31T23:59:59', timezone_open('UTC')), 253402300799, 0],
+        ];
+    }
+}

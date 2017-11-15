@@ -43,16 +43,7 @@ class ClientUtils
      */
     public function buildCurrentTimestamp(): Timestamp
     {
-        $timestamp = new Timestamp();
-        $microtime = microtime(true);
-        $time = explode(".", (string) $microtime);
-        $seconds = $time[0];
-        $nanos = (($microtime * 1000) % 1000) * 1000000;
-
-        $timestamp->setSeconds($seconds);
-        $timestamp->setNanos($nanos);
-
-        return $timestamp;
+        return TimestampFactory::fromDateTime();
     }
 
     /**
