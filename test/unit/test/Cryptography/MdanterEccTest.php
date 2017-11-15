@@ -50,7 +50,7 @@ iXjyf0KgE6OKZjQ+5INjwelRAC6hRANCAASb3u+hY+U/FZvhYDN6d08HJ1v56UJU
 yz/n2NHyJgTg6kC05AaJMeGIinEF0JeJtRDNVQGzoQJQYjnzUTS9FvGh
 -----END PRIVATE KEY-----
 TAG
-);
+        );
         $files->addChild($certs);
 
         $result = $this->sut->signByteString(new Proposal(), new \SplFileObject($certs->url()));

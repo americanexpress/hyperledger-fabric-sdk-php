@@ -19,7 +19,7 @@ class ChannelFactory
 
         $hash = MdanterEccFactory::fromConfig($config);
 
-        return new Channel($config, $endorserClients, $hash);
+        return new Channel($endorserClients, $hash);
     }
 
     /**

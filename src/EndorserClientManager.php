@@ -17,7 +17,8 @@ class EndorserClientManager implements EndorserClientManagerInterface
      * @param string $host
      * @return EndorserClient
      */
-    public function get(string $host): EndorserClient {
+    public function get(string $host): EndorserClient
+    {
         if (!\array_key_exists($host, $this->instances)) {
             $this->instances[$host] = EndorserClientFactory::fromInsecureChannelCredentials($host);
         }

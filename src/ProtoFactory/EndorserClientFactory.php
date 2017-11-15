@@ -24,8 +24,10 @@ class EndorserClientFactory
      * @param ChannelCredentials $channelCredentials
      * @return EndorserClient
      */
-    public static function fromChannelCredentials(string $host, ChannelCredentials $channelCredentials = null): EndorserClient
-    {
+    public static function fromChannelCredentials(
+        string $host,
+        ChannelCredentials $channelCredentials = null
+    ): EndorserClient {
         return new EndorserClient($host, [
             'credentials' => $channelCredentials,
         ]);

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\Cryptography\CryptographyInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeInvocationSpecFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
@@ -21,11 +20,6 @@ use function igorw\get_in;
 class Channel
 {
     /**
-     * @var ClientConfigInterface
-     */
-    private $config;
-
-    /**
      * @var CryptographyInterface
      */
     private $cryptography;
@@ -37,57 +31,44 @@ class Channel
 
     /**
      * Channel constructor.
-     * @param ClientConfigInterface $config
      * @param EndorserClientManagerInterface $endorserClients
      * @param CryptographyInterface $cryptography
      */
     public function __construct(
-        ClientConfigInterface $config,
         EndorserClientManagerInterface $endorserClients,
         CryptographyInterface $cryptography
     ) {
-        $this->config = $config;
         $this->endorserClients = $endorserClients;
         $this->cryptography = $cryptography;
     }
 
     /**
-     * @param mixed[] $queryParams
-     * @param string $org
-     * @param string $network
-     * @param string $peer
+     * @param ChannelContext $context
+     * @param ChaincodeQueryParams $params
      * @return ProposalResponse
      */
     public function queryByChainCode(
-        array $queryParams,
-        string $org,
-        string $network = 'test-network',
-        string $peer = 'peer1'
+        ChannelContext $context,
+        ChaincodeQueryParams $params
     ): ProposalResponse {
-        $host = $this->config->getIn([$network, $org, $peer, 'requests'], null);
+        $host = $context->getHost();
 
         $endorserClient = $this->endorserClients->get($host);
 
-        $proposal = $this->createFabricProposal($queryParams, $org, $network);
+        $proposal = $this->createFabricProposal($context, $params);
 
-        return $this->sendTransaction($proposal, $endorserClient, $org, $network);
+        return $this->sendTransaction($context, $proposal, $endorserClient);
     }
 
     /**
-     * @param mixed[] $queryParams
-     * @param string $org
-     * @param string $network
+     * @param ChannelContext $context
+     * @param ChaincodeQueryParams $params
      * returns proposal using channelheader commonheader and chaincode invoke specification.
      * @return Proposal
      */
-    private function createFabricProposal(array $queryParams, string $org, string $network = 'test-network'): Proposal
+    private function createFabricProposal(ChannelContext $context, ChaincodeQueryParams $params): Proposal
     {
-        $config = $this->config->getIn([$network, $org], null);
-
-        $identity = SerializedIdentityFactory::fromFile(
-            (string) get_in($config, ['mspid']),
-            new \SplFileObject(get_in($config, ['admin_certs']))
-        );
+        $identity = SerializedIdentityFactory::fromFile($context->getMspId(), $context->getAdminCerts());
 
         $nonce = $this->cryptography->getNonce();
 
@@ -95,14 +76,14 @@ class Channel
 
         $chainHeader = ChannelHeaderFactory::create(
             $transactionId,
-            (string) get_in($queryParams, ['CHANNEL_ID']),
-            (string) get_in($queryParams, ['CHAINCODE_PATH']),
-            (string) get_in($queryParams, ['CHAINCODE_NAME']),
-            (string) get_in($queryParams, ['CHAINCODE_VERSION']),
-            $this->config->getIn(['epoch'])
+            $params->getChannelId(),
+            $params->getChaincodePath(),
+            $params->getChaincodeName(),
+            $params->getChaincodeVersion(),
+            $context->getEpoch()
         );
 
-        $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs(get_in($queryParams, ['ARGS']));
+        $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs($params->getArgs());
 
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpec(
             $chaincodeInvocationSpec
@@ -114,21 +95,17 @@ class Channel
     }
 
     /**
+     * @param ChannelContext $context
      * @param Proposal $proposal
      * @param EndorserClient $endorserClient
-     * @param string $org
-     * @param string $network
      * @return ProposalResponse
      */
     private function sendTransaction(
+        ChannelContext $context,
         Proposal $proposal,
-        EndorserClient $endorserClient,
-        string $org,
-        string $network = 'test-network'
+        EndorserClient $endorserClient
     ): ProposalResponse {
-        $config = $this->config->getIn([$network, $org], null);
-
-        $privateKey = new \SplFileObject(get_in($config, ['private_key']));
+        $privateKey = $context->getPrivateKey();
 
         $signature = $this->cryptography->signByteString($proposal, $privateKey);
 
