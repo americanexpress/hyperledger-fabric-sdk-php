@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\FabricClient\Utils;
+namespace AmericanExpressTest\FabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\Utils;
