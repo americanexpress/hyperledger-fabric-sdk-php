@@ -15,7 +15,6 @@ class UtilsTest extends TestCase
     /**
      * @var Utils
      */
-
     private $sut;
 
     protected function setUp()

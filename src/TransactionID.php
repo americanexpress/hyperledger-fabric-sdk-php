@@ -7,7 +7,11 @@ use AmericanExpress\HyperledgerFabricClient\MSP\Identity;
 
 class TransactionID
 {
+    /**
+     * @var Utils
+     */
     private $utils;
+
     /**
      * @var ClientConfigInterface
      */
