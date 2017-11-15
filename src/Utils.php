@@ -3,20 +3,12 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use Grpc\ChannelCredentials;
-use Hyperledger\Fabric\Protos\Peer\EndorserClient;
-
 class Utils
 {
     /**
      * @var ClientConfigInterface
      */
     private $config;
-
-    /**
-     * @var EndorserClient[]
-     */
-    private $endorserClients = [];
 
     /**
      * Utils constructor.
@@ -44,26 +36,6 @@ class Utils
     public function toByteArray(string $proposalString): array
     {
         return \unpack('c*', $proposalString);
-    }
-
-    /**
-     * @param string $org
-     * @param string $network
-     * @param string $peer
-     * @return EndorserClient
-     * Read connection configuration.
-     */
-    public function fabricConnect(string $org, string $network = 'test-network', string $peer = 'peer1'): EndorserClient
-    {
-        $host = $this->config->getIn([$network, $org, $peer, 'requests'], null);
-
-        if (!\array_key_exists($host, $this->endorserClients)) {
-            $this->endorserClients[$host] = new EndorserClient($host, [
-                'credentials' => ChannelCredentials::createInsecure(),
-            ]);
-        }
-
-        return $this->endorserClients[$host];
     }
 
     /**

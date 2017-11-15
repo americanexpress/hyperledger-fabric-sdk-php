@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\MSP\Identity;
+use Grpc\ChannelCredentials;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeSpec;
@@ -40,6 +41,11 @@ class Channel
      * @var TransactionID
      */
     private $transactionId;
+
+    /**
+     * @var EndorserClient[]
+     */
+    private $endorserClients = [];
 
     /**
      * Channel constructor.
@@ -85,11 +91,11 @@ class Channel
      */
     public function queryByChainCode(string $org, array $queryParams): ProposalResponse
     {
-        $connect = $this->utils->fabricConnect($org);
+        $endorserClient = $this->getEndorserClient($org);
 
-        $fabricProposal = $this->createFabricProposal($org, $queryParams);
+        $proposal = $this->createFabricProposal($org, $queryParams);
 
-        return $this->sendTransaction($fabricProposal, $connect, $org);
+        return $this->sendTransaction($proposal, $endorserClient, $org);
     }
 
     /**
@@ -134,18 +140,18 @@ class Channel
     }
 
     /**
-     * @param Proposal $request
-     * @param EndorserClient $connect
+     * @param Proposal $proposal
+     * @param EndorserClient $endorserClient
      * @param string $org
      * This method requests signed proposal and send transactional request to endorser.
      * @return ProposalResponse
      */
-    private function sendTransaction(Proposal $request, EndorserClient $connect, string $org): ProposalResponse
+    private function sendTransaction(Proposal $proposal, EndorserClient $endorserClient, string $org): ProposalResponse
     {
-        $request = $this->clientUtils->getSignedProposal($request, $org);
+        $signedProposal = $this->clientUtils->getSignedProposal($proposal, $org);
 
         /** @var UnaryCall $simpleSurfaceActiveCall */
-        $simpleSurfaceActiveCall = $connect->ProcessProposal($request);
+        $simpleSurfaceActiveCall = $endorserClient->ProcessProposal($signedProposal);
         list($proposalResponse, $status) = $simpleSurfaceActiveCall->wait();
         $status = (array)$status;
         if (isset($status["code"]) && $status["code"] == 0) {
@@ -154,5 +160,28 @@ class Channel
             error_log("unable to get response");
         }
         return null;
+    }
+
+    /**
+     * Read connection configuration.
+     * @param string $org
+     * @param string $network
+     * @param string $peer
+     * @return EndorserClient
+     */
+    private function getEndorserClient(
+        string $org,
+        string $network = 'test-network',
+        string $peer = 'peer1'
+    ): EndorserClient {
+        $host = $this->config->getIn([$network, $org, $peer, 'requests'], null);
+
+        if (!\array_key_exists($host, $this->endorserClients)) {
+            $this->endorserClients[$host] = new EndorserClient($host, [
+                'credentials' => ChannelCredentials::createInsecure(),
+            ]);
+        }
+
+        return $this->endorserClients[$host];
     }
 }
