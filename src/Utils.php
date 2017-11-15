@@ -36,9 +36,7 @@ class Utils
      */
     public function getNonce(): string
     {
-        $random = random_bytes($this->config->getDefault('nonce-size'));
-
-        return $random;
+        return \random_bytes($this->config->getIn(['nonce-size']));
     }
 
     /**

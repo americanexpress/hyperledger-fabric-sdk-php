@@ -29,6 +29,13 @@ class UtilsTest extends TestCase
         self::assertSame(24, strlen($nonce));
     }
 
+    public function testConfigurableNonceLength()
+    {
+        $nonce = (new Utils(new ClientConfig(['nonce-size' => 3])))->getNonce();
+
+        self::assertSame(3, strlen($nonce));
+    }
+
     public function testGetByteArray()
     {
         $actual = $this->sut->toByteArray('FooBar');
