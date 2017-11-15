@@ -57,16 +57,6 @@ class UtilsTest extends TestCase
         self::markTestIncomplete('Inject config to make this function testable.');
     }
 
-    public function testCreateChaincodeInvocationSpec()
-    {
-        $result = $this->sut->createChaincodeInvocationSpec([
-            'foo',
-            'bar',
-        ]);
-
-        self::assertSame(['foo', 'bar'], iterator_to_array($result->getChaincodeSpec()->getInput()->getArgs()));
-    }
-
     public function testProposalArrayToBinaryString()
     {
         $result = $this->sut->proposalArrayToBinaryString([

@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient;
 
 use Grpc\ChannelCredentials;
-use Hyperledger\Fabric\Protos\Peer\ChaincodeInput;
-use Hyperledger\Fabric\Protos\Peer\ChaincodeInvocationSpec;
-use Hyperledger\Fabric\Protos\Peer\ChaincodeSpec;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 
 class Utils
@@ -67,24 +64,6 @@ class Utils
         }
 
         return $this->endorserClients[$host];
-    }
-
-    /**
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $args
-     * @return ChaincodeInvocationSpec specify parameters of chaincode to be invoked during transaction.
-     * specify parameters of chaincode to be invoked during transaction.
-     */
-    public function createChaincodeInvocationSpec($args): ChaincodeInvocationSpec
-    {
-        $chaincodeInput = new ChaincodeInput();
-        $chaincodeInput->setArgs($args);
-
-        $chaincodeSpec = new ChaincodeSpec();
-        $chaincodeSpec->setInput($chaincodeInput);
-        $chaincodeInvocationSpec = new ChaincodeInvocationSpec();
-        $chaincodeInvocationSpec->setChaincodeSpec($chaincodeSpec);
-
-        return $chaincodeInvocationSpec;
     }
 
     /**

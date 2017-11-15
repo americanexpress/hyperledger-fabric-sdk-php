@@ -114,7 +114,7 @@ class Channel
             $TimeStamp
         );
         $chainHeaderString = $chainHeader->serializeToString();
-        $chaincodeInvocationSpec = $this->utils->createChaincodeInvocationSpec($queryParams["ARGS"]);
+        $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs($queryParams['ARGS']);
         $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
 
         $payload = new ChaincodeProposalPayload();
