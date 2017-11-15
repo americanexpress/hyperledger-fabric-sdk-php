@@ -7,6 +7,9 @@ use AmericanExpress\HyperledgerFabricClient\TimestampFactory;
 use Google\Protobuf\Timestamp;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \AmericanExpress\HyperledgerFabricClient\TimestampFactory
+ */
 class TimestampFactoryTest extends TestCase
 {
     public function testBuildCurrentTimestamp()
