@@ -28,7 +28,7 @@ class IdentityTest extends TestCase
     {
         $this->files = vfsStream::setup('test');
 
-        $this->sut = new Identity($this->files->url());
+        $this->sut = new Identity();
     }
 
     public function testCreateSerializedIdentity()
