@@ -18,6 +18,7 @@ class EndorserClientFactory
 
         return self::fromChannelCredentials($host, $channelCredentials);
     }
+
     /**
      * @param string $host
      * @param ChannelCredentials $channelCredentials

@@ -21,16 +21,12 @@ class SerializedIdentityFactory
     }
 
     /**
-     * @param string $mspID
+     * @param string $mspId
      * @param \SplFileObject $file
      * @return SerializedIdentity
      */
-    public static function fromFile(string $mspID, \SplFileObject $file): SerializedIdentity
+    public static function fromFile(string $mspId, \SplFileObject $file): SerializedIdentity
     {
-        $serializedIdentity = new SerializedIdentity();
-        $serializedIdentity->setMspid($mspID);
-        $serializedIdentity->setIdBytes($file->fread($file->getSize()));
-
-        return $serializedIdentity;
+        return self::fromBytes($mspId, $file->fread($file->getSize()));
     }
 }

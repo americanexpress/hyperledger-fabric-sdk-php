@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\ClientConfig;
+use AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\Hash;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use org\bovigo\vfs\vfsStream;
@@ -38,32 +39,6 @@ class HashTest extends TestCase
         self::assertSame(3, strlen($nonce));
     }
 
-    public function testGetByteArray()
-    {
-        $actual = $this->sut->toByteArray('FooBar');
-
-        $expected = [
-            1 => 70,
-            2 => 111,
-            3 => 111,
-            4 => 66,
-            5 => 97,
-            6 => 114,
-        ];
-
-        self::assertSame($expected, $actual);
-    }
-
-    public function testProposalArrayToBinaryString()
-    {
-        $result = $this->sut->proposalArrayToBinaryString([
-            'foo',
-            'bar',
-        ]);
-
-        self::assertNotEmpty($result);
-    }
-
     public function testSignByteString()
     {
         $files = vfsStream::setup('test');
@@ -88,6 +63,22 @@ TAG
         ]));
 
         $result = $sut->signByteString(new Proposal(), 'MyOrg', 'MyNetwork');
+
+        self::assertInternalType('string', $result);
+        self::assertNotEmpty($result);
+    }
+
+    public function testCreateTxId()
+    {
+        $files = vfsStream::setup('test');
+
+        $certs = vfsStream::newFile('foo');
+        $certs->setContent('FizBuz');
+        $files->addChild($certs);
+
+        $serializedIdentity = SerializedIdentityFactory::fromBytes('FooBar', 'FizBuz');
+
+        $result = $this->sut->createTxId($serializedIdentity, 'qur48f7e9');
 
         self::assertInternalType('string', $result);
         self::assertNotEmpty($result);

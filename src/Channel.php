@@ -29,11 +29,6 @@ class Channel
     private $hash;
 
     /**
-     * @var TransactionID
-     */
-    private $transactionId;
-
-    /**
      * @var EndorserClientManagerInterface
      */
     private $endorserClients;
@@ -43,18 +38,15 @@ class Channel
      * @param ClientConfigInterface $config
      * @param EndorserClientManagerInterface $endorserClients
      * @param Hash $hash
-     * @param TransactionID $transactionId
      */
     public function __construct(
         ClientConfigInterface $config,
         EndorserClientManagerInterface $endorserClients,
-        Hash $hash,
-        TransactionID $transactionId
+        Hash $hash
     ) {
         $this->config = $config;
         $this->endorserClients = $endorserClients;
         $this->hash = $hash;
-        $this->transactionId = $transactionId;
     }
 
     /**
@@ -63,21 +55,28 @@ class Channel
      */
     public static function fromConfig(ClientConfigInterface $config): self
     {
+        $endorserClients = new EndorserClientManager();
         $hash = new Hash($config);
-        $endorserClients = new EndorserClientManager($config);
-        $transactionId = new TransactionID($config, $hash);
 
-        return new self($config, $endorserClients, $hash, $transactionId);
+        return new self($config, $endorserClients, $hash);
     }
 
     /**
-     * @param string $org
      * @param mixed[] $queryParams
-     * @returns ProposalResponse
+     * @param string $org
+     * @param string $network
+     * @param string $peer
+     * @return ProposalResponse
      */
-    public function queryByChainCode(string $org, array $queryParams): ProposalResponse
-    {
-        $endorserClient = $this->endorserClients->get($org);
+    public function queryByChainCode(
+        array $queryParams,
+        string $org,
+        string $network = 'test-network',
+        string $peer = 'peer1'
+    ): ProposalResponse {
+        $host = $this->config->getIn([$network, $org, $peer, 'requests'], null);
+
+        $endorserClient = $this->endorserClients->get($host);
 
         $proposal = $this->createFabricProposal($org, $queryParams);
 
@@ -93,8 +92,17 @@ class Channel
      */
     private function createFabricProposal(string $org, array $queryParams, string $network = 'test-network'): Proposal
     {
+        $config = $this->config->getIn([$network, $org], null);
+
+        $identity = SerializedIdentityFactory::fromFile(
+            (string) get_in($config, ['mspid']),
+            new \SplFileObject(get_in($config, ['admin_certs']))
+        );
+
         $nonce = $this->hash->getNonce();
-        $transactionId = $this->transactionId->getTxId($nonce, $org);
+
+        $transactionId = $this->hash->createTxId($identity, $nonce);
+
         $chainHeader = ChannelHeaderFactory::create(
             $transactionId,
             (string) get_in($queryParams, ['CHANNEL_ID']),
@@ -103,14 +111,11 @@ class Channel
             (string) get_in($queryParams, ['CHAINCODE_VERSION']),
             $this->config->getIn(['epoch'])
         );
+
         $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs(get_in($queryParams, ['ARGS']));
+
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpec(
             $chaincodeInvocationSpec
-        );
-        $config = $this->config->getIn([$network, $org], null);
-        $identity = SerializedIdentityFactory::fromFile(
-            (string) get_in($config, ['mspid']),
-            new \SplFileObject((string) get_in($config, ['admin_certs']))
         );
 
         $header = HeaderFactory::create($identity, $chainHeader, $nonce);

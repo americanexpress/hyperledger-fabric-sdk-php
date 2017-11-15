@@ -24,6 +24,7 @@
   "require": {
     "php": "^7.1",
     "ext-grpc": "*",
+    "beberlei/assert": "^2.0",
     "google/protobuf": "^v3.3.0",
     "grpc/grpc": "^v1.3.0",
     "igorw/get-in": "^1.0",

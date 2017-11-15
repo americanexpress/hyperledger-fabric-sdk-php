@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
+use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use function igorw\get_in;
 use Mdanter\Ecc\Crypto\Key\PrivateKeyInterface;
@@ -120,7 +121,7 @@ class Hash
      * @return array
      * convert string to byte array
      */
-    public function toByteArray(string $proposalString): array
+    private function toByteArray(string $proposalString): array
     {
         return \unpack('c*', $proposalString);
     }
@@ -130,7 +131,7 @@ class Hash
      * @return string
      * convert array to binary string
      */
-    public function proposalArrayToBinaryString(array $arr): string
+    private function proposalArrayToBinaryString(array $arr): string
     {
         $str = "";
         foreach ($arr as $elm) {
@@ -138,5 +139,23 @@ class Hash
         }
 
         return $str;
+    }
+
+    /**
+     * @param SerializedIdentity $serializedIdentity
+     * @param string $nonce
+     * @return string
+     */
+    public function createTxId(SerializedIdentity $serializedIdentity, string $nonce): string
+    {
+        $identityString = $serializedIdentity->serializeToString();
+
+        $noArray = $this->toByteArray($nonce);
+        $identityArray = $this->toByteArray($identityString);
+        $comp = \array_merge($noArray, $identityArray);
+        $compString = $this->proposalArrayToBinaryString($comp);
+        $txID = \hash($this->config->getIn(['crypto-hash-algo']), $compString);
+
+        return $txID;
     }
 }

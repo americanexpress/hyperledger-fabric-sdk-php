@@ -8,14 +8,8 @@ use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 interface EndorserClientManagerInterface
 {
     /**
-     * @param string $org
-     * @param string $network
-     * @param string $peer
+     * @param string $host
      * @return EndorserClient
      */
-    public function get(
-        string $org,
-        string $network = 'test-network',
-        string $peer = 'peer1'
-    ): EndorserClient;
+    public function get(string $host): EndorserClient;
 }
