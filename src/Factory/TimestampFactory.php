@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient;
+namespace AmericanExpress\HyperledgerFabricClient\Factory;
 
 use Google\Protobuf\Timestamp;
 

@@ -3,20 +3,21 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\MSP\Identity;
-use Grpc\ChannelCredentials;
+use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeInvocationSpecFactory;
+use AmericanExpress\HyperledgerFabricClient\Factory\ChaincodeProposalPayloadFactory;
+use AmericanExpress\HyperledgerFabricClient\Factory\ChannelHeaderFactory;
+use AmericanExpress\HyperledgerFabricClient\Factory\HeaderFactory;
+use AmericanExpress\HyperledgerFabricClient\Factory\ProposalFactory;
+use AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\Factory\SignedProposalFactory;
 use Grpc\UnaryCall;
-use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
-use Hyperledger\Fabric\Protos\Peer\ChaincodeSpec;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
+use function igorw\get_in;
 
 class Channel
 {
-    private const DEFAULT_CHAINCODE_SPEC_TYPE = 1;
-    private const DEFAULT_CHANNEL_HEADER_TYPE = 3;
-
     /**
      * @var ClientConfigInterface
      */
@@ -28,44 +29,31 @@ class Channel
     private $hash;
 
     /**
-     * @var Identity
-     */
-    private $identity;
-
-    /**
-     * @var ClientUtils
-     */
-    private $clientUtils;
-
-    /**
      * @var TransactionID
      */
     private $transactionId;
 
     /**
-     * @var EndorserClient[]
+     * @var EndorserClientManagerInterface
      */
-    private $endorserClients = [];
+    private $endorserClients;
 
     /**
      * Channel constructor.
      * @param ClientConfigInterface $config
+     * @param EndorserClientManagerInterface $endorserClients
      * @param Hash $hash
-     * @param Identity $identity
-     * @param ClientUtils $clientUtils
      * @param TransactionID $transactionId
      */
     public function __construct(
         ClientConfigInterface $config,
+        EndorserClientManagerInterface $endorserClients,
         Hash $hash,
-        Identity $identity,
-        ClientUtils $clientUtils,
         TransactionID $transactionId
     ) {
         $this->config = $config;
+        $this->endorserClients = $endorserClients;
         $this->hash = $hash;
-        $this->identity = $identity;
-        $this->clientUtils = $clientUtils;
         $this->transactionId = $transactionId;
     }
 
@@ -76,11 +64,10 @@ class Channel
     public static function fromConfig(ClientConfigInterface $config): self
     {
         $hash = new Hash($config);
-        $clientUtils = new ClientUtils($config, $hash);
-        $identity = new Identity();
-        $transactionId = new TransactionID($config, $identity, $hash);
+        $endorserClients = new EndorserClientManager($config);
+        $transactionId = new TransactionID($config, $hash);
 
-        return new self($config, $hash, $identity, $clientUtils, $transactionId);
+        return new self($config, $endorserClients, $hash, $transactionId);
     }
 
     /**
@@ -90,7 +77,7 @@ class Channel
      */
     public function queryByChainCode(string $org, array $queryParams): ProposalResponse
     {
-        $endorserClient = $this->getEndorserClient($org);
+        $endorserClient = $this->endorserClients->get($org);
 
         $proposal = $this->createFabricProposal($org, $queryParams);
 
@@ -107,35 +94,28 @@ class Channel
     private function createFabricProposal(string $org, array $queryParams, string $network = 'test-network'): Proposal
     {
         $nonce = $this->hash->getNonce();
-        $ccType = new ChaincodeSpec();
-        $ccType->setType(self::DEFAULT_CHAINCODE_SPEC_TYPE);
-        $txID = $this->transactionId->getTxId($nonce, $org);
-        $TimeStamp = $this->clientUtils->buildCurrentTimestamp();
-        $chainHeader = $this->clientUtils->createChannelHeader(
-            self::DEFAULT_CHANNEL_HEADER_TYPE,
-            $txID,
-            $queryParams,
-            ClientConfig::getInstance()->getIn(['epoch']),
-            $TimeStamp
+        $transactionId = $this->transactionId->getTxId($nonce, $org);
+        $chainHeader = ChannelHeaderFactory::create(
+            $transactionId,
+            (string) get_in($queryParams, ['CHANNEL_ID']),
+            (string) get_in($queryParams, ['CHAINCODE_PATH']),
+            (string) get_in($queryParams, ['CHAINCODE_NAME']),
+            (string) get_in($queryParams, ['CHAINCODE_VERSION']),
+            $this->config->getIn(['epoch'])
         );
-        $chainHeaderString = $chainHeader->serializeToString();
-        $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs($queryParams['ARGS']);
-        $chaincodeInvocationSpecString = $chaincodeInvocationSpec->serializeToString();
-
-        $payload = new ChaincodeProposalPayload();
-        $payload->setInput($chaincodeInvocationSpecString);
-        $payloadString = $payload->serializeToString();
+        $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs(get_in($queryParams, ['ARGS']));
+        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpec(
+            $chaincodeInvocationSpec
+        );
         $config = $this->config->getIn([$network, $org], null);
-        $identity = $this->identity->createSerializedIdentity($config['admin_certs'], $config['mspid']);
+        $identity = SerializedIdentityFactory::fromFile(
+            (string) get_in($config, ['mspid']),
+            new \SplFileObject((string) get_in($config, ['admin_certs']))
+        );
 
-        $identityString = $identity->serializeToString();
+        $header = HeaderFactory::create($identity, $chainHeader, $nonce);
 
-        $headerString = $this->clientUtils->buildHeader($identityString, $chainHeaderString, $nonce);
-        $proposal = new Proposal();
-        $proposal->setHeader($headerString);
-        $proposal->setPayload($payloadString);
-
-        return $proposal;
+        return ProposalFactory::create($header, $chaincodeProposalPayload);
     }
 
     /**
@@ -147,40 +127,20 @@ class Channel
      */
     private function sendTransaction(Proposal $proposal, EndorserClient $endorserClient, string $org): ProposalResponse
     {
-        $signedProposal = $this->clientUtils->getSignedProposal($proposal, $org);
+        $signature = $this->hash->signByteString($proposal, $org);
+
+        $signedProposal = SignedProposalFactory::fromProposal($proposal, $signature);
 
         /** @var UnaryCall $simpleSurfaceActiveCall */
         $simpleSurfaceActiveCall = $endorserClient->ProcessProposal($signedProposal);
         list($proposalResponse, $status) = $simpleSurfaceActiveCall->wait();
         $status = (array)$status;
-        if (isset($status["code"]) && $status["code"] == 0) {
+        if (get_in($status, ['code']) === 0) {
             return $proposalResponse;
-        } else {
-            error_log("unable to get response");
         }
+
+        \error_log('unable to get response');
+
         return null;
-    }
-
-    /**
-     * Read connection configuration.
-     * @param string $org
-     * @param string $network
-     * @param string $peer
-     * @return EndorserClient
-     */
-    private function getEndorserClient(
-        string $org,
-        string $network = 'test-network',
-        string $peer = 'peer1'
-    ): EndorserClient {
-        $host = $this->config->getIn([$network, $org, $peer, 'requests'], null);
-
-        if (!\array_key_exists($host, $this->endorserClients)) {
-            $this->endorserClients[$host] = new EndorserClient($host, [
-                'credentials' => ChannelCredentials::createInsecure(),
-            ]);
-        }
-
-        return $this->endorserClients[$host];
     }
 }

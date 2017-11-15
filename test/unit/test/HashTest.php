@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\FabricClient;
+namespace AmericanExpressTest\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\Hash;
-use AmericanExpress\HyperledgerFabricClient\Utils;
+use Hyperledger\Fabric\Protos\Peer\Proposal;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -60,6 +61,35 @@ class HashTest extends TestCase
             'bar',
         ]);
 
+        self::assertNotEmpty($result);
+    }
+
+    public function testSignByteString()
+    {
+        $files = vfsStream::setup('test');
+
+        $certs = vfsStream::newFile('foo');
+        $certs->setContent(<<<'TAG'
+-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQghnA7rdgbZi/wndus
+iXjyf0KgE6OKZjQ+5INjwelRAC6hRANCAASb3u+hY+U/FZvhYDN6d08HJ1v56UJU
+yz/n2NHyJgTg6kC05AaJMeGIinEF0JeJtRDNVQGzoQJQYjnzUTS9FvGh
+-----END PRIVATE KEY-----
+TAG
+);
+        $files->addChild($certs);
+
+        $sut = new Hash(new ClientConfig([
+            'MyNetwork' => [
+                'MyOrg' => [
+                    'private_key' => $certs->url(),
+                ],
+            ],
+        ]));
+
+        $result = $sut->signByteString(new Proposal(), 'MyOrg', 'MyNetwork');
+
+        self::assertInternalType('string', $result);
         self::assertNotEmpty($result);
     }
 }

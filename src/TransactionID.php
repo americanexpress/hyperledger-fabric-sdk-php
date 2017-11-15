@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\MSP\Identity;
+use AmericanExpress\HyperledgerFabricClient\Factory\SerializedIdentityFactory;
+use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
+use function igorw\get_in;
 
 class TransactionID
 {
@@ -13,11 +15,6 @@ class TransactionID
     private $config;
 
     /**
-     * @var Identity
-     */
-    private $identity;
-
-    /**
      * @var Hash
      */
     private $hash;
@@ -25,13 +22,11 @@ class TransactionID
     /**
      * Utils constructor.
      * @param ClientConfigInterface $config
-     * @param Identity $identity
      * @param Hash $hash
      */
-    public function __construct(ClientConfigInterface $config, Identity $identity, Hash $hash)
+    public function __construct(ClientConfigInterface $config, Hash $hash)
     {
         $this->config = $config;
-        $this->identity = $identity;
         $this->hash = $hash;
     }
 
@@ -46,14 +41,28 @@ class TransactionID
     {
         $config = $this->config->getIn([$network, $org], null);
 
-        $identity = $this->identity->createSerializedIdentity($config['admin_certs'], $config['mspid']);
-        $identityString = $identity->serializeToString();
+        $identity = SerializedIdentityFactory::fromFile(
+            (string) get_in($config, ['mspid']),
+            new \SplFileObject(get_in($config, ['admin_certs']))
+        );
+
+        return self::fromSerializedIdentity($identity, $nonce);
+    }
+
+    /**
+     * @param SerializedIdentity $serializedIdentity
+     * @param string $nonce
+     * @return string
+     */
+    public function fromSerializedIdentity(SerializedIdentity $serializedIdentity, string $nonce): string
+    {
+        $identityString = $serializedIdentity->serializeToString();
 
         $noArray = $this->hash->toByteArray($nonce);
         $identityArray = $this->hash->toByteArray($identityString);
-        $comp = array_merge($noArray, $identityArray);
+        $comp = \array_merge($noArray, $identityArray);
         $compString = $this->hash->proposalArrayToBinaryString($comp);
-        $txID = hash($this->config->getIn(['crypto-hash-algo']), $compString);
+        $txID = \hash($this->config->getIn(['crypto-hash-algo']), $compString);
 
         return $txID;
     }

@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient;
+namespace AmericanExpressTest\HyperledgerFabricClient\Factory;
 
-use AmericanExpress\HyperledgerFabricClient\TimestampFactory;
+use AmericanExpress\HyperledgerFabricClient\Factory\TimestampFactory;
 use Google\Protobuf\Timestamp;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\TimestampFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\Factory\TimestampFactory
  */
 class TimestampFactoryTest extends TestCase
 {

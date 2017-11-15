@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient;
 
 use Hyperledger\Fabric\Protos\Peer\Proposal;
+use function igorw\get_in;
 use Mdanter\Ecc\Crypto\Key\PrivateKeyInterface;
 use Mdanter\Ecc\Crypto\Signature\Signature;
 use Mdanter\Ecc\EccFactory;
@@ -41,7 +42,7 @@ class Hash
         $config = $this->config->getIn([$network, $org], null);
         $proposalString = $proposal->serializeToString();
         $proposalArray = $this->toByteArray($proposalString);
-        $privateKey = $this->readPrivateKey($config["private_key"]);
+        $privateKey = $this->readPrivateKey((string) get_in($config, ['private_key']));
         $signData = $this->signData($privateKey, $proposalArray);
 
         return $signData;
@@ -58,7 +59,7 @@ class Hash
 
         ## You'll be restoring from a key, as opposed to generating one.
         $keyData = \file_get_contents($privateKeyPath);
-        openssl_pkey_export($keyData, $privateKey);
+        \openssl_pkey_export($keyData, $privateKey);
         $pemSerializer = new PemPrivateKeySerializer(new DerPrivateKeySerializer($adapter));
         $key = $pemSerializer->parse($privateKey);
 

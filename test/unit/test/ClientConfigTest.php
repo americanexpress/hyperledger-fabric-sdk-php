@@ -6,7 +6,6 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\ClientConfig;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
-use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\TestCase;
 
 /**
