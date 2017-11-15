@@ -16,7 +16,11 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 
 class Hash
 {
+    /**
+     * @var Utils
+     */
     private $utils;
+
     /**
      * @var ClientConfigInterface
      */
