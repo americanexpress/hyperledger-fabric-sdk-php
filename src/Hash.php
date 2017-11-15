@@ -17,11 +17,6 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 class Hash
 {
     /**
-     * @var Utils
-     */
-    private $utils;
-
-    /**
      * @var ClientConfigInterface
      */
     private $config;
@@ -29,12 +24,10 @@ class Hash
     /**
      * Utils constructor.
      * @param ClientConfigInterface $config
-     * @param Utils $utils
      */
-    public function __construct(ClientConfigInterface $config, Utils $utils)
+    public function __construct(ClientConfigInterface $config)
     {
         $this->config = $config;
-        $this->utils = $utils;
     }
 
     /**
@@ -47,7 +40,7 @@ class Hash
     {
         $config = $this->config->getIn([$network, $org], null);
         $proposalString = $proposal->serializeToString();
-        $proposalArray = $this->utils->toByteArray($proposalString);
+        $proposalArray = $this->toByteArray($proposalString);
         $privateKey = $this->readPrivateKey($config["private_key"]);
         $signData = $this->signData($privateKey, $proposalArray);
 
@@ -61,7 +54,6 @@ class Hash
      */
     private function readPrivateKey(string $privateKeyPath): PrivateKeyInterface
     {
-
         $adapter = EccFactory::getAdapter();
 
         ## You'll be restoring from a key, as opposed to generating one.
@@ -87,7 +79,7 @@ class Hash
 
         $key = $privateKeyData;
 
-        $dataString = $this->utils->proposalArrayToBinaryString($dataArray);
+        $dataString = $this->proposalArrayToBinaryString($dataArray);
 
         $signer = new Signer($adapter);
         $hash = $signer->hashData($generator, $algorithm, $dataString);
@@ -111,5 +103,39 @@ class Hash
         $serializedSig = $serializer->serialize($eccSignature);
 
         return $serializedSig;
+    }
+
+    /**
+     * Function for getting random nonce value
+     *  random number(nonce) which in turn used to generate txId.
+     */
+    public function getNonce(): string
+    {
+        return \random_bytes($this->config->getIn(['nonce-size']));
+    }
+
+    /**
+     * @param string $proposalString
+     * @return array
+     * convert string to byte array
+     */
+    public function toByteArray(string $proposalString): array
+    {
+        return \unpack('c*', $proposalString);
+    }
+
+    /**
+     * @param array $arr
+     * @return string
+     * convert array to binary string
+     */
+    public function proposalArrayToBinaryString(array $arr): string
+    {
+        $str = "";
+        foreach ($arr as $elm) {
+            $str .= \chr((int)$elm);
+        }
+
+        return $str;
     }
 }

@@ -23,9 +23,9 @@ class Channel
     private $config;
 
     /**
-     * @var Utils
+     * @var Hash
      */
-    private $utils;
+    private $hash;
 
     /**
      * @var Identity
@@ -50,20 +50,20 @@ class Channel
     /**
      * Channel constructor.
      * @param ClientConfigInterface $config
-     * @param Utils $utils
+     * @param Hash $hash
      * @param Identity $identity
      * @param ClientUtils $clientUtils
      * @param TransactionID $transactionId
      */
     public function __construct(
         ClientConfigInterface $config,
-        Utils $utils,
+        Hash $hash,
         Identity $identity,
         ClientUtils $clientUtils,
         TransactionID $transactionId
     ) {
         $this->config = $config;
-        $this->utils = $utils;
+        $this->hash = $hash;
         $this->identity = $identity;
         $this->clientUtils = $clientUtils;
         $this->transactionId = $transactionId;
@@ -75,13 +75,12 @@ class Channel
      */
     public static function fromConfig(ClientConfigInterface $config): self
     {
-        $utils = new Utils($config);
-        $hash = new Hash($config, $utils);
+        $hash = new Hash($config);
         $clientUtils = new ClientUtils($config, $hash);
         $identity = new Identity();
-        $transactionId = new TransactionID($config, $identity, $utils);
+        $transactionId = new TransactionID($config, $identity, $hash);
 
-        return new self($config, $utils, $identity, $clientUtils, $transactionId);
+        return new self($config, $hash, $identity, $clientUtils, $transactionId);
     }
 
     /**
@@ -107,7 +106,7 @@ class Channel
      */
     private function createFabricProposal(string $org, array $queryParams, string $network = 'test-network'): Proposal
     {
-        $nonce = $this->utils->getNonce();
+        $nonce = $this->hash->getNonce();
         $ccType = new ChaincodeSpec();
         $ccType->setType(self::DEFAULT_CHAINCODE_SPEC_TYPE);
         $txID = $this->transactionId->getTxId($nonce, $org);

@@ -8,11 +8,6 @@ use AmericanExpress\HyperledgerFabricClient\MSP\Identity;
 class TransactionID
 {
     /**
-     * @var Utils
-     */
-    private $utils;
-
-    /**
      * @var ClientConfigInterface
      */
     private $config;
@@ -23,16 +18,21 @@ class TransactionID
     private $identity;
 
     /**
+     * @var Hash
+     */
+    private $hash;
+
+    /**
      * Utils constructor.
      * @param ClientConfigInterface $config
      * @param Identity $identity
-     * @param Utils $utils
+     * @param Hash $hash
      */
-    public function __construct(ClientConfigInterface $config, Identity $identity, Utils $utils)
+    public function __construct(ClientConfigInterface $config, Identity $identity, Hash $hash)
     {
         $this->config = $config;
         $this->identity = $identity;
-        $this->utils = $utils;
+        $this->hash = $hash;
     }
 
     /**
@@ -49,12 +49,11 @@ class TransactionID
         $identity = $this->identity->createSerializedIdentity($config['admin_certs'], $config['mspid']);
         $identityString = $identity->serializeToString();
 
-        $utils = $this->utils;
-        $noArray = $utils->toByteArray($nonce);
-        $identityArray = $utils->toByteArray($identityString);
+        $noArray = $this->hash->toByteArray($nonce);
+        $identityArray = $this->hash->toByteArray($identityString);
         $comp = array_merge($noArray, $identityArray);
-        $compString = $utils->proposalArrayToBinaryString($comp);
-        $txID = hash($this->config->getDefault('crypto-hash-algo'), $compString);
+        $compString = $this->hash->proposalArrayToBinaryString($comp);
+        $txID = hash($this->config->getIn(['crypto-hash-algo']), $compString);
 
         return $txID;
     }

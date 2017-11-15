@@ -4,22 +4,23 @@ declare(strict_types=1);
 namespace AmericanExpressTest\FabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\ClientConfig;
+use AmericanExpress\HyperledgerFabricClient\Hash;
 use AmericanExpress\HyperledgerFabricClient\Utils;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Utils
+ * @covers \AmericanExpress\HyperledgerFabricClient\Hash
  */
-class UtilsTest extends TestCase
+class HashTest extends TestCase
 {
     /**
-     * @var Utils
+     * @var Hash
      */
     private $sut;
 
     protected function setUp()
     {
-        $this->sut = new Utils(new ClientConfig([]));
+        $this->sut = new Hash(new ClientConfig([]));
     }
 
     public function testDefaultNonceLength()
@@ -31,7 +32,7 @@ class UtilsTest extends TestCase
 
     public function testConfigurableNonceLength()
     {
-        $nonce = (new Utils(new ClientConfig(['nonce-size' => 3])))->getNonce();
+        $nonce = (new Hash(new ClientConfig(['nonce-size' => 3])))->getNonce();
 
         self::assertSame(3, strlen($nonce));
     }
@@ -50,11 +51,6 @@ class UtilsTest extends TestCase
         ];
 
         self::assertSame($expected, $actual);
-    }
-
-    public function testFabricConnect()
-    {
-        self::markTestIncomplete('Inject config to make this function testable.');
     }
 
     public function testProposalArrayToBinaryString()
