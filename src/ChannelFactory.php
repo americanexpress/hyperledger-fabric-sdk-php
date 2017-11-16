@@ -9,6 +9,7 @@ use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatoryFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
+use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
 
 class ChannelFactory
 {
@@ -22,7 +23,7 @@ class ChannelFactory
 
         $transactionContextFactory = new TransactionContextFactory(
             new RandomBytesNonceGenerator($config->getIn(['nonce-size'])),
-            new TxIdFactory($config->getIn(['crypto-hash-algo']))
+            new TxIdFactory(HashAlgorithm::fromConfig($config))
         );
 
         $signatory = MdanterEccSignatoryFactory::fromConfig($config);

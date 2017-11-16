@@ -3,16 +3,14 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
-use Assert\Assertion;
-use Assert\AssertionFailedException;
+use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
 class TxIdFactory implements TxIdFactoryInterface
 {
     /**
-     * @var string
+     * @var HashAlgorithm
      */
     private $hashAlgorithm;
 
@@ -22,17 +20,11 @@ class TxIdFactory implements TxIdFactoryInterface
     private $binaryStringSerializer;
 
     /**
-     * @param string $hashAlgorithm
+     * @param HashAlgorithm $hashAlgorithm
      */
-    public function __construct(string $hashAlgorithm = 'sha256')
+    public function __construct(HashAlgorithm $hashAlgorithm = null)
     {
-        try {
-            Assertion::inArray($hashAlgorithm, hash_algos());
-        } catch (AssertionFailedException $e) {
-            throw InvalidArgumentException::fromException($e);
-        }
-
-        $this->hashAlgorithm = $hashAlgorithm;
+        $this->hashAlgorithm = $hashAlgorithm ?: new HashAlgorithm();
         $this->binaryStringSerializer = new BinaryStringSerializer();
     }
 
@@ -51,6 +43,6 @@ class TxIdFactory implements TxIdFactoryInterface
 
         $compString = $this->binaryStringSerializer->serialize($comp);
 
-        return \hash($this->hashAlgorithm, $compString);
+        return \hash((string) $this->hashAlgorithm, $compString);
     }
 }

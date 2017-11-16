@@ -47,12 +47,4 @@ TAG
         self::assertInternalType('string', $result->getSignature());
         self::assertNotEmpty($result->getSignature());
     }
-
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
-     */
-    public function testInvalidHashAlgorithm()
-    {
-        new MdanterEccSignatory('invalidAlgorithm');
-    }
 }

@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Signatory;
 
-use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignedProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
-use Assert\Assertion;
-use Assert\AssertionFailedException;
+use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use Mdanter\Ecc\Crypto\Key\PrivateKeyInterface;
@@ -23,7 +21,7 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 class MdanterEccSignatory implements SignatoryInterface
 {
     /**
-     * @var string
+     * @var HashAlgorithm
      */
     private $hashAlgorithm;
 
@@ -49,17 +47,11 @@ class MdanterEccSignatory implements SignatoryInterface
 
     /**
      * Utils constructor.
-     * @param string $hashAlgorithm
+     * @param HashAlgorithm $hashAlgorithm
      */
-    public function __construct(string $hashAlgorithm = 'sha256')
+    public function __construct(HashAlgorithm $hashAlgorithm = null)
     {
-        try {
-            Assertion::inArray($hashAlgorithm, hash_algos());
-        } catch (AssertionFailedException $e) {
-            throw InvalidArgumentException::fromException($e);
-        }
-
-        $this->hashAlgorithm = $hashAlgorithm;
+        $this->hashAlgorithm = $hashAlgorithm ?: new HashAlgorithm();
         $this->binaryStringSerializer = new BinaryStringSerializer();
         $this->adapter = EccFactory::getAdapter();
         $this->generator = EccFactory::getNistCurves()->generator256();
@@ -107,11 +99,11 @@ class MdanterEccSignatory implements SignatoryInterface
     {
         $dataString = $this->binaryStringSerializer->serialize($dataArray);
 
-        $hash = $this->signer->hashData($this->generator, $this->hashAlgorithm, $dataString);
+        $hash = $this->signer->hashData($this->generator, (string) $this->hashAlgorithm, $dataString);
 
         # Derandomized signatures are not necessary, but can reduce
         # the attack surface for a private key that is to be used often.
-        $random = RandomGeneratorFactory::getHmacRandomGenerator($privateKey, $hash, $this->hashAlgorithm);
+        $random = RandomGeneratorFactory::getHmacRandomGenerator($privateKey, $hash, (string) $this->hashAlgorithm);
 
         $randomK = $random->generate($this->generator->getOrder());
         $signature = $this->signer->sign($privateKey, $hash, $randomK);

@@ -39,12 +39,4 @@ class TxIdFactoryTest extends TestCase
         self::assertInternalType('string', $result);
         self::assertNotEmpty($result);
     }
-
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
-     */
-    public function testInvalidHashAlgorithm()
-    {
-        new TxIdFactory('invalidAlgorithm');
-    }
 }

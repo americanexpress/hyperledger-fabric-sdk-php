@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Signatory;
 
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
+use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
 
 class MdanterEccSignatoryFactory
 {
@@ -13,6 +14,6 @@ class MdanterEccSignatoryFactory
      */
     public static function fromConfig(ClientConfigInterface $config): MdanterEccSignatory
     {
-        return new MdanterEccSignatory($config->getIn(['crypto-hash-algo']));
+        return new MdanterEccSignatory(HashAlgorithm::fromConfig($config));
     }
 }
