@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Cryptography\CryptographyInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeInvocationSpecFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
@@ -115,12 +116,10 @@ class Channel implements ChannelInterface
         $simpleSurfaceActiveCall = $endorserClient->ProcessProposal($signedProposal);
         list($proposalResponse, $status) = $simpleSurfaceActiveCall->wait();
         $status = (array)$status;
-        if (get_in($status, ['code']) === 0) {
+        if ($proposalResponse instanceof ProposalResponse) {
             return $proposalResponse;
         }
 
-        \error_log('unable to get response');
-
-        return null;
+        throw new RuntimeException(get_in($status, ['details']), get_in($status, ['code']));
     }
 }

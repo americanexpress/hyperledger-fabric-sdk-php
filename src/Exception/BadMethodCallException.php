@@ -8,7 +8,7 @@ class BadMethodCallException extends \BadMethodCallException implements Exceptio
     /**
      * @param \Exception $exception
      * @param string $message
-     * @return BadMethodCallException
+     * @return self
      */
     public static function fromException(\Exception $exception, string $message = '')
     {

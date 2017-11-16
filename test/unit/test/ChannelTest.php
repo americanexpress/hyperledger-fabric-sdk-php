@@ -100,4 +100,47 @@ class ChannelTest extends TestCase
 
         self::assertSame($proposalResponse, $result);
     }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
+     * @expectedExceptionMessage Connect failed
+     * @expectedExceptionCode 14
+     */
+    public function testQueryByChaincodeConnectionFailure()
+    {
+        $file = new \SplFileObject(__FILE__);
+
+        $context = new ChannelContext([
+            'host' => 'example.com',
+            'mspId' => '1234',
+            'adminCerts' => $file,
+            'epoch' => 54321,
+            'privateKey' => $file,
+        ]);
+
+        $params = new ChaincodeQueryParams([
+            'channelId' => 'MyChannelId',
+            'chaincodeName' => 'FooBar',
+            'chaincodePath' => 'FizBuz',
+            'chaincodeVersion' => 'v12.34',
+            'args' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->endorserClient->method('ProcessProposal')
+            ->willReturn($this->unaryCall);
+
+        $this->unaryCall->method('wait')
+            ->willReturn([
+                null,
+                [
+                    'code' => 14,
+                    'details' => 'Connect failed',
+                    'metadata' => [],
+                ]
+            ]);
+
+        $this->sut->queryByChainCode($context, $params);
+    }
 }

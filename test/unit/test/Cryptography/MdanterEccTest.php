@@ -90,4 +90,9 @@ TAG
     {
         new MdanterEcc(24, 'invalidAlgorithm');
     }
+
+    public function test()
+    {
+
+    }
 }

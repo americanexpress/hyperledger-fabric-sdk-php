@@ -87,7 +87,7 @@ class MdanterEcc implements CryptographyInterface
      * @return string
      * sign private key of node
      */
-    private function signData(PrivateKeyInterface $privateKeyData, array $dataArray)
+    private function signData(PrivateKeyInterface $privateKeyData, array $dataArray): string
     {
         $adapter = EccFactory::getAdapter();
         $generator = EccFactory::getNistCurves()->generator256();
