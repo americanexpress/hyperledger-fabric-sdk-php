@@ -32,4 +32,22 @@ class ChaincodeProposalPayloadFactoryTest extends TestCase
 TAG;
         self::assertSame($expected, $result->getInput());
     }
+
+    public function testFromChaincodeInvocationSpecArgs()
+    {
+        $result = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([
+            'foo',
+            'bar',
+        ]);
+
+        self::assertInstanceOf(ChaincodeProposalPayload::class, $result);
+        $expected = <<<'TAG'
+
+
+
+foo
+bar
+TAG;
+        self::assertSame($expected, $result->getInput());
+    }
 }

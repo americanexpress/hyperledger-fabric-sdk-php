@@ -6,8 +6,9 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\ChaincodeQueryParams;
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\ChannelContext;
-use AmericanExpress\HyperledgerFabricClient\Cryptography\CryptographyInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
@@ -24,14 +25,19 @@ class ChannelTest extends TestCase
     private $unaryCall;
 
     /**
+     * @var SignatoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $signatory;
+
+    /**
      * @var EndorserClient|\PHPUnit_Framework_MockObject_MockObject
      */
     private $endorserClient;
 
     /**
-     * @var CryptographyInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TransactionContextFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $cryptography;
+    private $transactionContextFactory;
 
     /**
      * @var Channel
@@ -51,14 +57,17 @@ class ChannelTest extends TestCase
         $endorserClients->method('get')
             ->willReturn($this->endorserClient);
 
-        $this->cryptography = self::getMockBuilder(CryptographyInterface::class)
+        $this->transactionContextFactory = self::getMockBuilder(TransactionContextFactoryInterface::class)
+            ->getMock();
+
+        $this->signatory = self::getMockBuilder(SignatoryInterface::class)
             ->getMock();
 
         $this->unaryCall = self::getMockBuilder(UnaryCall::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->sut = new Channel($endorserClients, $this->cryptography);
+        $this->sut = new Channel($endorserClients, $this->transactionContextFactory, $this->signatory);
     }
 
     public function testQueryByChaincode()
@@ -69,7 +78,6 @@ class ChannelTest extends TestCase
             'host' => 'example.com',
             'mspId' => '1234',
             'adminCerts' => $file,
-            'epoch' => 54321,
             'privateKey' => $file,
         ]);
 
@@ -114,7 +122,6 @@ class ChannelTest extends TestCase
             'host' => 'example.com',
             'mspId' => '1234',
             'adminCerts' => $file,
-            'epoch' => 54321,
             'privateKey' => $file,
         ]);
 

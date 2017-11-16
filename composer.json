@@ -47,7 +47,7 @@
     "test:integration": "vendor/bin/phpunit --testsuite integration",
     "test:mutations": "vendor/bin/humbug",
     "test:units": "vendor/bin/phpunit --testsuite unit",
-    "coverage": "vendor/bin/phpunit --testsuite unit --coverage-text",
+    "coverage": "vendor/bin/phpunit --testsuite unit --coverage-text --coverage-html=build/coverage/html",
     "test": "vendor/bin/phpunit --testsuite unit"
   }
 }

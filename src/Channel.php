@@ -3,27 +3,22 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Cryptography\CryptographyInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeInvocationSpecFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignedProposalFactory;
+use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use Grpc\UnaryCall;
-use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
+use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use function igorw\get_in;
 
 class Channel implements ChannelInterface
 {
-    /**
-     * @var CryptographyInterface
-     */
-    private $cryptography;
+    private $transactionContextFactory;
 
     /**
      * @var EndorserClientManagerInterface
@@ -31,16 +26,23 @@ class Channel implements ChannelInterface
     private $endorserClients;
 
     /**
-     * Channel constructor.
+     * @var SignatoryInterface
+     */
+    private $signatory;
+
+    /**
      * @param EndorserClientManagerInterface $endorserClients
-     * @param CryptographyInterface $cryptography
+     * @param TransactionContextFactoryInterface $transactionContextFactory
+     * @param SignatoryInterface $signatory
      */
     public function __construct(
         EndorserClientManagerInterface $endorserClients,
-        CryptographyInterface $cryptography
+        TransactionContextFactoryInterface $transactionContextFactory,
+        SignatoryInterface $signatory
     ) {
         $this->endorserClients = $endorserClients;
-        $this->cryptography = $cryptography;
+        $this->transactionContextFactory = $transactionContextFactory;
+        $this->signatory = $signatory;
     }
 
     /**
@@ -52,65 +54,63 @@ class Channel implements ChannelInterface
         ChannelContext $context,
         ChaincodeQueryParams $params
     ): ProposalResponse {
-        $host = $context->getHost();
+        $proposal = $this->createProposal($context, $params);
 
-        $endorserClient = $this->endorserClients->get($host);
-
-        $proposal = $this->createFabricProposal($context, $params);
-
-        return $this->sendTransaction($context, $proposal, $endorserClient);
+        return $this->processProposal($proposal, $context);
     }
 
     /**
-     * @param ChannelContext $context
+     * @param ChannelContext $channelContext
      * @param ChaincodeQueryParams $params
-     * returns proposal using channelheader commonheader and chaincode invoke specification.
      * @return Proposal
      */
-    private function createFabricProposal(ChannelContext $context, ChaincodeQueryParams $params): Proposal
+    private function createProposal(ChannelContext $channelContext, ChaincodeQueryParams $params): Proposal
     {
-        $identity = SerializedIdentityFactory::fromFile($context->getMspId(), $context->getAdminCerts());
-
-        $nonce = $this->cryptography->getNonce();
-
-        $transactionId = $this->cryptography->createTxId($identity, $nonce);
+        $transactionContext = $this->transactionContextFactory->fromChannelContext($channelContext);
 
         $chainHeader = ChannelHeaderFactory::create(
-            $transactionId,
+            $transactionContext,
             $params->getChannelId(),
             $params->getChaincodePath(),
             $params->getChaincodeName(),
-            $params->getChaincodeVersion(),
-            $context->getEpoch()
+            $params->getChaincodeVersion()
         );
 
-        $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs($params->getArgs());
-
-        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpec(
-            $chaincodeInvocationSpec
+        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs(
+            $params->getArgs()
         );
 
-        $header = HeaderFactory::create($identity, $chainHeader, $nonce);
+        $header = HeaderFactory::fromTransactionContext($transactionContext, $chainHeader);
 
         return ProposalFactory::create($header, $chaincodeProposalPayload);
     }
 
     /**
-     * @param ChannelContext $context
      * @param Proposal $proposal
-     * @param EndorserClient $endorserClient
+     * @param ChannelContext $channelContext
      * @return ProposalResponse
      */
-    private function sendTransaction(
-        ChannelContext $context,
+    private function processProposal(
         Proposal $proposal,
-        EndorserClient $endorserClient
+        ChannelContext $channelContext
     ): ProposalResponse {
-        $privateKey = $context->getPrivateKey();
+        $privateKey = $channelContext->getPrivateKey();
 
-        $signature = $this->cryptography->signByteString($proposal, $privateKey);
+        $signedProposal = $this->signatory->signProposal($proposal, $privateKey);
 
-        $signedProposal = SignedProposalFactory::fromProposal($proposal, $signature);
+        return $this->processSignedProposal($signedProposal, $channelContext);
+    }
+
+    /**
+     * @param SignedProposal $signedProposal
+     * @param ChannelContext $channelContext
+     * @return ProposalResponse
+     */
+    private function processSignedProposal(
+        SignedProposal $signedProposal,
+        ChannelContext $channelContext
+    ): ProposalResponse {
+        $endorserClient = $this->endorserClients->get($channelContext->getHost());
 
         /** @var UnaryCall $simpleSurfaceActiveCall */
         $simpleSurfaceActiveCall = $endorserClient->ProcessProposal($signedProposal);

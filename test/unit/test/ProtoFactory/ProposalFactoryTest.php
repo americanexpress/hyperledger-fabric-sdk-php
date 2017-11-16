@@ -9,6 +9,7 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use PHPUnit\Framework\TestCase;
 
@@ -19,17 +20,19 @@ class ProposalFactoryTest extends TestCase
 {
     public function testCreate()
     {
-        $serializedIdentity = SerializedIdentityFactory::fromBytes('FooBar', 'FizBuz');
-
         $channelHeader = ChannelHeaderFactory::create(
-            'MyTransactionId',
+            $transactionContext = new TransactionContext(
+                SerializedIdentityFactory::fromBytes('Alice', 'Bob'),
+                'u58920du89f',
+                'MyTransactionId'
+            ),
             'MyChannelId',
-            'ccPath',
-            'ccName',
+            'FooBar',
+            'FizBuz',
             'v12.34'
         );
 
-        $header = HeaderFactory::create($serializedIdentity, $channelHeader, 'u58920du89f');
+        $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
 
         $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs([
             'foo',
@@ -42,21 +45,16 @@ class ProposalFactoryTest extends TestCase
 
         $result = ProposalFactory::create($header, $chaincodeProposalPayload);
         self::assertInstanceOf(Proposal::class, $result);
-
-        $expectedHeader = '"MyChannelId*MyTransactionId:
-ccPathccNamev12.34
-
-FooBarFizBuzu58920du89f';
-
-        $expectedPayload = '
-
-
-
-foo
-bar';
-
-        self::assertContains($expectedHeader, $result->getHeader());
-        self::assertSame($expectedPayload, $result->getPayload());
+        self::assertContains('Alice', $result->getHeader());
+        self::assertContains('Bob', $result->getHeader());
+        self::assertContains('MyChannelId', $result->getHeader());
+        self::assertContains('MyTransactionId', $result->getHeader());
+        self::assertContains('FooBar', $result->getHeader());
+        self::assertContains('FizBuz', $result->getHeader());
+        self::assertContains('v12.34', $result->getHeader());
+        self::assertContains('u58920du89f', $result->getHeader());
+        self::assertContains('foo', $result->getPayload());
+        self::assertContains('bar', $result->getPayload());
         self::assertSame('', $result->getExtension());
     }
 }

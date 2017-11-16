@@ -50,15 +50,6 @@ class ChannelContextTest extends TestCase
         self::assertSame($file, $this->sut->getAdminCerts());
     }
 
-    public function testEpoch()
-    {
-        self::assertSame(0, $this->sut->getEpoch());
-
-        $this->sut->setEpoch(54321);
-
-        self::assertSame(54321, $this->sut->getEpoch());
-    }
-
     public function testPrivateKey()
     {
         self::assertNull($this->sut->getPrivateKey());
@@ -78,14 +69,12 @@ class ChannelContextTest extends TestCase
             'host' => 'example.com',
             'mspId' => '1234',
             'adminCerts' => $file,
-            'epoch' => 54321,
             'privateKey' => $file,
         ]);
 
         self::assertSame('example.com', $sut->getHost());
         self::assertSame('1234', $sut->getMspId());
         self::assertSame($file, $sut->getAdminCerts());
-        self::assertSame(54321, $sut->getEpoch());
         self::assertSame($file, $sut->getPrivateKey());
     }
 }

@@ -23,11 +23,6 @@ class ChannelContext extends AbstractOptions
     private $adminCerts;
 
     /**
-     * @var int
-     */
-    private $epoch = 0;
-
-    /**
      * @var \SplFileObject|null
      */
     private $privateKey;
@@ -78,22 +73,6 @@ class ChannelContext extends AbstractOptions
     public function setAdminCerts(\SplFileObject $adminCerts)
     {
         $this->adminCerts = $adminCerts;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEpoch(): int
-    {
-        return $this->epoch;
-    }
-
-    /**
-     * @param int $epoch
-     */
-    public function setEpoch(int $epoch)
-    {
-        $this->epoch = $epoch;
     }
 
     /**

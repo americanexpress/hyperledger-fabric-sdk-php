@@ -20,4 +20,15 @@ class ChaincodeProposalPayloadFactory
 
         return $chaincodeProposalPayload;
     }
+
+    /**
+     * @param array $args
+     * @return ChaincodeProposalPayload
+     */
+    public static function fromChaincodeInvocationSpecArgs(array $args): ChaincodeProposalPayload
+    {
+        $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs($args);
+
+        return self::fromChaincodeInvocationSpec($chaincodeInvocationSpec);
+    }
 }
