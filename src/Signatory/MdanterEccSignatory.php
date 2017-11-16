@@ -13,6 +13,8 @@ use Mdanter\Ecc\Crypto\Signature\Signature;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Math\GmpMath;
+use Mdanter\Ecc\Math\GmpMathInterface;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Random\RandomGeneratorFactory;
 use Mdanter\Ecc\Serializer\PrivateKey\PemPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\PrivateKey\DerPrivateKeySerializer;
@@ -20,6 +22,16 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 
 class MdanterEccSignatory implements SignatoryInterface
 {
+    /**
+     * @var DerSignatureSerializer
+     */
+    private $derSignatureSerializer;
+
+    /**
+     * @var GmpMath
+     */
+    private $gmpMath;
+
     /**
      * @var HashAlgorithm
      */
@@ -31,12 +43,12 @@ class MdanterEccSignatory implements SignatoryInterface
     private $binaryStringSerializer;
 
     /**
-     * @var \Mdanter\Ecc\Math\GmpMathInterface
+     * @var GmpMathInterface
      */
     private $adapter;
 
     /**
-     * @var \Mdanter\Ecc\Primitives\GeneratorPoint
+     * @var GeneratorPoint
      */
     private $generator;
 
@@ -56,6 +68,8 @@ class MdanterEccSignatory implements SignatoryInterface
         $this->adapter = EccFactory::getAdapter();
         $this->generator = EccFactory::getNistCurves()->generator256();
         $this->signer = new Signer($this->adapter);
+        $this->gmpMath = new GmpMath();
+        $this->derSignatureSerializer = new DerSignatureSerializer();
     }
 
     /**
@@ -106,19 +120,28 @@ class MdanterEccSignatory implements SignatoryInterface
         $random = RandomGeneratorFactory::getHmacRandomGenerator($privateKey, $hash, (string) $this->hashAlgorithm);
 
         $randomK = $random->generate($this->generator->getOrder());
-        $signature = $this->signer->sign($privateKey, $hash, $randomK);
-        $s = $signature->getS();
-        $halfOrder = $this->adapter->rightShift($this->generator->getOrder(), 1);
-        $math = new GmpMath();
 
-        if ($math->cmp($s, $halfOrder) > 0) {
-            $s = $this->adapter->sub($this->generator->getOrder(), $s);
+        $signature = $this->signer->sign($privateKey, $hash, $randomK);
+
+        $eccSignature = new Signature($signature->getR(), $this->getS($signature));
+
+        return $this->derSignatureSerializer->serialize($eccSignature);
+    }
+
+    /**
+     * @param Signature $signature
+     * @return \GMP
+     */
+    private function getS(Signature $signature): \GMP
+    {
+        $order = $this->generator->getOrder();
+        $halfOrder = $this->adapter->rightShift($order, 1);
+
+        $s = $signature->getS();
+        if ($this->gmpMath->cmp($s, $halfOrder) > 0) {
+            $s = $this->adapter->sub($order, $s);
         }
 
-        $eccSignature = new Signature($signature->getR(), $s);
-        $serializer = new DerSignatureSerializer();
-        $serializedSig = $serializer->serialize($eccSignature);
-
-        return $serializedSig;
+        return $s;
     }
 }
