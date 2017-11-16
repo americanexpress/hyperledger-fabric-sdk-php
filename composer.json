@@ -17,9 +17,10 @@
     }
   },
   "autoload-dev": {
-    "classmap": [
-      "test"
-    ]
+    "psr-4": {
+      "AmericanExpressTest\\HyperledgerFabricClient\\TestAsset\\": "test/unit/TestAsset",
+      "AmericanExpressTest\\Integration\\TestAsset\\": "test/integration/TestAsset"
+    }
   },
   "require": {
     "php": "^7.1",

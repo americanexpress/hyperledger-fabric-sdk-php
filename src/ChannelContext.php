@@ -35,7 +35,7 @@ class ChannelContext extends AbstractOptions
     /**
      * @return string|null
      */
-    public function getHost(): string
+    public function getHost(): ?string
     {
         return $this->host;
     }
@@ -51,7 +51,7 @@ class ChannelContext extends AbstractOptions
     /**
      * @return string|null
      */
-    public function getMspId(): string
+    public function getMspId(): ?string
     {
         return $this->mspId;
     }
@@ -67,7 +67,7 @@ class ChannelContext extends AbstractOptions
     /**
      * @return \SplFileObject|null
      */
-    public function getAdminCerts(): \SplFileObject
+    public function getAdminCerts(): ?\SplFileObject
     {
         return $this->adminCerts;
     }
@@ -99,7 +99,7 @@ class ChannelContext extends AbstractOptions
     /**
      * @return \SplFileObject|null
      */
-    public function getPrivateKey(): \SplFileObject
+    public function getPrivateKey(): ?\SplFileObject
     {
         return $this->privateKey;
     }

@@ -17,7 +17,7 @@ use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use function igorw\get_in;
 
-class Channel
+class Channel implements ChannelInterface
 {
     /**
      * @var CryptographyInterface

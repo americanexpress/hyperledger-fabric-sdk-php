@@ -35,7 +35,7 @@ class ChaincodeQueryParams extends AbstractOptions
     /**
      * @return string|null
      */
-    public function getChannelId(): string
+    public function getChannelId(): ?string
     {
         return $this->channelId;
     }
@@ -51,7 +51,7 @@ class ChaincodeQueryParams extends AbstractOptions
     /**
      * @return string|null
      */
-    public function getChaincodeName(): string
+    public function getChaincodeName(): ?string
     {
         return $this->chaincodeName;
     }
@@ -67,7 +67,7 @@ class ChaincodeQueryParams extends AbstractOptions
     /**
      * @return string|null
      */
-    public function getChaincodePath(): string
+    public function getChaincodePath(): ?string
     {
         return $this->chaincodePath;
     }
@@ -83,7 +83,7 @@ class ChaincodeQueryParams extends AbstractOptions
     /**
      * @return string|null
      */
-    public function getChaincodeVersion(): string
+    public function getChaincodeVersion(): ?string
     {
         return $this->chaincodeVersion;
     }

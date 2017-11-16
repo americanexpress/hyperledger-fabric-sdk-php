@@ -7,7 +7,7 @@ use AmericanExpress\HyperledgerFabricClient\Exception\BadMethodCallException;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 
-class AbstractOptions
+abstract class AbstractOptions
 {
     /**
      * AbstractOptions constructor.
@@ -23,7 +23,11 @@ class AbstractOptions
             try {
                 Assertion::isCallable($callable);
             } catch (AssertionFailedException $e) {
-                throw BadMethodCallException::fromException($e);
+                throw BadMethodCallException::fromException($e, sprintf(
+                    '%s::%s is not callable.',
+                    get_called_class(),
+                    $setter
+                ));
             }
 
             call_user_func($callable, $value);
