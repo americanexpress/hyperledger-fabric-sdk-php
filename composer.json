@@ -35,12 +35,14 @@
     "humbug/humbug": "1.0.x-dev",
     "jakub-onderka/php-parallel-lint": "*",
     "mikey179/vfsStream": "^1.6",
+    "ocramius/finalizer": "^1.0",
     "phpunit/phpunit": "*",
     "squizlabs/php_codesniffer": "*"
   },
   "scripts": {
-    "build": "composer lint:syntax && composer lint:style && composer coverage && composer test:mutations",
+    "build": "composer lint:syntax && composer lint:style && composer lint:final && composer coverage && composer test:mutations",
     "lint:beautify": "vendor/bin/phpcbf --standard=PSR2 --extensions=php -v src/ test/",
+    "lint:final": "vendor/bin/finalizer finalizer:check-final-classes src",
     "lint:style": "vendor/bin/phpcs --standard=PSR2 --extensions=php -v src/ test/ --ignore=test/integration/config.php",
     "lint:syntax": "vendor/bin/parallel-lint src/ protobuf/dist/ test/",
     "protoc": "bin/compile-protos.sh",

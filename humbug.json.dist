@@ -1,7 +1,7 @@
 {
   "source": {
     "directories": [
-      "fabric-client/src"
+      "src"
     ]
   },
   "timeout": 10,

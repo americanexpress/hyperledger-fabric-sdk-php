@@ -16,7 +16,7 @@ use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use function igorw\get_in;
 
-class Channel implements ChannelInterface
+final class Channel implements ChannelInterface
 {
     private $transactionContextFactory;
 

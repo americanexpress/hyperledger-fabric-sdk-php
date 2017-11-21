@@ -5,7 +5,7 @@ namespace AmericanExpress\HyperledgerFabricClient\Config;
 
 use function igorw\get_in;
 
-class ClientConfig implements ClientConfigInterface
+final class ClientConfig implements ClientConfigInterface
 {
     /**
      * @var array

@@ -7,7 +7,7 @@ use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 
-class RandomBytesNonceGenerator implements NonceGeneratorInterface
+final class RandomBytesNonceGenerator implements NonceGeneratorInterface
 {
     /**
      * @var int

@@ -20,7 +20,7 @@ use Mdanter\Ecc\Serializer\PrivateKey\PemPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\PrivateKey\DerPrivateKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 
-class MdanterEccSignatory implements SignatoryInterface
+final class MdanterEccSignatory implements SignatoryInterface
 {
     /**
      * @var DerSignatureSerializer

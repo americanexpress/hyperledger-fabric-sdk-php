@@ -9,7 +9,7 @@ class ClientConfigFactory
      * @param \SplFileObject $file
      * @return ClientConfig
      */
-    public static function fromFile(\SplFileObject $file)
+    public static function fromFile(\SplFileObject $file): ClientConfig
     {
         $path = $file->getPathname();
 

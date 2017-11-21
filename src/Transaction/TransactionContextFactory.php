@@ -7,7 +7,7 @@ use AmericanExpress\HyperledgerFabricClient\ChannelContext;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
 
-class TransactionContextFactory implements TransactionContextFactoryInterface
+final class TransactionContextFactory implements TransactionContextFactoryInterface
 {
     /**
      * @var NonceGeneratorInterface

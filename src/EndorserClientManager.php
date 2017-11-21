@@ -6,7 +6,7 @@ namespace AmericanExpress\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\EndorserClientFactory;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 
-class EndorserClientManager implements EndorserClientManagerInterface
+final class EndorserClientManager implements EndorserClientManagerInterface
 {
     /**
      * @var EndorserClient[]

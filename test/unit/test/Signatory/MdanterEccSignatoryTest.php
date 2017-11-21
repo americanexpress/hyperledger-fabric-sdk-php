@@ -66,11 +66,11 @@ TAG
     /**
      * @covers       \AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory::getS
      * @dataProvider dataGetS
-     * @param \DateTime $dateTime
+     * @param string $dateTime
      * @param string $encodedProposalBytes
      * @param string $encodedSignature
      */
-    public function testGetS(\DateTime $dateTime, string $encodedProposalBytes, string $encodedSignature)
+    public function testGetS(string $dateTime, string $encodedProposalBytes, string $encodedSignature)
     {
         $transactionContextFactory = new TransactionContextFactory(
             new class implements NonceGeneratorInterface {
@@ -94,7 +94,7 @@ TAG
             'MyChaincodeVersion',
             3,
             1,
-            TimestampFactory::fromDateTime($dateTime)
+            TimestampFactory::fromDateTime(new \DateTime($dateTime))
         );
         $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
@@ -109,17 +109,14 @@ TAG
 
     public function dataGetS()
     {
-        return [
-            [
-                new \DateTime('2017-11-16T11:00:00Z'),
-                'CqUDCpUBCAMQARoGCLDftdAFIgtNeUNoYW5uZWxJZCpANTg0YWU3YzczMTJkMTRmNjA5MWI2ZjA1ZmZkYmQ1ZDA5NTA1OGE0MGMyMDQ2NmY3OGQ4ZWZlMjE4NmNkM2VmMTo4EjYKD015Q2hhaW5jb2RlUGF0aBIPTXlDaGFpbmNvZGVOYW1lGhJNeUNoYWluY29kZVZlcnNpb24SigIK+QEKBDEyMzQS8AEtLS0tLUJFR0lOIFBSSVZBVEUgS0VZLS0tLS0KTUlHSEFnRUFNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQkcwd2F3SUJBUVFnaG5BN3JkZ2JaaS93bmR1cwppWGp5ZjBLZ0U2T0taalErNUlOandlbFJBQzZoUkFOQ0FBU2IzdStoWStVL0ZadmhZRE42ZDA4SEoxdjU2VUpVCnl6L24yTkh5SmdUZzZrQzA1QWFKTWVHSWluRUYwSmVKdFJETlZRR3pvUUpRWWpuelVUUzlGdkdoCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0SDHUyM201azRoZjg2ahIGCgQKAhoA',
-                'MEQCIC7Rv6xBiXDybRH7owipe5aB5eMWBCYdEOkF3/u6SJ2FAiBCaR89Rae61+VyddJZQkn8GTGg2lz9Dgr4xvW95eLdIg==',
-            ],
-            [
-                new \DateTime('2017-11-16T00:00:00Z'),
-                'CqUDCpUBCAMQARoGCICqs9AFIgtNeUNoYW5uZWxJZCpANTg0YWU3YzczMTJkMTRmNjA5MWI2ZjA1ZmZkYmQ1ZDA5NTA1OGE0MGMyMDQ2NmY3OGQ4ZWZlMjE4NmNkM2VmMTo4EjYKD015Q2hhaW5jb2RlUGF0aBIPTXlDaGFpbmNvZGVOYW1lGhJNeUNoYWluY29kZVZlcnNpb24SigIK+QEKBDEyMzQS8AEtLS0tLUJFR0lOIFBSSVZBVEUgS0VZLS0tLS0KTUlHSEFnRUFNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQkcwd2F3SUJBUVFnaG5BN3JkZ2JaaS93bmR1cwppWGp5ZjBLZ0U2T0taalErNUlOandlbFJBQzZoUkFOQ0FBU2IzdStoWStVL0ZadmhZRE42ZDA4SEoxdjU2VUpVCnl6L24yTkh5SmdUZzZrQzA1QWFKTWVHSWluRUYwSmVKdFJETlZRR3pvUUpRWWpuelVUUzlGdkdoCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0SDHUyM201azRoZjg2ahIGCgQKAhoA',
-                'MEUCIQD9EDUxpvpBYtewKngRajsZy5YDcpDbPHD82hYdivM34QIgIvGTZW65l0vgsc87Ws3r3oq3140TYbZEChRLYk5pZE0=',
-            ],
-        ];
+        $contents = file_get_contents(__DIR__ . '/data-get-s.json');
+
+        $json = json_decode($contents, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException(json_last_error_msg(), json_last_error());
+        }
+
+        return $json;
     }
 }
