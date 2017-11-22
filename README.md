@@ -22,7 +22,6 @@ $config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
 $request = new \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest([
     'organization' => $config->getOrganization('test-network', 'org1'),
     'peer' => 'peer1',
-    'channelId' => 'foo',
     'chaincodeId' => (new ChaincodeID())
         ->setPath('github.com/example_cc')
         ->setName('example_cc')
@@ -33,7 +32,8 @@ $request = new \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionR
         'a',
     ],
 ]);
-$response = \AmericanExpress\HyperledgerFabricClient\ChannelFactory::fromConfig($config)
+$response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config)
+    ->getChannel('foo')
     ->queryByChainCode($request);
 ```
 
