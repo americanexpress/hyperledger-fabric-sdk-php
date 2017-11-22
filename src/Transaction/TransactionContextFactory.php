@@ -48,7 +48,7 @@ final class TransactionContextFactory implements TransactionContextFactoryInterf
     public function __construct(
         NonceGeneratorInterface $nonceGenerator,
         TransactionIdGeneratorInterface $transactionIdGenerator,
-        int $epoch = 0 // TODO: From config!
+        int $epoch = 0
     ) {
         $this->nonceGenerator = $nonceGenerator;
         $this->transactionIdGenerator = $transactionIdGenerator;

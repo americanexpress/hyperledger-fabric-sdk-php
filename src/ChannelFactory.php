@@ -50,7 +50,8 @@ class ChannelFactory
 
         $transactionContextFactory = new TransactionContextFactory(
             new RandomBytesNonceGenerator($config->getNonceSize()),
-            new TransactionIdGenerator($hashAlgo)
+            new TransactionIdGenerator($hashAlgo),
+            $config->getEpoch()
         );
 
         $client = ClientFactory::fromConfig($config);
