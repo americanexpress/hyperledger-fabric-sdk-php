@@ -60,15 +60,6 @@ class TransactionRequestTest extends TestCase
         self::assertSame('peer1', $this->sut->getPeer());
     }
 
-    public function testChannelId()
-    {
-        self::assertNull($this->sut->getChannelId());
-
-        $this->sut->setChannelId('foo');
-
-        self::assertSame('foo', $this->sut->getChannelId());
-    }
-
     public function testChaincodeId()
     {
         self::assertNull($this->sut->getChaincodeId());

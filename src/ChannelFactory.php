@@ -31,10 +31,11 @@ use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
 class ChannelFactory
 {
     /**
+     * @param string $name
      * @param ClientConfigInterface $config
      * @return Channel
      */
-    public static function fromConfig(ClientConfigInterface $config): Channel
+    public static function fromConfig(string $name, ClientConfigInterface $config): Channel
     {
         $endorserClients = new EndorserClientManager();
         try {
@@ -54,17 +55,6 @@ class ChannelFactory
 
         $signatory = new MdanterEccSignatory($hashAlgo);
 
-        return new Channel($endorserClients, $transactionContextFactory, $signatory);
-    }
-
-    /**
-     * @param \SplFileObject $file
-     * @return Channel
-     */
-    public static function fromConfigFile(\SplFileObject $file)
-    {
-        $config = ClientConfigFactory::fromFile($file);
-
-        return self::fromConfig($config);
+        return new Channel($name, $endorserClients, $transactionContextFactory, $signatory);
     }
 }

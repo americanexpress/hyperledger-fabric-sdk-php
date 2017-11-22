@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\TestAsset;
 
-use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
+use AmericanExpress\HyperledgerFabricClient\Client\Client;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
@@ -37,7 +37,6 @@ class E2EUtils
         $request = new TransactionRequest([
             'organization' => $config->getOrganization('test-network', $org),
             'peer' => 'peer1',
-            'channelId' => 'foo',
             'chaincodeId' => (new ChaincodeID())
                 ->setPath('github.com/example_cc')
                 ->setName('example_cc')
@@ -48,7 +47,11 @@ class E2EUtils
                 'a',
             ],
         ]);
-        $fabricProposal = ChannelFactory::fromConfig($config)->queryByChainCode($request);
+
+        $fabricProposal = (new Client($config))
+            ->getChannel('foo')
+            ->queryByChainCode($request);
+
         return $fabricProposal->getPayload();
     }
 }

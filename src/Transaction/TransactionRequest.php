@@ -39,11 +39,6 @@ class TransactionRequest extends AbstractOptions
     private $peer;
 
     /**
-     * @var string|null
-     */
-    private $channelId;
-
-    /**
      * @var ChaincodeID|null
      */
     private $chaincodeId;
@@ -100,23 +95,6 @@ class TransactionRequest extends AbstractOptions
     public function getPeerOptions(): ?PeerOptionsInterface
     {
         return $this->peer ? $this->organization->getPeerByName($this->peer) : null;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getChannelId(): ?string
-    {
-        return $this->channelId;
-    }
-
-    /**
-     * @param string $channelId
-     * @return void
-     */
-    public function setChannelId(string $channelId): void
-    {
-        $this->channelId = $channelId;
     }
 
     /**

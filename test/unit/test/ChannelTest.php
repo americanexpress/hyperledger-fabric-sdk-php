@@ -85,7 +85,7 @@ class ChannelTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->sut = new Channel($endorserClients, $this->transactionContextFactory, $this->signatory);
+        $this->sut = new Channel('foo', $endorserClients, $this->transactionContextFactory, $this->signatory);
     }
 
     public function testQueryByChaincode()
@@ -116,7 +116,6 @@ class ChannelTest extends TestCase
                 ],
             ]),
             'peer' => 'peer1',
-            'channelId' => 'MyChannelId',
             'chaincodeId' => (new ChaincodeID())
                 ->setPath('FizBuz')
                 ->setName('FooBar')
@@ -162,7 +161,6 @@ class ChannelTest extends TestCase
                 ],
             ]),
             'peer' => 'peer1',
-            'channelId' => 'MyChannelId',
             'chaincodeId' => (new ChaincodeID())
                 ->setPath('FizBuz')
                 ->setName('FooBar')

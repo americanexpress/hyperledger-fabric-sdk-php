@@ -18,33 +18,34 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient;
+namespace AmericanExpressTest\HyperledgerFabricClient\Client;
 
-use AmericanExpress\HyperledgerFabricClient\Channel;
-use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
+use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
+use AmericanExpress\HyperledgerFabricClient\Client\Client;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
-use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\ChannelFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\Client\Client
  */
-class ChannelFactoryTest extends TestCase
+class ClientTest extends TestCase
 {
-    public function testFromConfig()
-    {
-        $result = ChannelFactory::fromConfig('foo', new ClientConfig([]));
+    /**
+     * @var Client
+     */
+    private $sut;
 
-        self::assertInstanceOf(Channel::class, $result);
+    protected function setUp()
+    {
+        $this->sut = new Client(new ClientConfig([]));
     }
 
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
-     */
-    public function testThrowsExceptionOnInvalidHashAlgoInConfigFile()
+    public function testGetChannel()
     {
-        ChannelFactory::fromConfig('foo', new ClientConfig([
-            'crypto-hash-algo' => 'DEFINITELY INVALID'
-        ]));
+        $result = $this->sut->getChannel('foo');
+
+        self::assertInstanceOf(ChannelInterface::class, $result);
+
+        self::assertSame($result, $this->sut->getChannel('foo'));
     }
 }

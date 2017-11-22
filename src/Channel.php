@@ -36,6 +36,14 @@ use function igorw\get_in;
 
 final class Channel implements ChannelInterface
 {
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var TransactionContextFactoryInterface
+     */
     private $transactionContextFactory;
 
     /**
@@ -49,15 +57,18 @@ final class Channel implements ChannelInterface
     private $signatory;
 
     /**
+     * @param string $name
      * @param EndorserClientManagerInterface $endorserClients
      * @param TransactionContextFactoryInterface $transactionContextFactory
      * @param SignatoryInterface $signatory
      */
     public function __construct(
+        string $name,
         EndorserClientManagerInterface $endorserClients,
         TransactionContextFactoryInterface $transactionContextFactory,
         SignatoryInterface $signatory
     ) {
+        $this->name = $name;
         $this->endorserClients = $endorserClients;
         $this->transactionContextFactory = $transactionContextFactory;
         $this->signatory = $signatory;
@@ -83,7 +94,7 @@ final class Channel implements ChannelInterface
 
         $chainHeader = ChannelHeaderFactory::create(
             $transactionContext,
-            $request->getChannelId(),
+            $this->name,
             $request->getChaincodeId()->getPath(),
             $request->getChaincodeId()->getName(),
             $request->getChaincodeId()->getVersion()
