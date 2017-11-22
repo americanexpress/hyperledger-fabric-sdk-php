@@ -94,6 +94,7 @@ final class ClientConfig implements ClientConfigInterface
      * @param string $network
      * @param string $organization
      * @return OrganizationOptionsInterface|null
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\BadMethodCallException
      */
     public function getOrganization(string $network, string $organization): ?OrganizationOptionsInterface
     {

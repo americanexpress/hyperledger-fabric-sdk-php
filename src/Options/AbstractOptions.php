@@ -29,6 +29,7 @@ abstract class AbstractOptions
     /**
      * AbstractOptions constructor.
      * @param iterable $options
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\BadMethodCallException
      */
     public function __construct(iterable $options = [])
     {
@@ -42,12 +43,12 @@ abstract class AbstractOptions
             } catch (AssertionFailedException $e) {
                 throw BadMethodCallException::fromException($e, sprintf(
                     '%s::%s is not callable.',
-                    get_called_class(),
+                    static::class,
                     $setter
                 ));
             }
 
-            call_user_func($callable, $value);
+            $callable($value);
         }
     }
 }

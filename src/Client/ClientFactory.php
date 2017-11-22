@@ -31,6 +31,8 @@ class ClientFactory
     /**
      * @param ClientConfigInterface $config
      * @return ClientInterface
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public static function fromConfig(ClientConfigInterface $config): ClientInterface
     {

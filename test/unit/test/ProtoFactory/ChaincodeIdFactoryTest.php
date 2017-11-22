@@ -30,7 +30,7 @@ class ChaincodeIdFactoryTest extends TestCase
     {
         $result = ChaincodeIdFactory::create('FooBar', 'FizBuz', 'v12.34');
 
-        self::assertInstanceOf(ChaincodeId::class, $result);
+        self::assertInstanceOf(ChaincodeID::class, $result);
         self::assertSame('FooBar', $result->getPath());
         self::assertSame('FizBuz', $result->getName());
         self::assertSame('v12.34', $result->getVersion());

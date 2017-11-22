@@ -38,7 +38,7 @@ final class TransactionContextFactory implements TransactionContextFactoryInterf
     /**
      * @var int
      */
-    private $epoch = 0;
+    private $epoch;
 
     /**
      * @param NonceGeneratorInterface $nonceGenerator

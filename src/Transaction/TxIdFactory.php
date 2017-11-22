@@ -38,6 +38,7 @@ final class TxIdFactory implements TxIdFactoryInterface
 
     /**
      * @param HashAlgorithm $hashAlgorithm
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public function __construct(HashAlgorithm $hashAlgorithm = null)
     {

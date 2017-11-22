@@ -24,10 +24,11 @@ class InvalidArgumentException extends \InvalidArgumentException implements Exce
 {
     /**
      * @param \Exception $exception
+     * @param string $message
      * @return self
      */
-    public static function fromException(\Exception $exception): self
+    public static function fromException(\Exception $exception, string $message = ''): self
     {
-        return new self($exception->getMessage(), $exception->getCode(), $exception);
+        return new self($message ?: $exception->getMessage(), $exception->getCode(), $exception);
     }
 }

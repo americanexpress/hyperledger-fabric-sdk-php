@@ -23,7 +23,6 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
-use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 /**

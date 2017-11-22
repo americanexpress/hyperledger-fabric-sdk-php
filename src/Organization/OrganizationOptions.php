@@ -152,6 +152,7 @@ class OrganizationOptions extends AbstractOptions implements OrganizationOptions
     /**
      * @param array|PeerOptions[] $peers
      * @return void
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\BadMethodCallException
      */
     public function setPeers(array $peers): void
     {

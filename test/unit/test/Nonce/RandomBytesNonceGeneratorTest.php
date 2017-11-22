@@ -42,14 +42,14 @@ class RandomBytesNonceGeneratorTest extends TestCase
     {
         $nonce = $this->sut->generateNonce();
 
-        self::assertSame(24, strlen($nonce));
+        self::assertSame(24, \strlen($nonce));
     }
 
     public function testConfigurableNonceLength()
     {
         $nonce = (new RandomBytesNonceGenerator(3))->generateNonce();
 
-        self::assertSame(3, strlen($nonce));
+        self::assertSame(3, \strlen($nonce));
     }
 
     /**

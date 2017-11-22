@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Signatory;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignedProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
 use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
@@ -77,6 +78,8 @@ final class MdanterEccSignatory implements SignatoryInterface
     /**
      * Utils constructor.
      * @param HashAlgorithm $hashAlgorithm
+     * @throws RuntimeException
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public function __construct(HashAlgorithm $hashAlgorithm = null)
     {
@@ -115,9 +118,8 @@ final class MdanterEccSignatory implements SignatoryInterface
         $keyData = $privateKeyPath->fread($privateKeyPath->getSize());
         \openssl_pkey_export($keyData, $privateKey);
         $pemSerializer = new PemPrivateKeySerializer(new DerPrivateKeySerializer($this->adapter));
-        $key = $pemSerializer->parse($privateKey);
 
-        return $key;
+        return $pemSerializer->parse($privateKey);
     }
 
     /**

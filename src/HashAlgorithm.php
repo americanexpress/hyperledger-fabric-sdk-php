@@ -34,6 +34,7 @@ class HashAlgorithm
     /**
      * HashAlgorithm constructor.
      * @param string $value
+     * @throws InvalidArgumentException
      */
     public function __construct(string $value = 'sha256')
     {

@@ -77,7 +77,7 @@ class PeerOptions extends AbstractOptions implements PeerOptionsInterface
     /**
      * @param string $requests
      */
-    public function setRequests(string $requests)
+    public function setRequests(string $requests): void
     {
         $this->requests = $requests;
     }
@@ -93,7 +93,7 @@ class PeerOptions extends AbstractOptions implements PeerOptionsInterface
     /**
      * @param string $events
      */
-    public function setEvents(string $events)
+    public function setEvents(string $events): void
     {
         $this->events = $events;
     }
@@ -109,7 +109,7 @@ class PeerOptions extends AbstractOptions implements PeerOptionsInterface
     /**
      * @param string $serverHostname
      */
-    public function setServerHostname(string $serverHostname)
+    public function setServerHostname(string $serverHostname): void
     {
         $this->serverHostname = $serverHostname;
     }
@@ -125,7 +125,7 @@ class PeerOptions extends AbstractOptions implements PeerOptionsInterface
     /**
      * @param string $tlsCaCerts
      */
-    public function setTlsCaCerts(string $tlsCaCerts)
+    public function setTlsCaCerts(string $tlsCaCerts): void
     {
         $this->tlsCaCerts = $tlsCaCerts;
     }

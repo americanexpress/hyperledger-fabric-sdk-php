@@ -33,6 +33,7 @@ class ChannelFactory
      * @param string $name
      * @param ClientConfigInterface $config
      * @return Channel
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
      * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public static function fromConfig(string $name, ClientConfigInterface $config): Channel

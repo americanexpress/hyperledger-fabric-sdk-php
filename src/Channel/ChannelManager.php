@@ -48,6 +48,8 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * @param string $name
      * @return ChannelInterface
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public function get(string $name): ChannelInterface
     {

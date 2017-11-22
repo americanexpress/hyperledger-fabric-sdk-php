@@ -22,5 +22,13 @@ namespace AmericanExpress\HyperledgerFabricClient\Exception;
 
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
-
+    /**
+     * @param \Exception $exception
+     * @param string $message
+     * @return self
+     */
+    public static function fromException(\Exception $exception, string $message = ''): self
+    {
+        return new self($message ?: $exception->getMessage(), $exception->getCode(), $exception);
+    }
 }

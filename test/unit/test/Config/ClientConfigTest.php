@@ -56,7 +56,7 @@ class ClientConfigTest extends TestCase
     {
         self::assertSame('FizBuz', $this->sut->getIn(['foo', 'bar']));
         self::assertSame(['bar' => 'FizBuz'], $this->sut->getIn(['foo']));
-        self::assertSame(null, $this->sut->getIn(['Alice', 'Bob']));
+        self::assertNull($this->sut->getIn(['Alice', 'Bob']));
         self::assertSame('FizBuz', $this->sut->getIn(['Alice', 'Bob'], 'FizBuz'));
     }
 

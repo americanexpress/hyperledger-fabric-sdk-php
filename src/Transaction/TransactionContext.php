@@ -42,7 +42,7 @@ class TransactionContext
     /**
      * @var int
      */
-    private $epoch = 0;
+    private $epoch;
 
     /**
      * @param SerializedIdentity $serializedIdentity
