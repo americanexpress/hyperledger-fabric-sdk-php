@@ -24,7 +24,7 @@ use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 
-class ChannelManager implements ChannelManagerInterface
+final class ChannelManager implements ChannelManagerInterface
 {
     /**
      * @var ClientConfigInterface

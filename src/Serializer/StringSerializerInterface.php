@@ -18,39 +18,19 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Organization;
+namespace AmericanExpress\HyperledgerFabricClient\Serializer;
 
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
-
-interface OrganizationOptionsInterface
+interface StringSerializerInterface
 {
     /**
-     * @return string|null
+     * @param array $array
+     * @return string
      */
-    public function getName(): ?string;
+    public function serialize(array $array): string;
 
     /**
-     * @return string|null
+     * @param string $string
+     * @return array
      */
-    public function getMspId(): ?string;
-
-    /**
-     * @return string[]
-     */
-    public function getCa(): array;
-
-    /**
-     * @return string|null
-     */
-    public function getAdminCerts(): ?string;
-
-    /**
-     * @return string|null
-     */
-    public function getPrivateKey(): ?string;
-
-    /**
-     * @return PeerOptions[]
-     */
-    public function getPeers(): array;
+    public function deserialize(string $string): array;
 }

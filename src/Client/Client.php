@@ -35,7 +35,7 @@ use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use function igorw\get_in;
 
-class Client implements ClientInterface
+final class Client implements ClientInterface
 {
     /**
      * @var ChannelManagerInterface
@@ -84,7 +84,8 @@ class Client implements ClientInterface
      * @throws \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
      * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
      */
-    public function processProposal(Proposal $proposal, TransactionRequest $context): ProposalResponse {
+    public function processProposal(Proposal $proposal, TransactionRequest $context): ProposalResponse
+    {
         $privateKey = $context->getOrganization()->getPrivateKey();
 
         $signedProposal = $this->signatory->signProposal($proposal, new \SplFileObject($privateKey));

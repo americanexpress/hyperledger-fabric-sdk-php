@@ -18,39 +18,25 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Organization;
+namespace AmericanExpress\HyperledgerFabricClient\Serializer;
 
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
-
-interface OrganizationOptionsInterface
+final class SignedCharStringSerializer implements StringSerializerInterface
 {
     /**
-     * @return string|null
+     * @param array $array
+     * @return string
      */
-    public function getName(): ?string;
+    public function serialize(array $array): string
+    {
+        return pack(...array_merge(['c*'], $array));
+    }
 
     /**
-     * @return string|null
+     * @param string $data
+     * @return array
      */
-    public function getMspId(): ?string;
-
-    /**
-     * @return string[]
-     */
-    public function getCa(): array;
-
-    /**
-     * @return string|null
-     */
-    public function getAdminCerts(): ?string;
-
-    /**
-     * @return string|null
-     */
-    public function getPrivateKey(): ?string;
-
-    /**
-     * @return PeerOptions[]
-     */
-    public function getPeers(): array;
+    public function deserialize(string $data): array
+    {
+        return \unpack('c*', $data);
+    }
 }

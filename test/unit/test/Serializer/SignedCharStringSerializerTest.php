@@ -18,39 +18,32 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Organization;
+namespace AmericanExpressTest\HyperledgerFabricClient\Serializer;
 
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
+use AmericanExpress\HyperledgerFabricClient\Serializer\SignedCharStringSerializer;
+use PHPUnit\Framework\TestCase;
 
-interface OrganizationOptionsInterface
+/**
+ * @covers \AmericanExpress\HyperledgerFabricClient\Serializer\SignedCharStringSerializer
+ */
+class SignedCharStringSerializerTest extends TestCase
 {
     /**
-     * @return string|null
+     * @var SignedCharStringSerializer
      */
-    public function getName(): ?string;
+    private $sut;
 
-    /**
-     * @return string|null
-     */
-    public function getMspId(): ?string;
+    protected function setUp()
+    {
+        $this->sut = new SignedCharStringSerializer();
+    }
 
-    /**
-     * @return string[]
-     */
-    public function getCa(): array;
+    public function testSerialize()
+    {
+        $encoded = $this->sut->deserialize('FooBar');
 
-    /**
-     * @return string|null
-     */
-    public function getAdminCerts(): ?string;
+        $decoded = $this->sut->serialize($encoded);
 
-    /**
-     * @return string|null
-     */
-    public function getPrivateKey(): ?string;
-
-    /**
-     * @return PeerOptions[]
-     */
-    public function getPeers(): array;
+        self::assertSame('FooBar', $decoded);
+    }
 }

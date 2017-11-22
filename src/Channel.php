@@ -66,7 +66,8 @@ final class Channel implements ChannelInterface
      * @param TransactionRequest $request
      * @return ProposalResponse
      */
-    public function queryByChainCode(TransactionRequest $request): ProposalResponse {
+    public function queryByChainCode(TransactionRequest $request): ProposalResponse
+    {
         $proposal = $this->createProposal($request);
 
         return $this->client->processProposal($proposal, $request);

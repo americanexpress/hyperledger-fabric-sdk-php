@@ -20,8 +20,9 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
+use AmericanExpress\HyperledgerFabricClient\Serializer\AsciiCharStringSerializer;
 use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
+use AmericanExpress\HyperledgerFabricClient\Serializer\SignedCharStringSerializer;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
 final class TransactionIdGenerator implements TransactionIdGeneratorInterface
@@ -32,9 +33,14 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
     private $hashAlgorithm;
 
     /**
-     * @var BinaryStringSerializer
+     * @var AsciiCharStringSerializer
      */
-    private $binaryStringSerializer;
+    private $asciiCharStringSerializer;
+
+    /**
+     * @var SignedCharStringSerializer
+     */
+    private $signedCharStringSerializer;
 
     /**
      * @param HashAlgorithm $hashAlgorithm
@@ -43,7 +49,8 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
     public function __construct(HashAlgorithm $hashAlgorithm = null)
     {
         $this->hashAlgorithm = $hashAlgorithm ?: new HashAlgorithm();
-        $this->binaryStringSerializer = new BinaryStringSerializer();
+        $this->asciiCharStringSerializer = new AsciiCharStringSerializer();
+        $this->signedCharStringSerializer = new SignedCharStringSerializer();
     }
 
     /**
@@ -53,13 +60,13 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
      */
     public function fromSerializedIdentity(SerializedIdentity $serializedIdentity, string $nonce): string
     {
-        $noArray = $this->binaryStringSerializer->deserialize($nonce);
+        $noArray = $this->signedCharStringSerializer->deserialize($nonce);
 
-        $identityArray = $this->binaryStringSerializer->deserialize($serializedIdentity->serializeToString());
+        $identityArray = $this->signedCharStringSerializer->deserialize($serializedIdentity->serializeToString());
 
         $comp = \array_merge($noArray, $identityArray);
 
-        $compString = $this->binaryStringSerializer->serialize($comp);
+        $compString = $this->asciiCharStringSerializer->serialize($comp);
 
         return \hash((string) $this->hashAlgorithm, $compString);
     }

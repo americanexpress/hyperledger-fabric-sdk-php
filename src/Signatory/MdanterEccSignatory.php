@@ -22,8 +22,9 @@ namespace AmericanExpress\HyperledgerFabricClient\Signatory;
 
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignedProposalFactory;
-use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
+use AmericanExpress\HyperledgerFabricClient\Serializer\AsciiCharStringSerializer;
 use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
+use AmericanExpress\HyperledgerFabricClient\Serializer\SignedCharStringSerializer;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use Mdanter\Ecc\Crypto\Key\PrivateKeyInterface;
@@ -56,9 +57,14 @@ final class MdanterEccSignatory implements SignatoryInterface
     private $hashAlgorithm;
 
     /**
-     * @var BinaryStringSerializer
+     * @var AsciiCharStringSerializer
      */
-    private $binaryStringSerializer;
+    private $asciiCharStringSerializer;
+
+    /**
+     * @var SignedCharStringSerializer
+     */
+    private $signedCharStringSerializer;
 
     /**
      * @var GmpMathInterface
@@ -84,7 +90,8 @@ final class MdanterEccSignatory implements SignatoryInterface
     public function __construct(HashAlgorithm $hashAlgorithm = null)
     {
         $this->hashAlgorithm = $hashAlgorithm ?: new HashAlgorithm();
-        $this->binaryStringSerializer = new BinaryStringSerializer();
+        $this->asciiCharStringSerializer = new AsciiCharStringSerializer();
+        $this->signedCharStringSerializer = new SignedCharStringSerializer();
         $this->adapter = EccFactory::getAdapter();
         $this->generator = EccFactory::getNistCurves()->generator256();
         $this->signer = new Signer($this->adapter);
@@ -100,7 +107,7 @@ final class MdanterEccSignatory implements SignatoryInterface
     public function signProposal(Proposal $proposal, \SplFileObject $privateKeyFile): SignedProposal
     {
         $proposalString = $proposal->serializeToString();
-        $proposalArray = $this->binaryStringSerializer->deserialize($proposalString);
+        $proposalArray = $this->signedCharStringSerializer->deserialize($proposalString);
         $privateKey = $this->readPrivateKey($privateKeyFile);
         $signature = $this->signData($privateKey, $proposalArray);
 
@@ -130,7 +137,7 @@ final class MdanterEccSignatory implements SignatoryInterface
      */
     private function signData(PrivateKeyInterface $privateKey, array $dataArray): string
     {
-        $dataString = $this->binaryStringSerializer->serialize($dataArray);
+        $dataString = $this->asciiCharStringSerializer->serialize($dataArray);
 
         $hash = $this->signer->hashData($this->generator, (string) $this->hashAlgorithm, $dataString);
 

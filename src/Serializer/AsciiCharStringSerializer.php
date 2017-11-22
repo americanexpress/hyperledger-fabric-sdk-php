@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Serializer;
 
-class BinaryStringSerializer
+final class AsciiCharStringSerializer implements StringSerializerInterface
 {
     /**
      * @param array $array
@@ -43,6 +43,6 @@ class BinaryStringSerializer
      */
     public function deserialize(string $string): array
     {
-        return \unpack('c*', $string);
+        return array_map('\ord', \str_split($string));
     }
 }

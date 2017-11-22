@@ -20,34 +20,30 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Serializer;
 
-use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
+use AmericanExpress\HyperledgerFabricClient\Serializer\AsciiCharStringSerializer;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer
+ * @covers \AmericanExpress\HyperledgerFabricClient\Serializer\AsciiCharStringSerializer
  */
-class BinaryStringSerializerTest extends TestCase
+class AsciiCharStringSerializerTest extends TestCase
 {
     /**
-     * @var BinaryStringSerializer
+     * @var AsciiCharStringSerializer
      */
     private $sut;
 
     protected function setUp()
     {
-        $this->sut = new BinaryStringSerializer();
+        $this->sut = new AsciiCharStringSerializer();
     }
 
     public function testSerialize()
     {
-        self::assertSame('AAA=', base64_encode($this->sut->serialize([
-            'foo',
-            'bar',
-        ])));
-    }
+        $encoded = $this->sut->deserialize('FooBar');
 
-    public function testDeserialize()
-    {
-        self::assertSame([1 => 0, 2 => 0], $this->sut->deserialize(base64_decode('AAA=')));
+        $decoded = $this->sut->serialize($encoded);
+
+        self::assertSame('FooBar', $decoded);
     }
 }
