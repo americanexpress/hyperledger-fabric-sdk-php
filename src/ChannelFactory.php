@@ -23,7 +23,7 @@ namespace AmericanExpress\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
-use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatoryFactory;
+use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
 
@@ -36,13 +36,14 @@ class ChannelFactory
     public static function fromConfig(ClientConfigInterface $config): Channel
     {
         $endorserClients = new EndorserClientManager();
+        $hashAlgo = new HashAlgorithm($config->getIn(['crypto-hash-algo']));
 
         $transactionContextFactory = new TransactionContextFactory(
             new RandomBytesNonceGenerator($config->getNonceSize()),
-            new TxIdFactory(HashAlgorithm::fromConfig($config))
+            new TxIdFactory($hashAlgo)
         );
 
-        $signatory = MdanterEccSignatoryFactory::fromConfig($config);
+        $signatory = new MdanterEccSignatory($hashAlgo);
 
         return new Channel($endorserClients, $transactionContextFactory, $signatory);
     }

@@ -54,13 +54,4 @@ class HashAlgorithm
     {
         return $this->value;
     }
-
-    /**
-     * @param ClientConfigInterface $config
-     * @return self
-     */
-    public static function fromConfig(ClientConfigInterface $config): self
-    {
-        return new self($config->getIn(['crypto-hash-algo']));
-    }
 }

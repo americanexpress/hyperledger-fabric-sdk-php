@@ -50,13 +50,4 @@ class HashAlgorithmTest extends TestCase
     {
         new HashAlgorithm('InvalidAlgorithm');
     }
-
-    public function testFromConfig()
-    {
-        $result = HashAlgorithm::fromConfig(new ClientConfig([
-            'crypto-hash-algo' => 'sha512',
-        ]));
-
-        self::assertSame('sha512', (string) $result);
-    }
 }
