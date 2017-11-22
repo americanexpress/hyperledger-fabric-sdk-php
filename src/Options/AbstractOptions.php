@@ -33,7 +33,7 @@ abstract class AbstractOptions
     public function __construct(iterable $options = [])
     {
         foreach ($options as $key => $value) {
-            $setter = 'set' . str_replace('_', '', $key);
+            $setter = 'set' . str_replace(['_', '-'], '', $key);
 
             $callable = [$this, $setter];
 

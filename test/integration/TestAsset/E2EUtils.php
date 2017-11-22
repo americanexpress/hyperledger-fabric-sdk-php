@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\TestAsset;
 
-use AmericanExpress\HyperledgerFabricClient\ChaincodeQueryParams;
-use AmericanExpress\HyperledgerFabricClient\ChannelContext;
 use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 
 class E2EUtils
 {
@@ -31,36 +31,24 @@ class E2EUtils
      * @param string $org
      * @return string
      */
-    public function queryChaincode(string $org)
+    public function queryChaincode(string $org): string
     {
-        $queryParams = $this->getQueryParam();
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
-        $channel = ChannelFactory::fromConfig($config);
-        $channelContext = new ChannelContext([
-            'host' => $config->getIn(['test-network', $org, 'peer1', 'requests']),
-            'mspId' => $config->getIn(['test-network', $org, 'mspid']),
-            'adminCerts' => new \SplFileObject($config->getIn(['test-network', $org, 'admin_certs'])),
-            'privateKey' => new \SplFileObject($config->getIn(['test-network', $org, 'private_key'])),
-        ]);
-        $fabricProposal = $channel->queryByChainCode($channelContext, $queryParams);
-        return $fabricProposal->getPayload();
-    }
-
-    /**
-     * @return ChaincodeQueryParams
-     */
-    public function getQueryParam()
-    {
-        return new ChaincodeQueryParams([
-            'CHAINCODE_NAME' => 'example_cc',
-            'CHAINCODE_PATH' => 'github.com/example_cc',
-            'CHAINCODE_VERSION' => '1',
-            'CHANNEL_ID' => 'foo',
-            'ARGS' => [
+        $request = new TransactionRequest([
+            'organization' => $config->getOrganization('test-network', $org),
+            'peer' => 'peer1',
+            'channelId' => 'foo',
+            'chaincodeId' => (new ChaincodeID())
+                ->setPath('github.com/example_cc')
+                ->setName('example_cc')
+                ->setVersion('1'),
+            'args' => [
                 'invoke',
                 'query',
                 'a',
             ],
         ]);
+        $fabricProposal = ChannelFactory::fromConfig($config)->queryByChainCode($request);
+        return $fabricProposal->getPayload();
     }
 }

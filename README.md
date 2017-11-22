@@ -16,28 +16,25 @@ Below, you will find high-level and concise snippets of code demonstrating how t
 
 ### Channel::queryByChaincode
 ```php
-$org = 'org1';
-$config = new ClientConfig([
+$config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
     // See `test/integration/config.php` for an example.
 ]);
-$channel = ChannelFactory::fromConfig($config);
-$channelContext = new ChannelContext([
-    'host' => $config->getIn(['test-network', $org, 'peer1', 'requests']),
-    'mspId' => $config->getIn(['test-network', $org, 'mspid']),
-    'adminCerts' => new \SplFileObject($config->getIn(['test-network', $org, 'admin_certs'])),
-    'privateKey' => new \SplFileObject($config->getIn(['test-network', $org, 'private_key'])),
+$request = new \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest([
+    'organization' => $config->getOrganization('test-network', 'org1'),
+    'peer' => 'peer1',
+    'channelId' => 'foo',
+    'chaincodeId' => (new ChaincodeID())
+        ->setPath('github.com/example_cc')
+        ->setName('example_cc')
+        ->setVersion('1'),
+    'args' => [
+        'invoke',
+        'query',
+        'a',
+    ],
 ]);
-$fabricProposal = $channel->queryByChainCode($channelContext, new QueryParams([
-  'CHAINCODE_NAME' => 'example_cc',
-  'CHAINCODE_PATH' => 'github.com/example_cc',
-  'CHAINCODE_VERSION' => '1',
-  'CHANNEL_ID' => 'foo',
-  'ARGS' => [
-      'invoke',
-      'query',
-      'a',
-  ],
-]));
+$response = \AmericanExpress\HyperledgerFabricClient\ChannelFactory::fromConfig($config)
+    ->queryByChainCode($request);
 ```
 
 ## Phase 1

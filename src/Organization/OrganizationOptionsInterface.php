@@ -18,16 +18,39 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient;
+namespace AmericanExpress\HyperledgerFabricClient\Organization;
 
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 
-interface ChannelInterface
+interface OrganizationOptionsInterface
 {
     /**
-     * @param TransactionRequest $request
-     * @return ProposalResponse
+     * @return string|null
      */
-    public function queryByChainCode(TransactionRequest $request): ProposalResponse;
+    public function getName(): ?string;
+
+    /**
+     * @return string|null
+     */
+    public function getMspId(): ?string;
+
+    /**
+     * @return string[]
+     */
+    public function getCa(): array;
+
+    /**
+     * @return string|null
+     */
+    public function getAdminCerts(): ?string;
+
+    /**
+     * @return string|null
+     */
+    public function getPrivateKey(): ?string;
+
+    /**
+     * @return PeerOptions[]
+     */
+    public function getPeers(): array;
 }

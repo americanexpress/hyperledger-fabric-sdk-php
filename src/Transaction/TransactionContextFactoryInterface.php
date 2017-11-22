@@ -20,13 +20,11 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\ChannelContext;
-
 interface TransactionContextFactoryInterface
 {
     /**
-     * @param ChannelContext $channelContext
+     * @param TransactionRequest $request
      * @return TransactionContext
      */
-    public function fromChannelContext(ChannelContext $channelContext): TransactionContext;
+    public function fromTransactionRequest(TransactionRequest $request): TransactionContext;
 }

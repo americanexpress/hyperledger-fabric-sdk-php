@@ -71,6 +71,15 @@ class AbstractOptionsTest extends TestCase
         self::assertSame('FizBuz', $sut->getFooBar());
     }
 
+    public function testSetOptionStripsHyphens()
+    {
+        $sut = new FakeOptions([
+            '-Foo-Bar-' => 'FizBuz',
+        ]);
+
+        self::assertSame('FizBuz', $sut->getFooBar());
+    }
+
     /**
      * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\BadMethodCallException
      * @expectedExceptionMessage FakeOptions::setAlice is not callable.

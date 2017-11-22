@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Config;
 
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
+use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
@@ -146,5 +147,31 @@ class ClientConfigTest extends TestCase
         $sut = new ClientConfig([]);
 
         self::assertSame(5000, $sut->getTimeout());
+    }
+
+    public function testGetOrganizationOptionsByNetworkAndOrganizationNames()
+    {
+        $sut = new ClientConfig([
+            'test-network' => [
+                'org1' => [
+                    'name' => 'peerOrg1',
+                    'mspid' => 'Org1MSP',
+                    'admin_certs' => __FILE__,
+                    'private_key' => __FILE__,
+                ],
+            ],
+        ]);
+
+        self::assertInstanceOf(
+            OrganizationOptionsInterface::class,
+            $sut->getOrganization('test-network', 'org1')
+        );
+    }
+
+    public function testGetOrganizationOptionsByInvalidNetworkAndOrganizationNames()
+    {
+        $sut = new ClientConfig([]);
+
+        self::assertNull($sut->getOrganization('FooBar', 'FizBuz'));
     }
 }

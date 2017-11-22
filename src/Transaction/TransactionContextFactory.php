@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\ChannelContext;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
 
@@ -57,12 +56,15 @@ final class TransactionContextFactory implements TransactionContextFactoryInterf
     }
 
     /**
-     * @param ChannelContext $channelContext
+     * @param TransactionRequest $request
      * @return TransactionContext
      */
-    public function fromChannelContext(ChannelContext $channelContext): TransactionContext
+    public function fromTransactionRequest(TransactionRequest $request): TransactionContext
     {
-        $identity = SerializedIdentityFactory::fromFile($channelContext->getMspId(), $channelContext->getAdminCerts());
+        $identity = SerializedIdentityFactory::fromFile(
+            $request->getOrganization()->getMspId(),
+            new \SplFileObject($request->getOrganization()->getAdminCerts())
+        );
 
         $nonce = $this->nonceGenerator->generateNonce();
 

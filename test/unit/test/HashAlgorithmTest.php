@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use PHPUnit\Framework\TestCase;
 

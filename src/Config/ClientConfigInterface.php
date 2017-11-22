@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Config;
 
+use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
+
 interface ClientConfigInterface
 {
     /**
@@ -48,4 +50,11 @@ interface ClientConfigInterface
      * @return int
      */
     public function getEpoch(): int;
+
+    /**
+     * @param string $network
+     * @param string $organization
+     * @return OrganizationOptionsInterface|null
+     */
+    public function getOrganization(string $network, string $organization): ?OrganizationOptionsInterface;
 }

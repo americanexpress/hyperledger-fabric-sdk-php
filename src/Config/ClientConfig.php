@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Config;
 
+use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
+use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
 use function igorw\get_in;
 
 final class ClientConfig implements ClientConfigInterface
@@ -86,5 +88,17 @@ final class ClientConfig implements ClientConfigInterface
     public function getEpoch(): int
     {
         return (int) $this->getIn(['epoch']);
+    }
+
+    /**
+     * @param string $network
+     * @param string $organization
+     * @return OrganizationOptionsInterface|null
+     */
+    public function getOrganization(string $network, string $organization): ?OrganizationOptionsInterface
+    {
+        $options = $this->getIn([$network, $organization]);
+
+        return $options ? new OrganizationOptions($options) : null;
     }
 }

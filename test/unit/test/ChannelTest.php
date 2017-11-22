@@ -20,13 +20,14 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\ChaincodeQueryParams;
 use AmericanExpress\HyperledgerFabricClient\Channel;
-use AmericanExpress\HyperledgerFabricClient\ChannelContext;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Grpc\UnaryCall;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
@@ -89,25 +90,6 @@ class ChannelTest extends TestCase
 
     public function testQueryByChaincode()
     {
-        $file = new \SplFileObject(__FILE__);
-
-        $context = new ChannelContext([
-            'host' => 'example.com',
-            'mspId' => '1234',
-            'adminCerts' => $file,
-            'privateKey' => $file,
-        ]);
-
-        $params = new ChaincodeQueryParams([
-            'channelId' => 'MyChannelId',
-            'chaincodeName' => 'FooBar',
-            'chaincodePath' => 'FizBuz',
-            'chaincodeVersion' => 'v12.34',
-            'args' => [
-                'foo' => 'bar',
-            ],
-        ]);
-
         $this->endorserClient->method('ProcessProposal')
             ->willReturn($this->unaryCall);
 
@@ -121,7 +103,28 @@ class ChannelTest extends TestCase
                 ]
             ]);
 
-        $result = $this->sut->queryByChainCode($context, $params);
+        $result = $this->sut->queryByChainCode(new TransactionRequest([
+            'organization' => new OrganizationOptions([
+                'mspId' => '1234',
+                'adminCerts' => __FILE__,
+                'privateKey' => __FILE__,
+                'peers' => [
+                    [
+                        'name' => 'peer1',
+                        'requests' => 'example.com',
+                    ],
+                ],
+            ]),
+            'peer' => 'peer1',
+            'channelId' => 'MyChannelId',
+            'chaincodeId' => (new ChaincodeID())
+                ->setPath('FizBuz')
+                ->setName('FooBar')
+                ->setVersion('v12.34'),
+            'args' => [
+                'foo' => 'bar',
+            ],
+        ]));
 
         self::assertSame($proposalResponse, $result);
     }
@@ -133,25 +136,6 @@ class ChannelTest extends TestCase
      */
     public function testQueryByChaincodeConnectionFailure()
     {
-        $file = new \SplFileObject(__FILE__);
-
-        $context = new ChannelContext([
-            'host' => 'example.com',
-            'mspId' => '1234',
-            'adminCerts' => $file,
-            'privateKey' => $file,
-        ]);
-
-        $params = new ChaincodeQueryParams([
-            'channelId' => 'MyChannelId',
-            'chaincodeName' => 'FooBar',
-            'chaincodePath' => 'FizBuz',
-            'chaincodeVersion' => 'v12.34',
-            'args' => [
-                'foo' => 'bar',
-            ],
-        ]);
-
         $this->endorserClient->method('ProcessProposal')
             ->willReturn($this->unaryCall);
 
@@ -165,6 +149,27 @@ class ChannelTest extends TestCase
                 ]
             ]);
 
-        $this->sut->queryByChainCode($context, $params);
+        $this->sut->queryByChainCode(new TransactionRequest([
+            'organization' => new OrganizationOptions([
+                'mspId' => '1234',
+                'adminCerts' => __FILE__,
+                'privateKey' => __FILE__,
+                'peers' => [
+                    [
+                        'name' => 'peer1',
+                        'requests' => 'example.com',
+                    ],
+                ],
+            ]),
+            'peer' => 'peer1',
+            'channelId' => 'MyChannelId',
+            'chaincodeId' => (new ChaincodeID())
+                ->setPath('FizBuz')
+                ->setName('FooBar')
+                ->setVersion('v12.34'),
+            'args' => [
+                'foo' => 'bar',
+            ],
+        ]));
     }
 }

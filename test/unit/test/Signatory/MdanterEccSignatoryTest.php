@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Signatory;
 
-use AmericanExpress\HyperledgerFabricClient\ChannelContext;
 use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
+use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
@@ -29,6 +29,7 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
@@ -98,11 +99,12 @@ TAG
             },
             new TxIdFactory()
         );
-        $channelContext = new ChannelContext([
-            'mspId' => '1234',
-            'adminCerts' => new \SplFileObject($this->privateKey->url()),
-        ]);
-        $transactionContext = $transactionContextFactory->fromChannelContext($channelContext);
+        $transactionContext = $transactionContextFactory->fromTransactionRequest(new TransactionRequest([
+            'organization' => new OrganizationOptions([
+                'mspId' => '1234',
+                'adminCerts' => $this->privateKey->url(),
+            ]),
+        ]));
         $channelHeader = ChannelHeaderFactory::create(
             $transactionContext,
             'MyChannelId',

@@ -20,10 +20,11 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\ChannelContext;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
+use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -45,11 +46,13 @@ class TransactionContextFactoryTest extends TestCase
         );
     }
 
-    public function testFromChannelContext()
+    public function testFromTransactionRequest()
     {
-        $result = $this->sut->fromChannelContext(new ChannelContext([
-            'mspId' => '1234',
-            'adminCerts' => new \SplFileObject(__FILE__),
+        $result = $this->sut->fromTransactionRequest(new TransactionRequest([
+            'organization' => new OrganizationOptions([
+                'mspid' => 'Org1MSP',
+                'admin_certs' => __FILE__,
+            ]),
         ]));
 
         self::assertInstanceOf(TransactionContext::class, $result);
