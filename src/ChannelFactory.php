@@ -25,7 +25,7 @@ use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
 
 class ChannelFactory
 {
@@ -50,7 +50,7 @@ class ChannelFactory
 
         $transactionContextFactory = new TransactionContextFactory(
             new RandomBytesNonceGenerator($config->getNonceSize()),
-            new TxIdFactory($hashAlgo)
+            new TransactionIdGenerator($hashAlgo)
         );
 
         $client = ClientFactory::fromConfig($config);

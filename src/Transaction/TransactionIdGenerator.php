@@ -24,7 +24,7 @@ use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
 use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
-final class TxIdFactory implements TxIdFactoryInterface
+final class TransactionIdGenerator implements TransactionIdGeneratorInterface
 {
     /**
      * @var HashAlgorithm

@@ -21,24 +21,24 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGeneratorInterface;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator
  */
-class TxIdFactoryTest extends TestCase
+class TransactionIdGeneratorTest extends TestCase
 {
     /**
-     * @var TxIdFactoryInterface
+     * @var TransactionIdGeneratorInterface
      */
     private $sut;
 
     protected function setUp()
     {
-        $this->sut = new TxIdFactory();
+        $this->sut = new TransactionIdGenerator();
     }
 
     public function testCreateTxId()

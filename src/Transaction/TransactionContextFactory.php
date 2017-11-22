@@ -31,9 +31,9 @@ final class TransactionContextFactory implements TransactionContextFactoryInterf
     private $nonceGenerator;
 
     /**
-     * @var TxIdFactoryInterface
+     * @var TransactionIdGeneratorInterface
      */
-    private $txIdFactory;
+    private $transactionIdGenerator;
 
     /**
      * @var int
@@ -42,16 +42,16 @@ final class TransactionContextFactory implements TransactionContextFactoryInterf
 
     /**
      * @param NonceGeneratorInterface $nonceGenerator
-     * @param TxIdFactoryInterface $txIdFactory
+     * @param TransactionIdGeneratorInterface $transactionIdGenerator
      * @param int $epoch
      */
     public function __construct(
         NonceGeneratorInterface $nonceGenerator,
-        TxIdFactoryInterface $txIdFactory,
-        int $epoch = 0
+        TransactionIdGeneratorInterface $transactionIdGenerator,
+        int $epoch = 0 // TODO: From config!
     ) {
         $this->nonceGenerator = $nonceGenerator;
-        $this->txIdFactory = $txIdFactory;
+        $this->transactionIdGenerator = $transactionIdGenerator;
         $this->epoch = $epoch;
     }
 
@@ -68,7 +68,7 @@ final class TransactionContextFactory implements TransactionContextFactoryInterf
 
         $nonce = $this->nonceGenerator->generateNonce();
 
-        $txId = $this->txIdFactory->fromSerializedIdentity($identity, $nonce);
+        $txId = $this->transactionIdGenerator->fromSerializedIdentity($identity, $nonce);
 
         return new TransactionContext($identity, $nonce, $txId, $this->epoch);
     }

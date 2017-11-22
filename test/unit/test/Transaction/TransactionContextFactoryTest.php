@@ -25,7 +25,7 @@ use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -42,7 +42,7 @@ class TransactionContextFactoryTest extends TestCase
     {
         $this->sut = new TransactionContextFactory(
             new RandomBytesNonceGenerator(),
-            new TxIdFactory()
+            new TransactionIdGenerator()
         );
     }
 

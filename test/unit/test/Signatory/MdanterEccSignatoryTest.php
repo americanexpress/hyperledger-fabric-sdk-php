@@ -30,7 +30,7 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use org\bovigo\vfs\vfsStream;
@@ -97,7 +97,7 @@ TAG
                     return 'u23m5k4hf86j';
                 }
             },
-            new TxIdFactory()
+            new TransactionIdGenerator()
         );
         $transactionContext = $transactionContextFactory->fromTransactionRequest(new TransactionRequest([
             'organization' => new OrganizationOptions([

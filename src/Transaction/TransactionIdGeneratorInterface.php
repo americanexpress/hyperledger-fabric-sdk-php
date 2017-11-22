@@ -22,7 +22,7 @@ namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
-interface TxIdFactoryInterface
+interface TransactionIdGeneratorInterface
 {
     /**
      * @param SerializedIdentity $serializedIdentity
