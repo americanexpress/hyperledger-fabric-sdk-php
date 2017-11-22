@@ -39,7 +39,7 @@ class ChannelFactory
         $endorserClients = new EndorserClientManager();
 
         $transactionContextFactory = new TransactionContextFactory(
-            new RandomBytesNonceGenerator($config->getIn(['nonce-size'])),
+            new RandomBytesNonceGenerator($config->getNonceSize()),
             new TxIdFactory(HashAlgorithm::fromConfig($config))
         );
 

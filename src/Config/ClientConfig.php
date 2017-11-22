@@ -55,4 +55,12 @@ final class ClientConfig implements ClientConfigInterface
     {
         return get_in($this->config, $keys, $default);
     }
+
+    /**
+     * @return int
+     */
+    public function getNonceSize(): int
+    {
+        return (int) $this->getIn(['nonce-size']);
+    }
 }

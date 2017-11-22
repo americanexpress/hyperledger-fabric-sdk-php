@@ -26,4 +26,9 @@ interface ClientConfigInterface
      * @return mixed
      */
     public function getIn(array $keys = [], $default = null);
+
+    /**
+     * @return int
+     */
+    public function getNonceSize(): int;
 }

@@ -30,6 +30,6 @@ class RandomBytesNonceGeneratorFactory
      */
     public static function fromConfig(ClientConfigInterface $config): RandomBytesNonceGenerator
     {
-        return new RandomBytesNonceGenerator($config->getIn(['nonce-size']));
+        return new RandomBytesNonceGenerator($config->getNonceSize());
     }
 }

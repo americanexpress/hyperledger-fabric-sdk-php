@@ -83,4 +83,20 @@ class ClientConfigTest extends TestCase
         self::assertSame('md5', $sut->getIn(['crypto-hash-algo']));
         self::assertSame(3, $sut->getIn(['nonce-size']));
     }
+
+    public function testNonceSizeAssessor()
+    {
+        $sut = new ClientConfig([
+            'nonce-size'  => 234,
+        ]);
+
+        self::assertSame(234, $sut->getNonceSize());
+    }
+
+    public function testNonceSizeAssessorDefaultValue()
+    {
+        $sut = new ClientConfig([]);
+
+        self::assertSame(24, $sut->getNonceSize());
+    }
 }
