@@ -16,6 +16,8 @@
  * permissions and limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace AmericanExpress\HyperledgerFabricClient\ProtoFactory;
 
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
