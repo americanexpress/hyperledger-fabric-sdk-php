@@ -50,4 +50,14 @@ class ChannelFactoryTest extends TestCase
 
         self::assertInstanceOf(Channel::class, $result);
     }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
+     */
+    public function testThrowsExceptionOnInvalidHashAlgoInConfigFile()
+    {
+        ChannelFactory::fromConfig(new ClientConfig([
+            'crypto-hash-algo' => 'DEFINITELY INVALID'
+        ]));
+    }
 }

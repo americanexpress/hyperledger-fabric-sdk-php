@@ -22,6 +22,7 @@ namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
@@ -36,7 +37,15 @@ class ChannelFactory
     public static function fromConfig(ClientConfigInterface $config): Channel
     {
         $endorserClients = new EndorserClientManager();
-        $hashAlgo = new HashAlgorithm($config->getIn(['crypto-hash-algo']));
+        try {
+            $hashAlgo = new HashAlgorithm($config->getIn(['crypto-hash-algo']));
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(
+                "Unable to create Channel from Config; Invalid 'crypto-hash-algo' supplied",
+                $e->getCode(),
+                $e
+            );
+        }
 
         $transactionContextFactory = new TransactionContextFactory(
             new RandomBytesNonceGenerator($config->getNonceSize()),
