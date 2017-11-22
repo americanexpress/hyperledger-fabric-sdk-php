@@ -34,6 +34,7 @@ final class RandomBytesNonceGenerator implements NonceGeneratorInterface
     /**
      * Utils constructor.
      * @param int $nonceSize
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public function __construct(int $nonceSize = 24)
     {

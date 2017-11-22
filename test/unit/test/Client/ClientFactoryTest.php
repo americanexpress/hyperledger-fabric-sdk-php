@@ -18,17 +18,22 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpressTest\Integration\Test;
+namespace AmericanExpressTest\HyperledgerFabricClient\Client;
 
-use AmericanExpressTest\Integration\TestAsset\E2EUtils;
+use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
+use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
+use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use PHPUnit\Framework\TestCase;
 
-class QueryTest extends TestCase
+/**
+ * @covers \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory
+ */
+class ClientFactoryTest extends TestCase
 {
-    public function testQueryChainCode()
+    public function testFromConfig()
     {
-        $e2e = new E2EUtils();
-        $result = $e2e->queryChaincode('org1');
-        $this->assertNotEquals($result, null);
+        $client = ClientFactory::fromConfig(new ClientConfig([]));
+
+        self::assertInstanceOf(ClientInterface::class, $client);
     }
 }

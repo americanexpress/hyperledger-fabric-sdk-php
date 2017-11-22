@@ -18,25 +18,33 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Client;
+namespace AmericanExpressTest\HyperledgerFabricClient\Channel;
 
+use AmericanExpress\HyperledgerFabricClient\Channel\ChannelManager;
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use Hyperledger\Fabric\Protos\Peer\Proposal;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
+use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
+use PHPUnit\Framework\TestCase;
 
-interface ClientInterface
+/**
+ * @covers \AmericanExpress\HyperledgerFabricClient\Channel\ChannelManager
+ */
+class ChannelManagerTest extends TestCase
 {
     /**
-     * @param string $name
-     * @return ChannelInterface
+     * @var ChannelManager
      */
-    public function getChannel(string $name): ChannelInterface;
+    private $sut;
 
-    /**
-     * @param Proposal $proposal
-     * @param TransactionRequest $context
-     * @return ProposalResponse
-     */
-    public function processProposal(Proposal $proposal, TransactionRequest $context): ProposalResponse;
+    protected function setUp()
+    {
+        $this->sut = new ChannelManager(new ClientConfig([]));
+    }
+
+    public function testGet()
+    {
+        $endorserClient = $this->sut->get('FooBar');
+
+        self::assertInstanceOf(ChannelInterface::class, $endorserClient);
+        self::assertSame($endorserClient, $this->sut->get('FooBar'));
+    }
 }

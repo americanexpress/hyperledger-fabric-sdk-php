@@ -27,7 +27,7 @@ class BadMethodCallException extends \BadMethodCallException implements Exceptio
      * @param string $message
      * @return self
      */
-    public static function fromException(\Exception $exception, string $message = '')
+    public static function fromException(\Exception $exception, string $message = ''): self
     {
         return new self($message ?: $exception->getMessage(), $exception->getCode(), $exception);
     }

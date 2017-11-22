@@ -18,25 +18,17 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Client;
+namespace AmericanExpress\HyperledgerFabricClient\Exception;
 
-use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use Hyperledger\Fabric\Protos\Peer\Proposal;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
-
-interface ClientInterface
+class UnexpectedValueException extends \UnexpectedValueException implements ExceptionInterface
 {
     /**
-     * @param string $name
-     * @return ChannelInterface
+     * @param \Exception $exception
+     * @param string $message
+     * @return self
      */
-    public function getChannel(string $name): ChannelInterface;
-
-    /**
-     * @param Proposal $proposal
-     * @param TransactionRequest $context
-     * @return ProposalResponse
-     */
-    public function processProposal(Proposal $proposal, TransactionRequest $context): ProposalResponse;
+    public static function fromException(\Exception $exception, string $message = ''): self
+    {
+        return new self($message ?: $exception->getMessage(), $exception->getCode(), $exception);
+    }
 }

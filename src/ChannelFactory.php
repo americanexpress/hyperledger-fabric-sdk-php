@@ -20,11 +20,10 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
+use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
-use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
 
@@ -34,10 +33,10 @@ class ChannelFactory
      * @param string $name
      * @param ClientConfigInterface $config
      * @return Channel
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public static function fromConfig(string $name, ClientConfigInterface $config): Channel
     {
-        $endorserClients = new EndorserClientManager();
         try {
             $hashAlgo = new HashAlgorithm($config->getHashAlgorithm());
         } catch (InvalidArgumentException $e) {
@@ -53,8 +52,8 @@ class ChannelFactory
             new TxIdFactory($hashAlgo)
         );
 
-        $signatory = new MdanterEccSignatory($hashAlgo);
+        $client = ClientFactory::fromConfig($config);
 
-        return new Channel($name, $endorserClients, $transactionContextFactory, $signatory);
+        return new Channel($name, $client, $transactionContextFactory);
     }
 }

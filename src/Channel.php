@@ -20,19 +20,15 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
-use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
-use Hyperledger\Fabric\Protos\Peer\SignedProposal;
-use function igorw\get_in;
 
 final class Channel implements ChannelInterface
 {
@@ -42,36 +38,28 @@ final class Channel implements ChannelInterface
     private $name;
 
     /**
+     * @var ClientInterface
+     */
+    private $client;
+
+    /**
      * @var TransactionContextFactoryInterface
      */
     private $transactionContextFactory;
 
     /**
-     * @var EndorserClientManagerInterface
-     */
-    private $endorserClients;
-
-    /**
-     * @var SignatoryInterface
-     */
-    private $signatory;
-
-    /**
      * @param string $name
-     * @param EndorserClientManagerInterface $endorserClients
+     * @param ClientInterface $client
      * @param TransactionContextFactoryInterface $transactionContextFactory
-     * @param SignatoryInterface $signatory
      */
     public function __construct(
         string $name,
-        EndorserClientManagerInterface $endorserClients,
-        TransactionContextFactoryInterface $transactionContextFactory,
-        SignatoryInterface $signatory
+        ClientInterface $client,
+        TransactionContextFactoryInterface $transactionContextFactory
     ) {
         $this->name = $name;
-        $this->endorserClients = $endorserClients;
+        $this->client = $client;
         $this->transactionContextFactory = $transactionContextFactory;
-        $this->signatory = $signatory;
     }
 
     /**
@@ -81,7 +69,7 @@ final class Channel implements ChannelInterface
     public function queryByChainCode(TransactionRequest $request): ProposalResponse {
         $proposal = $this->createProposal($request);
 
-        return $this->processProposal($proposal, $request);
+        return $this->client->processProposal($proposal, $request);
     }
 
     /**
@@ -107,40 +95,5 @@ final class Channel implements ChannelInterface
         $header = HeaderFactory::fromTransactionContext($transactionContext, $chainHeader);
 
         return ProposalFactory::create($header, $chaincodeProposalPayload);
-    }
-
-    /**
-     * @param Proposal $proposal
-     * @param TransactionRequest $request
-     * @return ProposalResponse
-     */
-    private function processProposal(Proposal $proposal, TransactionRequest $request): ProposalResponse {
-        $privateKey = $request->getOrganization()->getPrivateKey();
-
-        $signedProposal = $this->signatory->signProposal($proposal, new \SplFileObject($privateKey));
-
-        return $this->processSignedProposal($signedProposal, $request);
-    }
-
-    /**
-     * @param SignedProposal $signedProposal
-     * @param TransactionRequest $request
-     * @return ProposalResponse
-     */
-    private function processSignedProposal(
-        SignedProposal $signedProposal,
-        TransactionRequest $request
-    ): ProposalResponse {
-        $endorserClient = $this->endorserClients->get($request->getPeerOptions()->getRequests());
-
-        /** @var UnaryCall $simpleSurfaceActiveCall */
-        $simpleSurfaceActiveCall = $endorserClient->ProcessProposal($signedProposal);
-        list($proposalResponse, $status) = $simpleSurfaceActiveCall->wait();
-        $status = (array)$status;
-        if ($proposalResponse instanceof ProposalResponse) {
-            return $proposalResponse;
-        }
-
-        throw new RuntimeException(get_in($status, ['details']), get_in($status, ['code']));
     }
 }

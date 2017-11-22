@@ -20,29 +20,52 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Client;
 
-use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
+use AmericanExpress\HyperledgerFabricClient\Channel\ChannelManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
-use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
+use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
+use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use Assert\Assertion;
+use Assert\AssertionFailedException;
+use Grpc\UnaryCall;
+use Hyperledger\Fabric\Protos\Peer\Proposal;
+use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
+use Hyperledger\Fabric\Protos\Peer\SignedProposal;
+use function igorw\get_in;
 
 class Client implements ClientInterface
 {
     /**
-     * @var ClientConfigInterface
+     * @var ChannelManagerInterface
      */
-    private $config;
+    private $channels;
 
     /**
-     * @var ChannelInterface[]
+     * @var EndorserClientManagerInterface
      */
-    private $channels = [];
+    private $endorserClients;
+
+    /**
+     * @var SignatoryInterface
+     */
+    private $signatory;
 
     /**
      * Client constructor.
-     * @param ClientConfigInterface $config
+     * @param SignatoryInterface $signatory
+     * @param ChannelManagerInterface $channels
+     * @param EndorserClientManagerInterface $endorserClients
      */
-    public function __construct(ClientConfigInterface $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        SignatoryInterface $signatory = null,
+        ChannelManagerInterface $channels = null,
+        EndorserClientManagerInterface $endorserClients = null
+    ) {
+        $this->signatory = $signatory;
+        $this->channels = $channels;
+        $this->endorserClients = $endorserClients;
     }
 
     /**
@@ -51,10 +74,55 @@ class Client implements ClientInterface
      */
     public function getChannel(string $name): ChannelInterface
     {
-        if (!array_key_exists($name, $this->channels)) {
-            $this->channels[$name] = ChannelFactory::fromConfig($name, $this->config);
+        return $this->channels->get($name);
+    }
+
+    /**
+     * @param Proposal $proposal
+     * @param TransactionRequest $context
+     * @return ProposalResponse
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
+     */
+    public function processProposal(Proposal $proposal, TransactionRequest $context): ProposalResponse {
+        $privateKey = $context->getOrganization()->getPrivateKey();
+
+        $signedProposal = $this->signatory->signProposal($proposal, new \SplFileObject($privateKey));
+
+        return $this->processSignedProposal($signedProposal, $context);
+    }
+
+    /**
+     * @param SignedProposal $proposal
+     * @param TransactionRequest $context
+     * @return ProposalResponse
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
+     */
+    private function processSignedProposal(
+        SignedProposal $proposal,
+        TransactionRequest $context
+    ): ProposalResponse {
+        $host = $context->getPeerOptions()->getRequests();
+
+        $endorserClient = $this->endorserClients->get($host);
+
+        $simpleSurfaceActiveCall = $endorserClient->ProcessProposal($proposal);
+
+        try {
+            Assertion::isInstanceOf($simpleSurfaceActiveCall, UnaryCall::class);
+        } catch (AssertionFailedException $e) {
+            throw UnexpectedValueException::fromException($e);
         }
 
-        return $this->channels[$name];
+        /** @var UnaryCall $simpleSurfaceActiveCall */
+        [$proposalResponse, $status] = $simpleSurfaceActiveCall->wait();
+
+        if ($proposalResponse instanceof ProposalResponse) {
+            return $proposalResponse;
+        }
+
+        $status = (array) $status;
+        throw new RuntimeException(get_in($status, ['details']), get_in($status, ['code']));
     }
 }

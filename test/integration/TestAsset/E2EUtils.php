@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\TestAsset;
 
-use AmericanExpress\HyperledgerFabricClient\Client\Client;
+use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
@@ -48,7 +48,7 @@ class E2EUtils
             ],
         ]);
 
-        $fabricProposal = (new Client($config))
+        $fabricProposal = ClientFactory::fromConfig($config)
             ->getChannel('foo')
             ->queryByChainCode($request);
 

@@ -21,14 +21,11 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Channel;
-use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
-use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
-use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
 
@@ -38,19 +35,9 @@ use PHPUnit\Framework\TestCase;
 class ChannelTest extends TestCase
 {
     /**
-     * @var UnaryCall|\PHPUnit_Framework_MockObject_MockObject
+     * @var ClientInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $unaryCall;
-
-    /**
-     * @var SignatoryInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $signatory;
-
-    /**
-     * @var EndorserClient|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $endorserClient;
+    private $client;
 
     /**
      * @var TransactionContextFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -64,44 +51,19 @@ class ChannelTest extends TestCase
 
     protected function setUp()
     {
-        $this->endorserClient = self::getMockBuilder(EndorserClient::class)
-            ->disableOriginalConstructor()
+        $this->client = $this->getMockBuilder(ClientInterface::class)
             ->getMock();
 
-        /** @var EndorserClientManagerInterface|\PHPUnit_Framework_MockObject_MockObject $endorserClients */
-        $endorserClients = self::getMockBuilder(EndorserClientManagerInterface::class)
+        $this->transactionContextFactory = $this->getMockBuilder(TransactionContextFactoryInterface::class)
             ->getMock();
 
-        $endorserClients->method('get')
-            ->willReturn($this->endorserClient);
-
-        $this->transactionContextFactory = self::getMockBuilder(TransactionContextFactoryInterface::class)
-            ->getMock();
-
-        $this->signatory = self::getMockBuilder(SignatoryInterface::class)
-            ->getMock();
-
-        $this->unaryCall = self::getMockBuilder(UnaryCall::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->sut = new Channel('foo', $endorserClients, $this->transactionContextFactory, $this->signatory);
+        $this->sut = new Channel('foo', $this->client, $this->transactionContextFactory);
     }
 
     public function testQueryByChaincode()
     {
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn($this->unaryCall);
-
-        $proposalResponse = new ProposalResponse();
-
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                $proposalResponse,
-                [
-                    'code' => 0,
-                ]
-            ]);
+        $this->client->method('processProposal')
+            ->willReturn($proposalResponse = new ProposalResponse());
 
         $result = $this->sut->queryByChainCode(new TransactionRequest([
             'organization' => new OrganizationOptions([
@@ -126,48 +88,5 @@ class ChannelTest extends TestCase
         ]));
 
         self::assertSame($proposalResponse, $result);
-    }
-
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
-     * @expectedExceptionMessage Connect failed
-     * @expectedExceptionCode 14
-     */
-    public function testQueryByChaincodeConnectionFailure()
-    {
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn($this->unaryCall);
-
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                null,
-                [
-                    'code' => 14,
-                    'details' => 'Connect failed',
-                    'metadata' => [],
-                ]
-            ]);
-
-        $this->sut->queryByChainCode(new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'mspId' => '1234',
-                'adminCerts' => __FILE__,
-                'privateKey' => __FILE__,
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                        'requests' => 'example.com',
-                    ],
-                ],
-            ]),
-            'peer' => 'peer1',
-            'chaincodeId' => (new ChaincodeID())
-                ->setPath('FizBuz')
-                ->setName('FooBar')
-                ->setVersion('v12.34'),
-            'args' => [
-                'foo' => 'bar',
-            ],
-        ]));
     }
 }

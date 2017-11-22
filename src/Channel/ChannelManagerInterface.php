@@ -18,25 +18,15 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Client;
+namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use Hyperledger\Fabric\Protos\Peer\Proposal;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
-interface ClientInterface
+interface ChannelManagerInterface
 {
     /**
      * @param string $name
      * @return ChannelInterface
      */
-    public function getChannel(string $name): ChannelInterface;
-
-    /**
-     * @param Proposal $proposal
-     * @param TransactionRequest $context
-     * @return ProposalResponse
-     */
-    public function processProposal(Proposal $proposal, TransactionRequest $context): ProposalResponse;
+    public function get(string $name): ChannelInterface;
 }
