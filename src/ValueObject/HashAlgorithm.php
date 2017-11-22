@@ -25,8 +25,13 @@ use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 
-class HashAlgorithm extends StringValue
+class HashAlgorithm
 {
+    /**
+     * @var string
+     */
+    private $value;
+
     /**
      * HashAlgorithm constructor.
      * @param string $value
@@ -39,7 +44,15 @@ class HashAlgorithm extends StringValue
             throw InvalidArgumentException::fromException($e);
         }
 
-        parent::__construct($value);
+        $this->value = $value;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->value;
     }
 
     /**
