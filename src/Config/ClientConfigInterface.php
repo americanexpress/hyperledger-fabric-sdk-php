@@ -33,4 +33,19 @@ interface ClientConfigInterface
      * @return int
      */
     public function getNonceSize(): int;
+
+    /**
+     * @return string
+     */
+    public function getHashAlgorithm(): string;
+
+    /**
+     * @return int
+     */
+    public function getTimeout(): int;
+
+    /**
+     * @return int
+     */
+    public function getEpoch(): int;
 }

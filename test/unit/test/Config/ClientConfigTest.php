@@ -99,4 +99,52 @@ class ClientConfigTest extends TestCase
 
         self::assertSame(24, $sut->getNonceSize());
     }
+
+    public function testEpochAssessor()
+    {
+        $sut = new ClientConfig([
+            'epoch'  => 234,
+        ]);
+
+        self::assertSame(234, $sut->getEpoch());
+    }
+
+    public function testEpochAssessorDefaultValue()
+    {
+        $sut = new ClientConfig([]);
+
+        self::assertSame(0, $sut->getEpoch());
+    }
+
+    public function testHashAlgorithmAssessor()
+    {
+        $sut = new ClientConfig([
+            'crypto-hash-algo'  => 'whirlpool',
+        ]);
+
+        self::assertSame('whirlpool', $sut->getHashAlgorithm());
+    }
+
+    public function testHashAlgorithmAssessorDefaultValue()
+    {
+        $sut = new ClientConfig([]);
+
+        self::assertSame('sha256', $sut->getHashAlgorithm());
+    }
+
+    public function testTimeoutAssessor()
+    {
+        $sut = new ClientConfig([
+            'timeout'  => 234,
+        ]);
+
+        self::assertSame(234, $sut->getTimeout());
+    }
+
+    public function testTimeoutAssessorDefaultValue()
+    {
+        $sut = new ClientConfig([]);
+
+        self::assertSame(5000, $sut->getTimeout());
+    }
 }

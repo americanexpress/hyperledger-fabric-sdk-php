@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use Assert\Assertion;
 use Assert\AssertionFailedException;

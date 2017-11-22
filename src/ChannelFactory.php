@@ -38,7 +38,7 @@ class ChannelFactory
     {
         $endorserClients = new EndorserClientManager();
         try {
-            $hashAlgo = new HashAlgorithm($config->getIn(['crypto-hash-algo']));
+            $hashAlgo = new HashAlgorithm($config->getHashAlgorithm());
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 "Unable to create Channel from Config; Invalid 'crypto-hash-algo' supplied",

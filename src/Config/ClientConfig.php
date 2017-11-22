@@ -63,4 +63,28 @@ final class ClientConfig implements ClientConfigInterface
     {
         return (int) $this->getIn(['nonce-size']);
     }
+
+    /**
+     * @return string
+     */
+    public function getHashAlgorithm(): string
+    {
+        return (string) $this->getIn(['crypto-hash-algo']);
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout(): int
+    {
+        return (int) $this->getIn(['timeout']);
+    }
+
+    /**
+     * @return int
+     */
+    public function getEpoch(): int
+    {
+        return (int) $this->getIn(['epoch']);
+    }
 }
