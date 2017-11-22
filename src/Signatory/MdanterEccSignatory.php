@@ -22,7 +22,7 @@ namespace AmericanExpress\HyperledgerFabricClient\Signatory;
 
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignedProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
-use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
+use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use Mdanter\Ecc\Crypto\Key\PrivateKeyInterface;

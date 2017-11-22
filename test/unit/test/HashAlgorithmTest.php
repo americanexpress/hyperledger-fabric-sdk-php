@@ -18,14 +18,14 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\ValueObject;
+namespace AmericanExpressTest\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
-use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
+use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm
+ * @covers \AmericanExpress\HyperledgerFabricClient\HashAlgorithm
  */
 class HashAlgorithmTest extends TestCase
 {

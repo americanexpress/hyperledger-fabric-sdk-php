@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Serializer\BinaryStringSerializer;
-use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
+use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
 final class TxIdFactory implements TxIdFactoryInterface

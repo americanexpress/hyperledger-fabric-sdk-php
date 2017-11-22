@@ -26,7 +26,6 @@ use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatoryFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
-use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
 
 class ChannelFactory
 {

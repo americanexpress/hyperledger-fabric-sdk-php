@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Signatory;
 
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
-use AmericanExpress\HyperledgerFabricClient\ValueObject\HashAlgorithm;
+use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 
 class MdanterEccSignatoryFactory
 {
