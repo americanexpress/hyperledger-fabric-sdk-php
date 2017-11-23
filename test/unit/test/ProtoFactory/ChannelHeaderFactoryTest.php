@@ -40,10 +40,7 @@ class ChannelHeaderFactoryTest extends TestCase
                 'u58920du89f',
                 'MyTransactionId'
             ),
-            'MyChannelId',
-            'FooBar',
-            'FizBuz',
-            'v12.34'
+            'MyChannelId'
         );
 
         self::assertInstanceOf(ChannelHeader::class, $result);
@@ -53,8 +50,5 @@ class ChannelHeaderFactoryTest extends TestCase
         self::assertSame('MyChannelId', $result->getChannelId());
         self::assertSame('MyTransactionId', $result->getTxId());
         self::assertSame(0, $result->getEpoch());
-        self::assertContains('FooBar', $result->getExtension());
-        self::assertContains('FizBuz', $result->getExtension());
-        self::assertContains('v12.34', $result->getExtension());
     }
 }

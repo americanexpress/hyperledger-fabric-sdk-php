@@ -22,6 +22,8 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Signatory;
 
 use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeIdFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
@@ -108,13 +110,19 @@ TAG
         $channelHeader = ChannelHeaderFactory::create(
             $transactionContext,
             'MyChannelId',
-            'MyChaincodePath',
-            'MyChaincodeName',
-            'MyChaincodeVersion',
             3,
             1,
             TimestampFactory::fromDateTime(new \DateTime($dateTime))
         );
+        $chaincodeId = ChaincodeIdFactory::create(
+            'MyChaincodePath',
+            'MyChaincodeName',
+            'MyChaincodeVersion'
+        );
+
+        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
+        $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
+
         $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
         $proposal = ProposalFactory::create($header, $chaincodeProposalPayload);

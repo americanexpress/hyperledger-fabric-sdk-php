@@ -24,7 +24,6 @@ use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -58,32 +57,6 @@ class TransactionRequestTest extends TestCase
         $this->sut->setPeer('peer1');
 
         self::assertSame('peer1', $this->sut->getPeer());
-    }
-
-    public function testChaincodeId()
-    {
-        self::assertNull($this->sut->getChaincodeId());
-
-        $this->sut->setChaincodeId($chaincodeId = new ChaincodeID());
-
-        self::assertSame($chaincodeId, $this->sut->getChaincodeId());
-    }
-
-    public function testArgs()
-    {
-        self::assertCount(0, $this->sut->getArgs());
-
-        $this->sut->setArgs([
-            'invoke',
-            'query',
-            'a',
-        ]);
-
-        self::assertSame([
-            'invoke',
-            'query',
-            'a',
-        ], $this->sut->getArgs());
     }
 
     public function testGetPeerOptions()

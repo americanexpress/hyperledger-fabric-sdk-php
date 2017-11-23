@@ -24,7 +24,6 @@ use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
-use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 
 class TransactionRequest extends AbstractOptions
 {
@@ -37,16 +36,6 @@ class TransactionRequest extends AbstractOptions
      * @var string|null
      */
     private $peer;
-
-    /**
-     * @var ChaincodeID|null
-     */
-    private $chaincodeId;
-
-    /**
-     * @var array
-     */
-    private $args = [];
 
     public function __construct($options = [])
     {
@@ -95,39 +84,5 @@ class TransactionRequest extends AbstractOptions
     public function getPeerOptions(): ?PeerOptionsInterface
     {
         return $this->peer ? $this->organization->getPeerByName($this->peer) : null;
-    }
-
-    /**
-     * @return ChaincodeID|null
-     */
-    public function getChaincodeId(): ?ChaincodeID
-    {
-        return $this->chaincodeId;
-    }
-
-    /**
-     * @param ChaincodeID $chaincodeId
-     * @return void
-     */
-    public function setChaincodeId(ChaincodeID $chaincodeId): void
-    {
-        $this->chaincodeId = $chaincodeId;
-    }
-
-    /**
-     * @return array
-     */
-    public function getArgs(): array
-    {
-        return $this->args;
-    }
-
-    /**
-     * @param array $args
-     * @return void
-     */
-    public function setArgs(array $args): void
-    {
-        $this->args = $args;
     }
 }

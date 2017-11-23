@@ -36,21 +36,23 @@ class E2EUtils
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
         $request = new TransactionRequest([
             'organization' => $config->getOrganization('test-network', $org),
-            'peer' => 'peer1',
-            'chaincodeId' => (new ChaincodeID())
-                ->setPath('github.com/example_cc')
-                ->setName('example_cc')
-                ->setVersion('1'),
-            'args' => [
-                'invoke',
-                'query',
-                'a',
-            ],
+            'peer' => 'peer1'
         ]);
 
         $fabricProposal = ClientFactory::fromConfig($config)
             ->getChannel('foo')
-            ->queryByChainCode($request);
+            ->queryByChainCode(
+                $request,
+                (new ChaincodeID())
+                    ->setPath('github.com/example_cc')
+                    ->setName('example_cc')
+                    ->setVersion('1'),
+                [
+                    'invoke',
+                    'query',
+                    'a',
+                ]
+            );
 
         return $fabricProposal->getPayload();
     }

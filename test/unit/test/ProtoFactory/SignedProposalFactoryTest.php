@@ -43,10 +43,7 @@ class SignedProposalFactoryTest extends TestCase
                 'u58920du89f',
                 'MyTransactionId'
             ),
-            'MyChannelId',
-            'FooBar',
-            'FizBuz',
-            'v12.34'
+            'MyChannelId'
         );
 
         $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
@@ -65,9 +62,6 @@ class SignedProposalFactoryTest extends TestCase
         self::assertContains('Bob', $result->getProposalBytes());
         self::assertContains('MyChannelId', $result->getProposalBytes());
         self::assertContains('MyTransactionId', $result->getProposalBytes());
-        self::assertContains('FooBar', $result->getProposalBytes());
-        self::assertContains('FizBuz', $result->getProposalBytes());
-        self::assertContains('v12.34', $result->getProposalBytes());
         self::assertContains('u58920du89f', $result->getProposalBytes());
         self::assertContains('foo', $result->getProposalBytes());
         self::assertContains('bar', $result->getProposalBytes());

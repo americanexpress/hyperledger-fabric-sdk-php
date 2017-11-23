@@ -43,10 +43,7 @@ class ProposalFactoryTest extends TestCase
                 'u58920du89f',
                 'MyTransactionId'
             ),
-            'MyChannelId',
-            'FooBar',
-            'FizBuz',
-            'v12.34'
+            'MyChannelId'
         );
 
         $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
@@ -66,9 +63,6 @@ class ProposalFactoryTest extends TestCase
         self::assertContains('Bob', $result->getHeader());
         self::assertContains('MyChannelId', $result->getHeader());
         self::assertContains('MyTransactionId', $result->getHeader());
-        self::assertContains('FooBar', $result->getHeader());
-        self::assertContains('FizBuz', $result->getHeader());
-        self::assertContains('v12.34', $result->getHeader());
         self::assertContains('u58920du89f', $result->getHeader());
         self::assertContains('foo', $result->getPayload());
         self::assertContains('bar', $result->getPayload());

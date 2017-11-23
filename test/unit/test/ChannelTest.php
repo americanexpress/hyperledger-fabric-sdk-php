@@ -20,9 +20,12 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient;
 
+use AmericanExpress\HyperledgerFabricClient\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
@@ -65,27 +68,90 @@ class ChannelTest extends TestCase
         $this->client->method('processProposal')
             ->willReturn($proposalResponse = new ProposalResponse());
 
-        $result = $this->sut->queryByChainCode(new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'mspId' => '1234',
-                'adminCerts' => __FILE__,
-                'privateKey' => __FILE__,
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                        'requests' => 'example.com',
+        $result = $this->sut->queryByChainCode(
+            new TransactionRequest([
+                'organization' => new OrganizationOptions([
+                    'mspId' => '1234',
+                    'adminCerts' => __FILE__,
+                    'privateKey' => __FILE__,
+                    'peers' => [
+                        [
+                            'name' => 'peer1',
+                            'requests' => 'example.com',
+                        ],
                     ],
-                ],
+                ]),
+                'peer' => 'peer1',
             ]),
-            'peer' => 'peer1',
-            'chaincodeId' => (new ChaincodeID())
+            (new ChaincodeID())
                 ->setPath('FizBuz')
                 ->setName('FooBar')
                 ->setVersion('v12.34'),
-            'args' => [
+            [
                 'foo' => 'bar',
-            ],
-        ]));
+            ]
+        );
+
+        self::assertSame($proposalResponse, $result);
+    }
+
+    public function testChannelCanCreateChaincode()
+    {
+        $chainCode = $this->sut->getChainCode(
+            'FizBuz',
+            new TransactionRequest([
+                'organization' => new OrganizationOptions([
+                    'mspId' => '1234',
+                    'adminCerts' => __FILE__,
+                    'privateKey' => __FILE__,
+                    'peers' => [
+                        [
+                            'name' => 'peer1',
+                            'requests' => 'example.com',
+                        ],
+                    ],
+                ]),
+                'peer' => 'peer1',
+            ])
+        );
+
+        self::assertInstanceOf(Chaincode::class, $chainCode);
+        self::assertSame($chainCode->getName(), 'FizBuz');
+    }
+
+    public function testChannelCanProcessChaincodeProposal()
+    {
+        $this->client->method('processProposal')
+            ->willReturn($proposalResponse = new ProposalResponse());
+
+        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId(
+            (new ChaincodeID())
+                ->setPath('FizBuz')
+                ->setName('FooBar')
+                ->setVersion('v12.34')
+        );
+        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([
+            'foo' => 'bar',
+        ]);
+
+        $result = $this->sut->processChaincodeProposal(
+            $chaincodeProposalPayload,
+            $chaincodeHeaderExtension,
+            new TransactionRequest([
+                'organization' => new OrganizationOptions([
+                    'mspId' => '1234',
+                    'adminCerts' => __FILE__,
+                    'privateKey' => __FILE__,
+                    'peers' => [
+                        [
+                            'name' => 'peer1',
+                            'requests' => 'example.com',
+                        ],
+                    ],
+                ]),
+                'peer' => 'peer1',
+            ])
+        );
 
         self::assertSame($proposalResponse, $result);
     }

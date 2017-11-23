@@ -40,10 +40,7 @@ class HeaderFactoryTest extends TestCase
                 $nonce = 'u58920du89f',
                 'MyTransactionId'
             ),
-            'MyChannelId',
-            'FooBar',
-            'FizBuz',
-            'v12.34'
+            'MyChannelId'
         );
 
         $result = HeaderFactory::create($serializedIdentity, $channelHeader, $nonce);
@@ -51,9 +48,6 @@ class HeaderFactoryTest extends TestCase
         self::assertInstanceOf(Header::class, $result);
         self::assertContains('MyChannelId', $result->getChannelHeader());
         self::assertContains('MyTransactionId', $result->getChannelHeader());
-        self::assertContains('FooBar', $result->getChannelHeader());
-        self::assertContains('FizBuz', $result->getChannelHeader());
-        self::assertContains('v12.34', $result->getChannelHeader());
         self::assertContains('Alice', $result->getSignatureHeader());
         self::assertContains('Bob', $result->getSignatureHeader());
         self::assertContains('u58920du89f', $result->getSignatureHeader());
@@ -67,10 +61,7 @@ class HeaderFactoryTest extends TestCase
                 'u58920du89f',
                 'MyTransactionId'
             ),
-            'MyChannelId',
-            'FooBar',
-            'FizBuz',
-            'v12.34'
+            'MyChannelId'
         );
 
         $result = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
@@ -78,9 +69,6 @@ class HeaderFactoryTest extends TestCase
         self::assertInstanceOf(Header::class, $result);
         self::assertContains('MyChannelId', $result->getChannelHeader());
         self::assertContains('MyTransactionId', $result->getChannelHeader());
-        self::assertContains('FooBar', $result->getChannelHeader());
-        self::assertContains('FizBuz', $result->getChannelHeader());
-        self::assertContains('v12.34', $result->getChannelHeader());
         self::assertContains('Alice', $result->getSignatureHeader());
         self::assertContains('Bob', $result->getSignatureHeader());
         self::assertContains('u58920du89f', $result->getSignatureHeader());

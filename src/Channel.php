@@ -21,16 +21,17 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
-use Hyperledger\Fabric\Protos\Peer\Proposal;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
+use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
-final class Channel implements ChannelInterface
+final class Channel implements ChannelInterface, ChaincodeProposalProcessorInterface
 {
     /**
      * @var string
@@ -64,37 +65,61 @@ final class Channel implements ChannelInterface
 
     /**
      * @param TransactionRequest $request
+     * @param ChaincodeID $chaincodeId
+     * @param mixed[] $args
      * @return ProposalResponse
      */
-    public function queryByChainCode(TransactionRequest $request): ProposalResponse
-    {
-        $proposal = $this->createProposal($request);
+    public function queryByChainCode(
+        TransactionRequest $request,
+        ChaincodeID $chaincodeId,
+        array $args = []
+    ): ProposalResponse {
+        $chainCode = $this->getChainCode([
+            'name' => $chaincodeId->getName(),
+            'version' => $chaincodeId->getPath(),
+            'path' => $chaincodeId->getVersion(),
+        ]);
 
-        return $this->client->processProposal($proposal, $request);
+        $functionName = array_shift($args);
+        array_push($args, $request);
+
+        return $chainCode->$functionName(...$args);
     }
 
     /**
-     * @param TransactionRequest $request
-     * @return Proposal
+     *
+     * Returns a named Chaincode for a channel
+     *
+     * @param string | array $nameOrVersionedName
+     * @return Chaincode
      */
-    private function createProposal(TransactionRequest $request): Proposal
+    public function getChaincode($nameOrVersionedName): Chaincode
     {
+        return new Chaincode($nameOrVersionedName, $this);
+    }
+
+    /**
+     *
+     * Envelopes a Chaincode function invocation from a Chaincode object
+     *
+     * @param ChaincodeProposalPayload $payload
+     * @param ChaincodeHeaderExtension $extension
+     * @param TransactionRequest|null $request
+     * @return ProposalResponse
+     */
+    public function processChaincodeProposal(
+        ChaincodeProposalPayload $payload,
+        ChaincodeHeaderExtension $extension,
+        TransactionRequest $request = null
+    ): ProposalResponse {
         $transactionContext = $this->transactionContextFactory->fromTransactionRequest($request);
+        $channelHeader = ChannelHeaderFactory::create($transactionContext, $this->name);
+        $channelHeader->setExtension($extension->serializeToString());
+        $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
 
-        $chainHeader = ChannelHeaderFactory::create(
-            $transactionContext,
-            $this->name,
-            $request->getChaincodeId()->getPath(),
-            $request->getChaincodeId()->getName(),
-            $request->getChaincodeId()->getVersion()
+        return $this->client->processProposal(
+            ProposalFactory::create($header, $payload),
+            $request
         );
-
-        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs(
-            $request->getArgs()
-        );
-
-        $header = HeaderFactory::fromTransactionContext($transactionContext, $chainHeader);
-
-        return ProposalFactory::create($header, $chaincodeProposalPayload);
     }
 }
