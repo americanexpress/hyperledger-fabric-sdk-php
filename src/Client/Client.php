@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Client;
 
+use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
@@ -101,7 +102,7 @@ final class Client implements ClientInterface
     public function getChannel(string $name): ChannelInterface
     {
         if (!\array_key_exists($name, $this->channels)) {
-            $this->channels[$name] = ChannelFactory::create($name, $this, $this->config);
+            $this->channels[$name] = new Channel($name, $this);
         }
 
         return $this->channels[$name];
