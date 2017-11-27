@@ -46,7 +46,7 @@ class SignedProposalFactoryTest extends TestCase
             'MyChannelId'
         );
 
-        $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
+        $header = HeaderFactory::fromTransactionContext($channelHeader, $transactionContext);
 
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([
             'foo',

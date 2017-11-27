@@ -121,7 +121,7 @@ TAG
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
         $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
 
-        $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
+        $header = HeaderFactory::fromTransactionContext($channelHeader, $transactionContext);
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
         $proposal = ProposalFactory::create($header, $chaincodeProposalPayload);
 

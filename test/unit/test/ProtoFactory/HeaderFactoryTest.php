@@ -23,6 +23,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient\ProtoFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use Hyperledger\Fabric\Protos\Common\Header;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +44,30 @@ class HeaderFactoryTest extends TestCase
             'MyChannelId'
         );
 
-        $result = HeaderFactory::create($serializedIdentity, $channelHeader, $nonce);
+        $signatureHeader = SignatureHeaderFactory::create($serializedIdentity, $nonce);
+
+        $result = HeaderFactory::create($channelHeader, $signatureHeader);
+
+        self::assertInstanceOf(Header::class, $result);
+        self::assertContains('MyChannelId', $result->getChannelHeader());
+        self::assertContains('MyTransactionId', $result->getChannelHeader());
+        self::assertContains('Alice', $result->getSignatureHeader());
+        self::assertContains('Bob', $result->getSignatureHeader());
+        self::assertContains('u58920du89f', $result->getSignatureHeader());
+    }
+
+    public function testCreateFromSerializedIdentity()
+    {
+        $channelHeader = ChannelHeaderFactory::create(
+            new TransactionContext(
+                $serializedIdentity = SerializedIdentityFactory::fromBytes('Alice', 'Bob'),
+                $nonce = 'u58920du89f',
+                'MyTransactionId'
+            ),
+            'MyChannelId'
+        );
+
+        $result = HeaderFactory::createFromSerializedIdentity($channelHeader, $serializedIdentity, $nonce);
 
         self::assertInstanceOf(Header::class, $result);
         self::assertContains('MyChannelId', $result->getChannelHeader());
@@ -64,7 +88,7 @@ class HeaderFactoryTest extends TestCase
             'MyChannelId'
         );
 
-        $result = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);
+        $result = HeaderFactory::fromTransactionContext($channelHeader, $transactionContext);
 
         self::assertInstanceOf(Header::class, $result);
         self::assertContains('MyChannelId', $result->getChannelHeader());

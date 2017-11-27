@@ -23,23 +23,20 @@ namespace AmericanExpress\HyperledgerFabricClient\ProtoFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
 use Hyperledger\Fabric\Protos\Common\Header;
+use Hyperledger\Fabric\Protos\Common\SignatureHeader;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
 class HeaderFactory
 {
     /**
-     * @param SerializedIdentity $serializedIdentity
      * @param ChannelHeader $channelHeader
-     * @param string $nonce
+     * @param SignatureHeader $signatureHeader
      * @return Header
      */
     public static function create(
-        SerializedIdentity $serializedIdentity,
         ChannelHeader $channelHeader,
-        string $nonce
+        SignatureHeader $signatureHeader
     ): Header {
-        $signatureHeader = SignatureHeaderFactory::create($serializedIdentity, $nonce);
-
         $header = new Header();
         $header->setChannelHeader($channelHeader->serializeToString());
         $header->setSignatureHeader($signatureHeader->serializeToString());
@@ -48,17 +45,33 @@ class HeaderFactory
     }
 
     /**
-     * @param TransactionContext $transactionContext
      * @param ChannelHeader $channelHeader
+     * @param SerializedIdentity $serializedIdentity
+     * @param string $nonce
+     * @return Header
+     */
+    public static function createFromSerializedIdentity(
+        ChannelHeader $channelHeader,
+        SerializedIdentity $serializedIdentity,
+        string $nonce
+    ): Header {
+        $signatureHeader = SignatureHeaderFactory::create($serializedIdentity, $nonce);
+
+        return self::create($channelHeader, $signatureHeader);
+    }
+
+    /**
+     * @param ChannelHeader $channelHeader
+     * @param TransactionContext $transactionContext
      * @return Header
      */
     public static function fromTransactionContext(
-        TransactionContext $transactionContext,
-        ChannelHeader $channelHeader
+        ChannelHeader $channelHeader,
+        TransactionContext $transactionContext
     ): Header {
-        return self::create(
-            $transactionContext->getSerializedIdentity(),
+        return self::createFromSerializedIdentity(
             $channelHeader,
+            $transactionContext->getSerializedIdentity(),
             $transactionContext->getNonce()
         );
     }
