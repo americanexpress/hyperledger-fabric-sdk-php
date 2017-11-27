@@ -53,9 +53,13 @@ interface ClientConfigInterface
     public function getEpoch(): int;
 
     /**
-     * @param string $network
-     * @param string $organization
+     * @param string $name
      * @return OrganizationOptionsInterface|null
      */
-    public function getOrganization(string $network, string $organization): ?OrganizationOptionsInterface;
+    public function getOrganizationByName(string $name): ?OrganizationOptionsInterface;
+
+    /**
+     * @return OrganizationOptionsInterface
+     */
+    public function getFirstOrganization(): OrganizationOptionsInterface;
 }

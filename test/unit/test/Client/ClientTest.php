@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Client;
 
-use AmericanExpress\HyperledgerFabricClient\Channel\ChannelManager;
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Client\Client;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
@@ -28,12 +27,12 @@ use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\User\UserContext;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
-use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -85,7 +84,20 @@ class ClientTest extends TestCase
 
         $config = new ClientConfig([]);
 
-        $this->sut = new Client($identity, $this->signatory, $endorserClients, $config);
+        $user = new UserContext($identity, new OrganizationOptions([
+            'peers' => [
+                [
+                    'name' => 'peer1',
+                    'requests' => 'localhost:7051',
+                    'events' => 'localhost:7053',
+                    'server-hostname' => 'peer0.org1.example.com',
+                    'tls_cacerts' => __FILE__,
+                ],
+            ],
+            'privateKey' => __FILE__,
+        ]));
+
+        $this->sut = new Client($user, $this->signatory, $endorserClients, $config);
     }
 
     public function testGetChannel()
@@ -102,18 +114,6 @@ class ClientTest extends TestCase
         $proposal = new Proposal();
 
         $context = new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                        'requests' => 'localhost:7051',
-                        'events' => 'localhost:7053',
-                        'server-hostname' => 'peer0.org1.example.com',
-                        'tls_cacerts' => __FILE__,
-                    ],
-                ],
-                'privateKey' => __FILE__,
-            ]),
             'peer' => 'peer1',
         ]);
 
@@ -141,18 +141,6 @@ class ClientTest extends TestCase
         $proposal = new Proposal();
 
         $context = new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                        'requests' => 'localhost:7051',
-                        'events' => 'localhost:7053',
-                        'server-hostname' => 'peer0.org1.example.com',
-                        'tls_cacerts' => __FILE__,
-                    ],
-                ],
-                'privateKey' => __FILE__,
-            ]),
             'peer' => 'peer1',
         ]);
 
@@ -172,18 +160,6 @@ class ClientTest extends TestCase
         $proposal = new Proposal();
 
         $context = new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                        'requests' => 'localhost:7051',
-                        'events' => 'localhost:7053',
-                        'server-hostname' => 'peer0.org1.example.com',
-                        'tls_cacerts' => __FILE__,
-                    ],
-                ],
-                'privateKey' => __FILE__,
-            ]),
             'peer' => 'peer1',
         ]);
 

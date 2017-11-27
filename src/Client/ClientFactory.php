@@ -22,43 +22,26 @@ namespace AmericanExpress\HyperledgerFabricClient\Client;
 
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManager;
-use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
+use AmericanExpress\HyperledgerFabricClient\User\UserContextFactory;
 
 class ClientFactory
 {
     /**
      * @param ClientConfigInterface $config
-     * @param string $network
-     * @param string $organization
+     * @param string|null $organization
      * @return ClientInterface
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public static function fromConfig(
         ClientConfigInterface $config,
-        string $network,
-        string $organization
+        string $organization = null
     ): ClientInterface {
-        $organizationOptions = $config->getOrganization($network, $organization);
-        if ($organizationOptions === null) {
-            throw new UnexpectedValueException(sprintf(
-                'Unable to load options for organization `%s` in network `%s`.',
-                $organization,
-                $network
-            ));
-        }
-
-        $identity = SerializedIdentityFactory::fromFile(
-            $organizationOptions->getMspId(),
-            new \SplFileObject($organizationOptions->getAdminCerts())
-        );
+        $user = UserContextFactory::fromConfig($config, $organization);
 
         $signatory = new MdanterEccSignatory($config->getHashAlgorithm());
 
         $endorserClients = new EndorserClientManager();
 
-        return new Client($identity, $signatory, $endorserClients, $config);
+        return new Client($user, $signatory, $endorserClients, $config);
     }
 }

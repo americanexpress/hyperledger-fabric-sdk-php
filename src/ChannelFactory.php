@@ -22,7 +22,6 @@ namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
-use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
@@ -34,8 +33,6 @@ class ChannelFactory
      * @param ClientInterface $client
      * @param ClientConfigInterface $config
      * @return Channel
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public static function fromConfig(string $name, ClientInterface $client, ClientConfigInterface $config): Channel
     {

@@ -33,15 +33,16 @@ class ClientFactoryTest extends TestCase
     public function testFromConfig()
     {
         $config = new ClientConfig([
-            'test-network' => [
-                'org1' => [
+            'organizations' => [
+                [
+                    'name' => 'peerOrg1',
                     'mspId' => 'FooBar',
                     'adminCerts' => __FILE__,
                 ],
             ],
         ]);
 
-        $client = ClientFactory::fromConfig($config, 'test-network', 'org1');
+        $client = ClientFactory::fromConfig($config, 'peerOrg1');
 
         self::assertInstanceOf(ClientInterface::class, $client);
     }
@@ -53,6 +54,6 @@ class ClientFactoryTest extends TestCase
     {
         $config = new ClientConfig([]);
 
-        ClientFactory::fromConfig($config, 'test-network', 'org1');
+        ClientFactory::fromConfig($config, 'peerOrg1');
     }
 }

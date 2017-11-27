@@ -66,7 +66,7 @@ class ClientConfigTest extends TestCase
 
         self::assertSame(5000, $sut->getIn(['timeout']));
         self::assertSame(0, $sut->getIn(['epoch']));
-        self::assertSame('sha256', (string) $sut->getIn(['crypto-hash-algo']));
+        self::assertSame('sha256', (string)$sut->getIn(['crypto-hash-algo']));
         self::assertSame(24, $sut->getIn(['nonce-size']));
     }
 
@@ -76,19 +76,19 @@ class ClientConfigTest extends TestCase
             'timeout' => 10,
             'epoch' => -100,
             'crypto-hash-algo' => 'md5',
-            'nonce-size'  => 3,
+            'nonce-size' => 3,
         ]);
 
         self::assertSame(10, $sut->getIn(['timeout']));
         self::assertSame(-100, $sut->getIn(['epoch']));
-        self::assertSame('md5', (string) $sut->getIn(['crypto-hash-algo']));
+        self::assertSame('md5', (string)$sut->getIn(['crypto-hash-algo']));
         self::assertSame(3, $sut->getIn(['nonce-size']));
     }
 
     public function testNonceSizeAssessor()
     {
         $sut = new ClientConfig([
-            'nonce-size'  => 234,
+            'nonce-size' => 234,
         ]);
 
         self::assertSame(234, $sut->getNonceSize());
@@ -104,7 +104,7 @@ class ClientConfigTest extends TestCase
     public function testEpochAssessor()
     {
         $sut = new ClientConfig([
-            'epoch'  => 234,
+            'epoch' => 234,
         ]);
 
         self::assertSame(234, $sut->getEpoch());
@@ -120,23 +120,23 @@ class ClientConfigTest extends TestCase
     public function testHashAlgorithmAssessor()
     {
         $sut = new ClientConfig([
-            'crypto-hash-algo'  => 'whirlpool',
+            'crypto-hash-algo' => 'whirlpool',
         ]);
 
-        self::assertSame('whirlpool', (string) $sut->getHashAlgorithm());
+        self::assertSame('whirlpool', (string)$sut->getHashAlgorithm());
     }
 
     public function testHashAlgorithmAssessorDefaultValue()
     {
         $sut = new ClientConfig([]);
 
-        self::assertSame('sha256', (string) $sut->getHashAlgorithm());
+        self::assertSame('sha256', (string)$sut->getHashAlgorithm());
     }
 
     public function testTimeoutAssessor()
     {
         $sut = new ClientConfig([
-            'timeout'  => 234,
+            'timeout' => 234,
         ]);
 
         self::assertSame(234, $sut->getTimeout());
@@ -152,8 +152,8 @@ class ClientConfigTest extends TestCase
     public function testGetOrganizationOptionsByNetworkAndOrganizationNames()
     {
         $sut = new ClientConfig([
-            'test-network' => [
-                'org1' => [
+            'organizations' => [
+                [
                     'name' => 'peerOrg1',
                     'mspid' => 'Org1MSP',
                     'admin_certs' => __FILE__,
@@ -164,7 +164,7 @@ class ClientConfigTest extends TestCase
 
         self::assertInstanceOf(
             OrganizationOptionsInterface::class,
-            $sut->getOrganization('test-network', 'org1')
+            $sut->getOrganizationByName('peerOrg1')
         );
     }
 
@@ -172,7 +172,7 @@ class ClientConfigTest extends TestCase
     {
         $sut = new ClientConfig([]);
 
-        self::assertNull($sut->getOrganization('FooBar', 'FizBuz'));
+        self::assertNull($sut->getOrganizationByName('FooBar'));
     }
 
     /**
@@ -185,5 +185,21 @@ class ClientConfigTest extends TestCase
         ]);
 
         $config->getHashAlgorithm();
+    }
+
+    public function testGetFirstOrganization()
+    {
+        $config = new ClientConfig([
+            'organizations' => [
+                [
+                    'name' => 'peerOrg1',
+                ],
+            ],
+        ]);
+
+        $result = $config->getFirstOrganization();
+
+        self::assertInstanceOf(OrganizationOptionsInterface::class, $result);
+        self::assertSame('peerOrg1', $result->getName());
     }
 }

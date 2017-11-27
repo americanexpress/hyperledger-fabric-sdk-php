@@ -36,11 +36,10 @@ class E2EUtils
     {
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
         $request = new TransactionRequest([
-            'organization' => $config->getOrganization('test-network', $org),
             'peer' => 'peer1'
         ]);
 
-        $fabricProposal = ClientFactory::fromConfig($config, 'test-network', $org)
+        $fabricProposal = ClientFactory::fromConfig($config, $org)
             ->getChannel('foo')
             ->queryByChainCode(
                 $request,

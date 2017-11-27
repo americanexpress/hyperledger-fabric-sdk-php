@@ -23,7 +23,6 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
-use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
@@ -70,17 +69,6 @@ class ChannelTest extends TestCase
 
         $result = $this->sut->queryByChainCode(
             new TransactionRequest([
-                'organization' => new OrganizationOptions([
-                    'mspId' => '1234',
-                    'adminCerts' => __FILE__,
-                    'privateKey' => __FILE__,
-                    'peers' => [
-                        [
-                            'name' => 'peer1',
-                            'requests' => 'example.com',
-                        ],
-                    ],
-                ]),
                 'peer' => 'peer1',
             ]),
             (new ChaincodeID())
@@ -97,23 +85,7 @@ class ChannelTest extends TestCase
 
     public function testChannelCanCreateChaincode()
     {
-        $chainCode = $this->sut->getChainCode(
-            'FizBuz',
-            new TransactionRequest([
-                'organization' => new OrganizationOptions([
-                    'mspId' => '1234',
-                    'adminCerts' => __FILE__,
-                    'privateKey' => __FILE__,
-                    'peers' => [
-                        [
-                            'name' => 'peer1',
-                            'requests' => 'example.com',
-                        ],
-                    ],
-                ]),
-                'peer' => 'peer1',
-            ])
-        );
+        $chainCode = $this->sut->getChaincode('FizBuz');
 
         self::assertInstanceOf(Chaincode::class, $chainCode);
         self::assertSame($chainCode->getName(), 'FizBuz');
@@ -138,17 +110,6 @@ class ChannelTest extends TestCase
             $chaincodeProposalPayload,
             $chaincodeHeaderExtension,
             new TransactionRequest([
-                'organization' => new OrganizationOptions([
-                    'mspId' => '1234',
-                    'adminCerts' => __FILE__,
-                    'privateKey' => __FILE__,
-                    'peers' => [
-                        [
-                            'name' => 'peer1',
-                            'requests' => 'example.com',
-                        ],
-                    ],
-                ]),
                 'peer' => 'peer1',
             ])
         );

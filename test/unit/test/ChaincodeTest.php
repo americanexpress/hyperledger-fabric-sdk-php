@@ -22,7 +22,6 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\ChaincodeProposalProcessorInterface;
-use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
@@ -156,17 +155,6 @@ class ChaincodeTest extends TestCase
     public function testCallPassesTransactionRequestToChannel()
     {
         $transactionRequest = new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'mspId' => '1234',
-                'adminCerts' => __FILE__,
-                'privateKey' => __FILE__,
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                        'requests' => 'example.com',
-                    ],
-                ],
-            ]),
             'peer' => 'peer1',
         ]);
 
@@ -187,17 +175,6 @@ class ChaincodeTest extends TestCase
     public function testCallPassesTransactionRequestToChannelAsFinalArgument()
     {
         $transactionRequest = new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'mspId' => '1234',
-                'adminCerts' => __FILE__,
-                'privateKey' => __FILE__,
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                        'requests' => 'example.com',
-                    ],
-                ],
-            ]),
             'peer' => 'peer1',
         ]);
 
@@ -218,17 +195,6 @@ class ChaincodeTest extends TestCase
     public function testInvokePassesTransactionRequestToChannelAsFinalArgument()
     {
         $transactionRequest = new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'mspId' => '1234',
-                'adminCerts' => __FILE__,
-                'privateKey' => __FILE__,
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                        'requests' => 'example.com',
-                    ],
-                ],
-            ]),
             'peer' => 'peer1',
         ]);
 

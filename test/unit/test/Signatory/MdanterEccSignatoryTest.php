@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Signatory;
 
 use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
-use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeIdFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
@@ -32,7 +31,6 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFacto
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;

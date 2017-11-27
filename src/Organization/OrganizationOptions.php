@@ -20,9 +20,11 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Organization;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
 use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 
 class OrganizationOptions extends AbstractOptions implements OrganizationOptionsInterface
 {
@@ -172,5 +174,46 @@ class OrganizationOptions extends AbstractOptions implements OrganizationOptions
         });
 
         return count($peers) > 0 ? reset($peers) : null;
+    }
+
+    /**
+     * @param TransactionRequest|null $context
+     * @return PeerOptionsInterface
+     * @throws UnexpectedValueException
+     */
+    public function getPeerByTransactionRequest(TransactionRequest $context = null): PeerOptionsInterface
+    {
+        if (count($this->peers) < 1) {
+            throw new UnexpectedValueException(sprintf(
+                'Organization `%s` has no peers.',
+                $this->name
+            ));
+        }
+
+        $peerName = $context ? $context->getPeer() : null;
+
+        if (!$peerName) {
+            return $this->getFirstPeer();
+        }
+
+        $peer = $this->getPeerByName($peerName);
+
+        if ($peer) {
+            return $peer;
+        }
+
+        throw new UnexpectedValueException(sprintf(
+            'Peer `%s` is invalid for organization `%s`',
+            $context->getPeer(),
+            $this->name
+        ));
+    }
+
+    /**
+     * @return PeerOptionsInterface|null
+     */
+    public function getFirstPeer(): ?PeerOptionsInterface
+    {
+        return reset($this->peers);
     }
 }

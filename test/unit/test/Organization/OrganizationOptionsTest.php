@@ -22,6 +22,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Organization;
 
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -195,5 +196,77 @@ class OrganizationOptionsTest extends TestCase
         self::assertInstanceOf(PeerOptionsInterface::class, $sut->getPeerByName('peer1'));
         self::assertInstanceOf(PeerOptionsInterface::class, $sut->getPeerByName('peer2'));
         self::assertNull($sut->getPeerByName('peer3'));
+    }
+
+    public function testGetPeerByValidNameFromTransactionRequest()
+    {
+        $sut = new OrganizationOptions([
+            'peers' => [
+                [
+                    'name' => 'peer1',
+                ],
+            ],
+        ]);
+
+        $context = new TransactionRequest([
+            'peer' => 'peer1',
+        ]);
+
+        $result = $sut->getPeerByTransactionRequest($context);
+
+        self::assertInstanceOf(PeerOptionsInterface::class, $result);
+        self::assertSame('peer1', $result->getName());
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
+     */
+    public function testGetPeerByInvalidNameFromTransactionRequest()
+    {
+        $sut = new OrganizationOptions([
+            'peers' => [
+                [
+                    'name' => 'peer1',
+                ],
+            ],
+        ]);
+
+        $context = new TransactionRequest([
+            'peer' => 'FooBar',
+        ]);
+
+        $sut->getPeerByTransactionRequest($context);
+    }
+
+    public function testGetFirstPeerByTransactionRequest()
+    {
+        $sut = new OrganizationOptions([
+            'peers' => [
+                [
+                    'name' => 'peer1',
+                ],
+            ],
+        ]);
+
+        $context = new TransactionRequest();
+
+        $result = $sut->getPeerByTransactionRequest($context);
+
+        self::assertInstanceOf(PeerOptionsInterface::class, $result);
+        self::assertSame('peer1', $result->getName());
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
+     */
+    public function testGetPeerFromEmptyCollectionByTransactionRequest()
+    {
+        $sut = new OrganizationOptions([
+            'peers' => [],
+        ]);
+
+        $context = new TransactionRequest();
+
+        $sut->getPeerByTransactionRequest($context);
     }
 }

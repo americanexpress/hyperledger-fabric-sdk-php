@@ -21,45 +21,13 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
-use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
-use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 
 class TransactionRequest extends AbstractOptions
 {
     /**
-     * @var OrganizationOptions
-     */
-    private $organization;
-
-    /**
      * @var string|null
      */
     private $peer;
-
-    public function __construct($options = [])
-    {
-        $this->organization = new OrganizationOptions();
-
-        parent::__construct($options);
-    }
-
-    /**
-     * @return OrganizationOptionsInterface
-     */
-    public function getOrganization(): OrganizationOptionsInterface
-    {
-        return $this->organization;
-    }
-
-    /**
-     * @param OrganizationOptionsInterface $organization
-     * @return void
-     */
-    public function setOrganization(OrganizationOptionsInterface $organization): void
-    {
-        $this->organization = $organization;
-    }
 
     /**
      * @return string|null
@@ -76,13 +44,5 @@ class TransactionRequest extends AbstractOptions
     public function setPeer(string $peer): void
     {
         $this->peer = $peer;
-    }
-
-    /**
-     * @return PeerOptionsInterface|null
-     */
-    public function getPeerOptions(): ?PeerOptionsInterface
-    {
-        return $this->peer ? $this->organization->getPeerByName($this->peer) : null;
     }
 }

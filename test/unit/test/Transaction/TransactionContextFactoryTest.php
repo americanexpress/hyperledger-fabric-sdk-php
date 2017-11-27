@@ -23,9 +23,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TxIdFactory;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use PHPUnit\Framework\TestCase;
 

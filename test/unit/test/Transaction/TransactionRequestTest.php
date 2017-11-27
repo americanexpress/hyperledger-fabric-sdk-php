@@ -20,9 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
-use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use PHPUnit\Framework\TestCase;
 
@@ -41,15 +38,6 @@ class TransactionRequestTest extends TestCase
         $this->sut = new TransactionRequest();
     }
 
-    public function testOrganization()
-    {
-        self::assertInstanceOf(OrganizationOptionsInterface::class, $this->sut->getOrganization());
-
-        $this->sut->setOrganization($organization = new OrganizationOptions());
-
-        self::assertSame($organization, $this->sut->getOrganization());
-    }
-
     public function testPeer()
     {
         self::assertNull($this->sut->getPeer());
@@ -59,24 +47,12 @@ class TransactionRequestTest extends TestCase
         self::assertSame('peer1', $this->sut->getPeer());
     }
 
-    public function testGetPeerOptions()
+    public function testFromArray()
     {
-        self::assertNull($this->sut->getPeerOptions());
+        $sut = new TransactionRequest([
+            'peer' => 'peer1',
+        ]);
 
-        $this->sut->setOrganization(new OrganizationOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                    'requests' => 'localhost:7051',
-                    'events' => 'localhost:7053',
-                    'server-hostname' => 'peer0.org1.example.com',
-                    'tls_cacerts' => __FILE__,
-                ],
-            ],
-        ]));
-
-        $this->sut->setPeer('peer1');
-
-        self::assertInstanceOf(PeerOptionsInterface::class, $this->sut->getPeerOptions());
+        self::assertSame('peer1', $sut->getPeer());
     }
 }

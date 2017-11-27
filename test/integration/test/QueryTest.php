@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\Integration\Test;
 
-use AmericanExpress\HyperledgerFabricClient\Client\Client;
 use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
@@ -32,24 +31,23 @@ class QueryTest extends TestCase
     public function testQueryChainCode()
     {
         $e2e = new E2EUtils();
-        $result = $e2e->queryChaincode('org1');
-        $this->assertNotEquals($result, null);
+        $result = $e2e->queryChaincode('peerOrg1');
+        $this->assertNotNull($result);
     }
 
     public function testChainCodeEntityQuery()
     {
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
         $request = new TransactionRequest([
-            'organization' => $config->getOrganization('test-network', 'org1'),
             'peer' => 'peer1'
         ]);
 
-        $fabricProposal = ClientFactory::fromConfig($config, 'test-network', 'org1')
+        $fabricProposal = ClientFactory::fromConfig($config, 'peerOrg1')
             ->getChannel('foo')
             ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
             ->invoke('query', 'a', $request);
 
         $payload = $fabricProposal->getPayload();
-        $this->assertTrue($payload != null);
+        $this->assertNotNull($payload);
     }
 }

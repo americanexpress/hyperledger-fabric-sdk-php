@@ -17,13 +17,13 @@
  */
 
 return [
-    'test-network' => [
-        'orderer' => [
-            'url' => 'localhost:7050',
-            'server-hostname' => 'orderer.example.com',
-            'tls_cacerts' => __DIR__ . '/../../test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/ca.example.com-cert.pem'
-        ],
-        'org1' => [
+    'orderer' => [
+        'url' => 'localhost:7050',
+        'server-hostname' => 'orderer.example.com',
+        'tls_cacerts' => __DIR__ . '/../../test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/ca.example.com-cert.pem',
+    ],
+    'organizations' => [
+        [
             'name' => 'peerOrg1',
             'mspid' => 'Org1MSP',
             'ca' => [
@@ -38,11 +38,11 @@ return [
                     'requests' => 'localhost:7051',
                     'events' => 'localhost:7053',
                     'server-hostname' => 'peer0.org1.example.com',
-                    'tls_cacerts' => __DIR__ . '/../../test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tlscacerts/org1.example.com-cert.pem'
+                    'tls_cacerts' => __DIR__ . '/../../test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tlscacerts/org1.example.com-cert.pem',
                 ],
             ],
         ],
-        'org2' => [
+        [
             'name' => 'peerOrg2',
             'mspid' => 'Org2MSP',
             'ca' => [
@@ -55,9 +55,9 @@ return [
                     'requests' => 'localhost:8051',
                     'events' => 'localhost:8053',
                     'server-hostname' => 'peer0.org2.example.com',
-                    'tls_cacerts' => __DIR__ . '/../../test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tlscacerts/org2.example.com-cert.pem'
+                    'tls_cacerts' => __DIR__ . '/../../test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tlscacerts/org2.example.com-cert.pem',
                 ],
-            ]
-        ]
-    ]
+            ],
+        ],
+    ],
 ];

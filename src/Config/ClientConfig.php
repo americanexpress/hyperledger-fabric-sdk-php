@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Config;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
@@ -35,6 +36,7 @@ final class ClientConfig implements ClientConfigInterface
     /**
      * ClientConfig constructor.
      * @param array $config
+     * @throws InvalidArgumentException
      */
     public function __construct(array $config)
     {
@@ -44,6 +46,8 @@ final class ClientConfig implements ClientConfigInterface
                 'epoch' => 0,
                 'crypto-hash-algo' => 'sha256',
                 'nonce-size'  => 24,
+                'orderers' => [],
+                'organizations' => [],
             ],
             $config
         );
@@ -61,6 +65,10 @@ final class ClientConfig implements ClientConfigInterface
                 );
             }
         }
+
+        $this->config['organizations'] = array_map(function(array $data) {
+            return new OrganizationOptions($data);
+        }, $this->config['organizations']);
     }
 
     /**
@@ -106,15 +114,29 @@ final class ClientConfig implements ClientConfigInterface
     }
 
     /**
-     * @param string $network
-     * @param string $organization
+     * @param string $name
      * @return OrganizationOptionsInterface|null
      * @throws \AmericanExpress\HyperledgerFabricClient\Exception\BadMethodCallException
      */
-    public function getOrganization(string $network, string $organization): ?OrganizationOptionsInterface
+    public function getOrganizationByName(string $name): ?OrganizationOptionsInterface
     {
-        $options = $this->getIn([$network, $organization]);
+        $organizations = array_filter(
+            $this->getIn(['organizations'], []),
+            function (OrganizationOptionsInterface $organization) use ($name) {
+                return $organization->getName() === $name;
+            }
+        );
 
-        return \is_array($options) ? new OrganizationOptions($options) : null;
+        return count($organizations) > 0 ? reset($organizations) : null;
+    }
+
+    /**
+     * @return OrganizationOptionsInterface
+     */
+    public function getFirstOrganization(): OrganizationOptionsInterface
+    {
+        $organizations = $this->getIn(['organizations']);
+
+        return reset($organizations);
     }
 }

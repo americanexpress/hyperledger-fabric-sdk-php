@@ -15,15 +15,48 @@ composer require americanexpress/hyperledger-fabric-sdk-php
 Below, you will find high-level and concise snippets of code demonstrating how to interact with this SDK.
 
 ### Channel::queryByChaincode
+Query first peer in first organization (default behavior):
+```php
+$config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
+    // See `test/integration/config.php` for an example.
+]);
+$response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config)
+    ->getChannel('foo')
+    ->getChaincode('example_cc')
+    ->invoke('query', 'a', $request);
+```
+
+Query specific organization:
+```php
+$config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
+    // See `test/integration/config.php` for an example.
+]);
+$response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config, 'peerOrg1')
+    ->getChannel('foo')
+    ->getChaincode('example_cc')
+    ->invoke('query', 'a', $request);
+```
+
+Query specific organization and peer:
 ```php
 $config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
     // See `test/integration/config.php` for an example.
 ]);
 $request = new \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest([
-    'organization' => $config->getOrganization('test-network', 'org1'),
     'peer' => 'peer1',
 ]);
-$response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config, 'test-network', 'org1')
+$response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config, 'peerOrg1')
+    ->getChannel('foo')
+    ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
+    ->invoke('query', 'a', $request);
+```
+
+Query chaincode by path and version:
+```php
+$config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
+    // See `test/integration/config.php` for an example.
+]);
+$response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config)
     ->getChannel('foo')
     ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
     ->invoke('query', 'a', $request);

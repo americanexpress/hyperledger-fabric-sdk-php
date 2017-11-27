@@ -28,6 +28,7 @@ use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Grpc\UnaryCall;
@@ -40,9 +41,9 @@ use function igorw\get_in;
 final class Client implements ClientInterface
 {
     /**
-     * @var SerializedIdentity
+     * @var UserContextInterface
      */
-    private $identity;
+    private $user;
 
     /**
      * @var EndorserClientManagerInterface
@@ -66,18 +67,18 @@ final class Client implements ClientInterface
 
     /**
      * Client constructor.
-     * @param SerializedIdentity $identity
+     * @param UserContextInterface $user
      * @param SignatoryInterface $signatory
      * @param EndorserClientManagerInterface $endorserClients
      * @param ClientConfigInterface $config
      */
     public function __construct(
-        SerializedIdentity $identity,
+        UserContextInterface $user,
         SignatoryInterface $signatory,
         EndorserClientManagerInterface $endorserClients,
         ClientConfigInterface $config
     ) {
-        $this->identity = $identity;
+        $this->user = $user;
         $this->signatory = $signatory;
         $this->endorserClients = $endorserClients;
         $this->config = $config;
@@ -88,7 +89,7 @@ final class Client implements ClientInterface
      */
     public function getIdentity(): SerializedIdentity
     {
-        return $this->identity;
+        return $this->user->getIdentity();
     }
 
     /**
@@ -106,14 +107,14 @@ final class Client implements ClientInterface
 
     /**
      * @param Proposal $proposal
-     * @param TransactionRequest $context
+     * @param TransactionRequest|null $context
      * @return ProposalResponse
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
+     * @throws UnexpectedValueException
+     * @throws RuntimeException
      */
-    public function processProposal(Proposal $proposal, TransactionRequest $context): ProposalResponse
+    public function processProposal(Proposal $proposal, TransactionRequest $context = null): ProposalResponse
     {
-        $privateKey = $context->getOrganization()->getPrivateKey();
+        $privateKey = $this->user->getOrganization()->getPrivateKey();
 
         $signedProposal = $this->signatory->signProposal($proposal, new \SplFileObject($privateKey));
 
@@ -122,16 +123,18 @@ final class Client implements ClientInterface
 
     /**
      * @param SignedProposal $proposal
-     * @param TransactionRequest $context
+     * @param TransactionRequest|null $context
      * @return ProposalResponse
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
+     * @throws RuntimeException
+     * @throws UnexpectedValueException
      */
     private function processSignedProposal(
         SignedProposal $proposal,
-        TransactionRequest $context
+        TransactionRequest $context = null
     ): ProposalResponse {
-        $host = $context->getPeerOptions()->getRequests();
+        $host = $this->user->getOrganization()
+            ->getPeerByTransactionRequest($context)
+            ->getRequests();
 
         $endorserClient = $this->endorserClients->get($host);
 
