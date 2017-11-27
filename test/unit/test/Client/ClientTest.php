@@ -178,11 +178,6 @@ class ClientTest extends TestCase
         $this->sut->processProposal($proposal);
     }
 
-    public function testGetIdentity()
-    {
-        self::assertInstanceOf(SerializedIdentity::class, $this->sut->getIdentity());
-    }
-
     public function testCreateTransactionContext()
     {
         $transactionContext = new TransactionContext(new SerializedIdentity(), 'FooBar', 'FizBuz');

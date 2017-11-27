@@ -95,14 +95,6 @@ final class Client implements ClientInterface
     }
 
     /**
-     * @return SerializedIdentity
-     */
-    public function getIdentity(): SerializedIdentity
-    {
-        return $this->user->getIdentity();
-    }
-
-    /**
      * @param string $name
      * @return ChannelInterface
      */
