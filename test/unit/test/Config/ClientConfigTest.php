@@ -66,7 +66,7 @@ class ClientConfigTest extends TestCase
 
         self::assertSame(5000, $sut->getIn(['timeout']));
         self::assertSame(0, $sut->getIn(['epoch']));
-        self::assertSame('sha256', $sut->getIn(['crypto-hash-algo']));
+        self::assertSame('sha256', (string) $sut->getIn(['crypto-hash-algo']));
         self::assertSame(24, $sut->getIn(['nonce-size']));
     }
 
@@ -81,7 +81,7 @@ class ClientConfigTest extends TestCase
 
         self::assertSame(10, $sut->getIn(['timeout']));
         self::assertSame(-100, $sut->getIn(['epoch']));
-        self::assertSame('md5', $sut->getIn(['crypto-hash-algo']));
+        self::assertSame('md5', (string) $sut->getIn(['crypto-hash-algo']));
         self::assertSame(3, $sut->getIn(['nonce-size']));
     }
 
@@ -123,14 +123,14 @@ class ClientConfigTest extends TestCase
             'crypto-hash-algo'  => 'whirlpool',
         ]);
 
-        self::assertSame('whirlpool', $sut->getHashAlgorithm());
+        self::assertSame('whirlpool', (string) $sut->getHashAlgorithm());
     }
 
     public function testHashAlgorithmAssessorDefaultValue()
     {
         $sut = new ClientConfig([]);
 
-        self::assertSame('sha256', $sut->getHashAlgorithm());
+        self::assertSame('sha256', (string) $sut->getHashAlgorithm());
     }
 
     public function testTimeoutAssessor()
@@ -173,5 +173,17 @@ class ClientConfigTest extends TestCase
         $sut = new ClientConfig([]);
 
         self::assertNull($sut->getOrganization('FooBar', 'FizBuz'));
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
+     */
+    public function testThrowsExceptionOnInvalidHashAlgoInConfigFile()
+    {
+        $config = new ClientConfig([
+            'crypto-hash-algo' => 'DEFINITELY INVALID'
+        ]);
+
+        $config->getHashAlgorithm();
     }
 }

@@ -22,11 +22,17 @@ namespace AmericanExpress\HyperledgerFabricClient\Client;
 
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
 interface ClientInterface
 {
+    /**
+     * @return SerializedIdentity
+     */
+    public function getIdentity(): SerializedIdentity;
+
     /**
      * @param string $name
      * @return ChannelInterface

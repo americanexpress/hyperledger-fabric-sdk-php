@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
+use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
@@ -31,30 +31,19 @@ class ChannelFactory
 {
     /**
      * @param string $name
+     * @param ClientInterface $client
      * @param ClientConfigInterface $config
      * @return Channel
      * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
      * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
-    public static function fromConfig(string $name, ClientConfigInterface $config): Channel
+    public static function fromConfig(string $name, ClientInterface $client, ClientConfigInterface $config): Channel
     {
-        try {
-            $hashAlgo = new HashAlgorithm($config->getHashAlgorithm());
-        } catch (InvalidArgumentException $e) {
-            throw new InvalidArgumentException(
-                "Unable to create Channel from Config; Invalid 'crypto-hash-algo' supplied",
-                $e->getCode(),
-                $e
-            );
-        }
-
         $transactionContextFactory = new TransactionContextFactory(
             new RandomBytesNonceGenerator($config->getNonceSize()),
-            new TransactionIdGenerator($hashAlgo),
+            new TransactionIdGenerator($config->getHashAlgorithm()),
             $config->getEpoch()
         );
-
-        $client = ClientFactory::fromConfig($config);
 
         return new Channel($name, $client, $transactionContextFactory);
     }

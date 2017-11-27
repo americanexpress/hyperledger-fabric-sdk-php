@@ -44,7 +44,7 @@ class QueryTest extends TestCase
             'peer' => 'peer1'
         ]);
 
-        $fabricProposal = ClientFactory::fromConfig($config)
+        $fabricProposal = ClientFactory::fromConfig($config, 'test-network', 'org1')
             ->getChannel('foo')
             ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
             ->invoke('query', 'a', $request);

@@ -20,28 +20,45 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Client;
 
-use AmericanExpress\HyperledgerFabricClient\Channel\ChannelManager;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManager;
-use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
+use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 
 class ClientFactory
 {
     /**
      * @param ClientConfigInterface $config
+     * @param string $network
+     * @param string $organization
      * @return ClientInterface
      * @throws \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
      * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
-    public static function fromConfig(ClientConfigInterface $config): ClientInterface
-    {
-        $signatory = new MdanterEccSignatory(new HashAlgorithm($config->getHashAlgorithm()));
+    public static function fromConfig(
+        ClientConfigInterface $config,
+        string $network,
+        string $organization
+    ): ClientInterface {
+        $organizationOptions = $config->getOrganization($network, $organization);
+        if ($organizationOptions === null) {
+            throw new UnexpectedValueException(sprintf(
+                'Unable to load options for organization `%s` in network `%s`.',
+                $organization,
+                $network
+            ));
+        }
 
-        $channels = new ChannelManager($config);
+        $identity = SerializedIdentityFactory::fromFile(
+            $organizationOptions->getMspId(),
+            new \SplFileObject($organizationOptions->getAdminCerts())
+        );
+
+        $signatory = new MdanterEccSignatory($config->getHashAlgorithm());
 
         $endorserClients = new EndorserClientManager();
 
-        return new Client($signatory, $channels, $endorserClients);
+        return new Client($identity, $signatory, $endorserClients, $config);
     }
 }

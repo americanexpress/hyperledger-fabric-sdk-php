@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
+use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
 final class TransactionContextFactory implements TransactionContextFactoryInterface
 {
@@ -56,16 +56,11 @@ final class TransactionContextFactory implements TransactionContextFactoryInterf
     }
 
     /**
-     * @param TransactionRequest $request
+     * @param SerializedIdentity $identity
      * @return TransactionContext
      */
-    public function fromTransactionRequest(TransactionRequest $request): TransactionContext
+    public function fromSerializedIdentity(SerializedIdentity $identity): TransactionContext
     {
-        $identity = SerializedIdentityFactory::fromFile(
-            $request->getOrganization()->getMspId(),
-            new \SplFileObject($request->getOrganization()->getAdminCerts())
-        );
-
         $nonce = $this->nonceGenerator->generateNonce();
 
         $txId = $this->transactionIdGenerator->fromSerializedIdentity($identity, $nonce);

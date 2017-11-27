@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Config;
 
+use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
 use function igorw\get_in;
@@ -46,6 +47,20 @@ final class ClientConfig implements ClientConfigInterface
             ],
             $config
         );
+
+        $hash = $this->getIn(['crypto-hash-algo']);
+
+        if (!$hash instanceof HashAlgorithm) {
+            try {
+                $this->config['crypto-hash-algo'] = new HashAlgorithm((string) $hash);
+            } catch (InvalidArgumentException $e) {
+                throw new InvalidArgumentException(
+                    "Unable to create Channel from Config; Invalid 'crypto-hash-algo' supplied",
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
     }
 
     /**
@@ -67,11 +82,11 @@ final class ClientConfig implements ClientConfigInterface
     }
 
     /**
-     * @return string
+     * @return HashAlgorithm
      */
-    public function getHashAlgorithm(): string
+    public function getHashAlgorithm(): HashAlgorithm
     {
-        return (string) $this->getIn(['crypto-hash-algo']);
+        return $this->getIn(['crypto-hash-algo']);
     }
 
     /**
@@ -100,6 +115,6 @@ final class ClientConfig implements ClientConfigInterface
     {
         $options = $this->getIn([$network, $organization]);
 
-        return $options ? new OrganizationOptions($options) : null;
+        return \is_array($options) ? new OrganizationOptions($options) : null;
     }
 }

@@ -28,6 +28,7 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloa
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
@@ -101,12 +102,9 @@ TAG
             },
             new TransactionIdGenerator()
         );
-        $transactionContext = $transactionContextFactory->fromTransactionRequest(new TransactionRequest([
-            'organization' => new OrganizationOptions([
-                'mspId' => '1234',
-                'adminCerts' => $this->privateKey->url(),
-            ]),
-        ]));
+        $transactionContext = $transactionContextFactory->fromSerializedIdentity(
+            SerializedIdentityFactory::fromFile('1234', new \SplFileObject($this->privateKey->url()))
+        );
         $channelHeader = ChannelHeaderFactory::create(
             $transactionContext,
             'MyChannelId',

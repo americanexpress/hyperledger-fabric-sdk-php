@@ -20,11 +20,13 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
+use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
+
 interface TransactionContextFactoryInterface
 {
     /**
-     * @param TransactionRequest $request
+     * @param SerializedIdentity $identity
      * @return TransactionContext
      */
-    public function fromTransactionRequest(TransactionRequest $request): TransactionContext;
+    public function fromSerializedIdentity(SerializedIdentity $identity): TransactionContext;
 }

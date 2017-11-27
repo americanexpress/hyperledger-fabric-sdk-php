@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Config;
 
+use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
 
 interface ClientConfigInterface
@@ -37,9 +38,9 @@ interface ClientConfigInterface
     public function getNonceSize(): int;
 
     /**
-     * @return string
+     * @return HashAlgorithm
      */
-    public function getHashAlgorithm(): string;
+    public function getHashAlgorithm(): HashAlgorithm;
 
     /**
      * @return int

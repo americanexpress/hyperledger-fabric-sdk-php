@@ -30,6 +30,7 @@ class E2EUtils
     /**
      * @param string $org
      * @return string
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
      */
     public function queryChaincode(string $org): string
     {
@@ -39,7 +40,7 @@ class E2EUtils
             'peer' => 'peer1'
         ]);
 
-        $fabricProposal = ClientFactory::fromConfig($config)
+        $fabricProposal = ClientFactory::fromConfig($config, 'test-network', $org)
             ->getChannel('foo')
             ->queryByChainCode(
                 $request,

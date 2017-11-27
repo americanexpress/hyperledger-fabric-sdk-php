@@ -112,7 +112,9 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
         ChaincodeHeaderExtension $extension,
         TransactionRequest $request = null
     ): ProposalResponse {
-        $transactionContext = $this->transactionContextFactory->fromTransactionRequest($request);
+        $identity = $this->client->getIdentity();
+
+        $transactionContext = $this->transactionContextFactory->fromSerializedIdentity($identity);
         $channelHeader = ChannelHeaderFactory::create($transactionContext, $this->name);
         $channelHeader->setExtension($extension->serializeToString());
         $header = HeaderFactory::fromTransactionContext($transactionContext, $channelHeader);

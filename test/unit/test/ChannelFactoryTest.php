@@ -22,6 +22,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
+use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use PHPUnit\Framework\TestCase;
 
@@ -30,9 +31,20 @@ use PHPUnit\Framework\TestCase;
  */
 class ChannelFactoryTest extends TestCase
 {
+    /**
+     * @var ClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $client;
+
+    protected function setUp()
+    {
+        $this->client = $this->getMockBuilder(ClientInterface::class)
+            ->getMock();
+    }
+
     public function testFromConfig()
     {
-        $result = ChannelFactory::fromConfig('foo', new ClientConfig([]));
+        $result = ChannelFactory::fromConfig('foo', $this->client, new ClientConfig([]));
 
         self::assertInstanceOf(Channel::class, $result);
     }
@@ -42,7 +54,7 @@ class ChannelFactoryTest extends TestCase
      */
     public function testThrowsExceptionOnInvalidHashAlgoInConfigFile()
     {
-        ChannelFactory::fromConfig('foo', new ClientConfig([
+        ChannelFactory::fromConfig('foo', $this->client, new ClientConfig([
             'crypto-hash-algo' => 'DEFINITELY INVALID'
         ]));
     }

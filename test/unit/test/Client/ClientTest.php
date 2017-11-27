@@ -29,6 +29,7 @@ use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Grpc\UnaryCall;
+use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
@@ -80,11 +81,11 @@ class ClientTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $identity = new SerializedIdentity();
+
         $config = new ClientConfig([]);
 
-        $channels = new ChannelManager($config);
-
-        $this->sut = new Client($this->signatory, $channels, $endorserClients);
+        $this->sut = new Client($identity, $this->signatory, $endorserClients, $config);
     }
 
     public function testGetChannel()
@@ -200,5 +201,10 @@ class ClientTest extends TestCase
             ]);
 
         $this->sut->processProposal($proposal, $context);
+    }
+
+    public function testGetIdentity()
+    {
+        self::assertInstanceOf(SerializedIdentity::class, $this->sut->getIdentity());
     }
 }

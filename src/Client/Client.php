@@ -20,8 +20,9 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Client;
 
-use AmericanExpress\HyperledgerFabricClient\Channel\ChannelManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
+use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
@@ -30,6 +31,7 @@ use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Grpc\UnaryCall;
+use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
@@ -38,9 +40,9 @@ use function igorw\get_in;
 final class Client implements ClientInterface
 {
     /**
-     * @var ChannelManagerInterface
+     * @var SerializedIdentity
      */
-    private $channels;
+    private $identity;
 
     /**
      * @var EndorserClientManagerInterface
@@ -53,19 +55,40 @@ final class Client implements ClientInterface
     private $signatory;
 
     /**
+     * @var ClientConfigInterface
+     */
+    private $config;
+
+    /**
+     * @var ChannelInterface[]
+     */
+    private $channels = [];
+
+    /**
      * Client constructor.
+     * @param SerializedIdentity $identity
      * @param SignatoryInterface $signatory
-     * @param ChannelManagerInterface $channels
      * @param EndorserClientManagerInterface $endorserClients
+     * @param ClientConfigInterface $config
      */
     public function __construct(
-        SignatoryInterface $signatory = null,
-        ChannelManagerInterface $channels = null,
-        EndorserClientManagerInterface $endorserClients = null
+        SerializedIdentity $identity,
+        SignatoryInterface $signatory,
+        EndorserClientManagerInterface $endorserClients,
+        ClientConfigInterface $config
     ) {
+        $this->identity = $identity;
         $this->signatory = $signatory;
-        $this->channels = $channels;
         $this->endorserClients = $endorserClients;
+        $this->config = $config;
+    }
+
+    /**
+     * @return SerializedIdentity
+     */
+    public function getIdentity(): SerializedIdentity
+    {
+        return $this->identity;
     }
 
     /**
@@ -74,7 +97,11 @@ final class Client implements ClientInterface
      */
     public function getChannel(string $name): ChannelInterface
     {
-        return $this->channels->get($name);
+        if (!\array_key_exists($name, $this->channels)) {
+            $this->channels[$name] = ChannelFactory::fromConfig($name, $this, $this->config);
+        }
+
+        return $this->channels[$name];
     }
 
     /**

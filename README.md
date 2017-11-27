@@ -22,19 +22,11 @@ $config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
 $request = new \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest([
     'organization' => $config->getOrganization('test-network', 'org1'),
     'peer' => 'peer1',
-    'chaincodeId' => (new ChaincodeID())
-        ->setPath('github.com/example_cc')
-        ->setName('example_cc')
-        ->setVersion('1'),
-    'args' => [
-        'invoke',
-        'query',
-        'a',
-    ],
 ]);
-$response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config)
+$response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config, 'test-network', 'org1')
     ->getChannel('foo')
-    ->queryByChainCode($request);
+    ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
+    ->invoke('query', 'a', $request);
 ```
 
 ## Phase 1

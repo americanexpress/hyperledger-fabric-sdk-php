@@ -32,8 +32,27 @@ class ClientFactoryTest extends TestCase
 {
     public function testFromConfig()
     {
-        $client = ClientFactory::fromConfig(new ClientConfig([]));
+        $config = new ClientConfig([
+            'test-network' => [
+                'org1' => [
+                    'mspId' => 'FooBar',
+                    'adminCerts' => __FILE__,
+                ],
+            ],
+        ]);
+
+        $client = ClientFactory::fromConfig($config, 'test-network', 'org1');
 
         self::assertInstanceOf(ClientInterface::class, $client);
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
+     */
+    public function testFromInvalidConfig()
+    {
+        $config = new ClientConfig([]);
+
+        ClientFactory::fromConfig($config, 'test-network', 'org1');
     }
 }
