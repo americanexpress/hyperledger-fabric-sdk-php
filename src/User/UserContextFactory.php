@@ -52,6 +52,6 @@ class UserContextFactory
             return $options;
         }
 
-        return $config->getFirstOrganization();
+        return $config->getDefaultOrganization();
     }
 }

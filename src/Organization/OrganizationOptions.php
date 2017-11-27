@@ -193,7 +193,7 @@ class OrganizationOptions extends AbstractOptions implements OrganizationOptions
         $peerName = $context ? $context->getPeer() : null;
 
         if (!$peerName) {
-            return $this->getFirstPeer();
+            return $this->getDefaultPeer();
         }
 
         $peer = $this->getPeerByName($peerName);
@@ -212,8 +212,8 @@ class OrganizationOptions extends AbstractOptions implements OrganizationOptions
     /**
      * @return PeerOptionsInterface|null
      */
-    public function getFirstPeer(): ?PeerOptionsInterface
+    public function getDefaultPeer(): ?PeerOptionsInterface
     {
-        return reset($this->peers);
+        return \reset($this->peers);
     }
 }

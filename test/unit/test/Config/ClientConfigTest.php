@@ -187,7 +187,7 @@ class ClientConfigTest extends TestCase
         $config->getHashAlgorithm();
     }
 
-    public function testGetFirstOrganization()
+    public function testGetDefaultOrganization()
     {
         $config = new ClientConfig([
             'organizations' => [
@@ -197,7 +197,7 @@ class ClientConfigTest extends TestCase
             ],
         ]);
 
-        $result = $config->getFirstOrganization();
+        $result = $config->getDefaultOrganization();
 
         self::assertInstanceOf(OrganizationOptionsInterface::class, $result);
         self::assertSame('peerOrg1', $result->getName());

@@ -61,5 +61,5 @@ interface ClientConfigInterface
     /**
      * @return OrganizationOptionsInterface
      */
-    public function getFirstOrganization(): OrganizationOptionsInterface;
+    public function getDefaultOrganization(): OrganizationOptionsInterface;
 }

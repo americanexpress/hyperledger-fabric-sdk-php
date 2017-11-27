@@ -238,7 +238,7 @@ class OrganizationOptionsTest extends TestCase
         $sut->getPeerByTransactionRequest($context);
     }
 
-    public function testGetFirstPeerByTransactionRequest()
+    public function testGetDefaultPeerByTransactionRequest()
     {
         $sut = new OrganizationOptions([
             'peers' => [

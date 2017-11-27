@@ -127,16 +127,16 @@ final class ClientConfig implements ClientConfigInterface
             }
         );
 
-        return count($organizations) > 0 ? reset($organizations) : null;
+        return \count($organizations) > 0 ? \reset($organizations) : null;
     }
 
     /**
      * @return OrganizationOptionsInterface
      */
-    public function getFirstOrganization(): OrganizationOptionsInterface
+    public function getDefaultOrganization(): OrganizationOptionsInterface
     {
         $organizations = $this->getIn(['organizations']);
 
-        return reset($organizations);
+        return \reset($organizations);
     }
 }
