@@ -44,7 +44,7 @@ class ChannelFactoryTest extends TestCase
 
     public function testFromConfig()
     {
-        $result = ChannelFactory::fromConfig('foo', $this->client, new ClientConfig([]));
+        $result = ChannelFactory::create('foo', $this->client, new ClientConfig([]));
 
         self::assertInstanceOf(Channel::class, $result);
     }
@@ -54,7 +54,7 @@ class ChannelFactoryTest extends TestCase
      */
     public function testThrowsExceptionOnInvalidHashAlgoInConfigFile()
     {
-        ChannelFactory::fromConfig('foo', $this->client, new ClientConfig([
+        ChannelFactory::create('foo', $this->client, new ClientConfig([
             'crypto-hash-algo' => 'DEFINITELY INVALID'
         ]));
     }

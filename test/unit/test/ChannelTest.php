@@ -25,7 +25,6 @@ use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
@@ -42,11 +41,6 @@ class ChannelTest extends TestCase
     private $client;
 
     /**
-     * @var TransactionContextFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $transactionContextFactory;
-
-    /**
      * @var Channel
      */
     private $sut;
@@ -56,10 +50,7 @@ class ChannelTest extends TestCase
         $this->client = $this->getMockBuilder(ClientInterface::class)
             ->getMock();
 
-        $this->transactionContextFactory = $this->getMockBuilder(TransactionContextFactoryInterface::class)
-            ->getMock();
-
-        $this->sut = new Channel('foo', $this->client, $this->transactionContextFactory);
+        $this->sut = new Channel('foo', $this->client);
     }
 
     public function testQueryByChaincode()

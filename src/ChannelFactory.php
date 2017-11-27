@@ -21,27 +21,16 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
-use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
-use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
 
 class ChannelFactory
 {
     /**
      * @param string $name
      * @param ClientInterface $client
-     * @param ClientConfigInterface $config
      * @return Channel
      */
-    public static function fromConfig(string $name, ClientInterface $client, ClientConfigInterface $config): Channel
+    public static function create(string $name, ClientInterface $client): Channel
     {
-        $transactionContextFactory = new TransactionContextFactory(
-            new RandomBytesNonceGenerator($config->getNonceSize()),
-            new TransactionIdGenerator($config->getHashAlgorithm()),
-            $config->getEpoch()
-        );
-
-        return new Channel($name, $client, $transactionContextFactory);
+        return new Channel($name, $client);
     }
 }

@@ -26,6 +26,8 @@ use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\User\UserContext;
 use Grpc\UnaryCall;
@@ -54,6 +56,11 @@ class ClientTest extends TestCase
      * @var EndorserClient|\PHPUnit_Framework_MockObject_MockObject
      */
     private $endorserClient;
+
+    /**
+     * @var TransactionContextFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $transactionContextFactory;
 
     /**
      * @var Client
@@ -97,7 +104,10 @@ class ClientTest extends TestCase
             'privateKey' => __FILE__,
         ]));
 
-        $this->sut = new Client($user, $this->signatory, $endorserClients, $config);
+        $this->transactionContextFactory = $this->getMockBuilder(TransactionContextFactoryInterface::class)
+            ->getMock();
+
+        $this->sut = new Client($user, $this->signatory, $endorserClients, $config, $this->transactionContextFactory);
     }
 
     public function testGetChannel()
@@ -182,5 +192,17 @@ class ClientTest extends TestCase
     public function testGetIdentity()
     {
         self::assertInstanceOf(SerializedIdentity::class, $this->sut->getIdentity());
+    }
+
+    public function testCreateTransactionContext()
+    {
+        $transactionContext = new TransactionContext(new SerializedIdentity(), 'FooBar', 'FizBuz');
+
+        $this->transactionContextFactory->method('fromSerializedIdentity')
+            ->willReturn($transactionContext);
+
+        $result = $this->sut->createTransactionContext();
+
+        self::assertSame($transactionContext, $result);
     }
 }

@@ -27,6 +27,8 @@ use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Assert\Assertion;
@@ -66,22 +68,30 @@ final class Client implements ClientInterface
     private $channels = [];
 
     /**
+     * @var TransactionContextFactoryInterface
+     */
+    private $transactionContextFactory;
+
+    /**
      * Client constructor.
      * @param UserContextInterface $user
      * @param SignatoryInterface $signatory
      * @param EndorserClientManagerInterface $endorserClients
      * @param ClientConfigInterface $config
+     * @param TransactionContextFactoryInterface $transactionContextFactory
      */
     public function __construct(
         UserContextInterface $user,
         SignatoryInterface $signatory,
         EndorserClientManagerInterface $endorserClients,
-        ClientConfigInterface $config
+        ClientConfigInterface $config,
+        TransactionContextFactoryInterface $transactionContextFactory
     ) {
         $this->user = $user;
         $this->signatory = $signatory;
         $this->endorserClients = $endorserClients;
         $this->config = $config;
+        $this->transactionContextFactory = $transactionContextFactory;
     }
 
     /**
@@ -99,7 +109,7 @@ final class Client implements ClientInterface
     public function getChannel(string $name): ChannelInterface
     {
         if (!\array_key_exists($name, $this->channels)) {
-            $this->channels[$name] = ChannelFactory::fromConfig($name, $this, $this->config);
+            $this->channels[$name] = ChannelFactory::create($name, $this, $this->config);
         }
 
         return $this->channels[$name];
@@ -155,5 +165,15 @@ final class Client implements ClientInterface
 
         $status = (array) $status;
         throw new RuntimeException(get_in($status, ['details']), get_in($status, ['code']));
+    }
+
+    /**
+     * @return TransactionContext
+     */
+    public function createTransactionContext(): TransactionContext
+    {
+        $identity = $this->user->getIdentity();
+
+        return $this->transactionContextFactory->fromSerializedIdentity($identity);
     }
 }
