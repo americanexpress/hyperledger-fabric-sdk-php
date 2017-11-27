@@ -28,6 +28,7 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
@@ -119,7 +120,10 @@ TAG
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
         $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
 
-        $header = HeaderFactory::fromTransactionContext($channelHeader, $transactionContext);
+        $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
+            $transactionContext->getSerializedIdentity(),
+            $transactionContext->getNonce())
+        );
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
         $proposal = ProposalFactory::create($header, $chaincodeProposalPayload);
 

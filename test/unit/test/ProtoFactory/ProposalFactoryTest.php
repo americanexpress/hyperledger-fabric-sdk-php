@@ -26,6 +26,7 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +47,10 @@ class ProposalFactoryTest extends TestCase
             'MyChannelId'
         );
 
-        $header = HeaderFactory::fromTransactionContext($channelHeader, $transactionContext);
+        $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
+            $transactionContext->getSerializedIdentity(),
+            $transactionContext->getNonce()
+        ));
 
         $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs([
             'foo',

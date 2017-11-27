@@ -43,36 +43,4 @@ class HeaderFactory
 
         return $header;
     }
-
-    /**
-     * @param ChannelHeader $channelHeader
-     * @param SerializedIdentity $serializedIdentity
-     * @param string $nonce
-     * @return Header
-     */
-    public static function createFromSerializedIdentity(
-        ChannelHeader $channelHeader,
-        SerializedIdentity $serializedIdentity,
-        string $nonce
-    ): Header {
-        $signatureHeader = SignatureHeaderFactory::create($serializedIdentity, $nonce);
-
-        return self::create($channelHeader, $signatureHeader);
-    }
-
-    /**
-     * @param ChannelHeader $channelHeader
-     * @param TransactionContext $transactionContext
-     * @return Header
-     */
-    public static function fromTransactionContext(
-        ChannelHeader $channelHeader,
-        TransactionContext $transactionContext
-    ): Header {
-        return self::createFromSerializedIdentity(
-            $channelHeader,
-            $transactionContext->getSerializedIdentity(),
-            $transactionContext->getNonce()
-        );
-    }
 }
