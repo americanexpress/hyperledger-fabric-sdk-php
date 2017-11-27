@@ -23,6 +23,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
@@ -60,7 +61,9 @@ class ChannelTest extends TestCase
 
         $result = $this->sut->queryByChainCode(
             new TransactionRequest([
-                'peer' => 'peer1',
+                'peer' => new PeerOptions([
+                    'name' => 'peer1',
+                ]),
             ]),
             (new ChaincodeID())
                 ->setPath('FizBuz')
@@ -101,7 +104,9 @@ class ChannelTest extends TestCase
             $chaincodeProposalPayload,
             $chaincodeHeaderExtension,
             new TransactionRequest([
-                'peer' => 'peer1',
+                'peer' => new PeerOptions([
+                    'name' => 'peer1',
+                ]),
             ])
         );
 

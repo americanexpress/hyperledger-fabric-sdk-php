@@ -25,6 +25,7 @@ use AmericanExpress\HyperledgerFabricClient\Client\Client;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
@@ -123,10 +124,6 @@ class ClientTest extends TestCase
     {
         $proposal = new Proposal();
 
-        $context = new TransactionRequest([
-            'peer' => 'peer1',
-        ]);
-
         $this->endorserClient->method('ProcessProposal')
             ->willReturn($this->unaryCall);
 
@@ -138,7 +135,7 @@ class ClientTest extends TestCase
                 ]
             ]);
 
-        $response = $this->sut->processProposal($proposal, $context);
+        $response = $this->sut->processProposal($proposal);
 
         self::assertInstanceOf(ProposalResponse::class, $response);
     }
@@ -150,14 +147,10 @@ class ClientTest extends TestCase
     {
         $proposal = new Proposal();
 
-        $context = new TransactionRequest([
-            'peer' => 'peer1',
-        ]);
-
         $this->endorserClient->method('ProcessProposal')
             ->willReturn(new \stdClass());
 
-        $this->sut->processProposal($proposal, $context);
+        $this->sut->processProposal($proposal);
     }
 
     /**
@@ -168,10 +161,6 @@ class ClientTest extends TestCase
     public function testProcessSignedProposalHandlesConnectionError()
     {
         $proposal = new Proposal();
-
-        $context = new TransactionRequest([
-            'peer' => 'peer1',
-        ]);
 
         $this->endorserClient->method('ProcessProposal')
             ->willReturn($this->unaryCall);
@@ -186,7 +175,7 @@ class ClientTest extends TestCase
                 ]
             ]);
 
-        $this->sut->processProposal($proposal, $context);
+        $this->sut->processProposal($proposal);
     }
 
     public function testGetIdentity()
@@ -204,5 +193,32 @@ class ClientTest extends TestCase
         $result = $this->sut->createTransactionContext();
 
         self::assertSame($transactionContext, $result);
+    }
+
+    public function testProcessProposalWithCustomPeer()
+    {
+        $proposal = new Proposal();
+
+        $context = new TransactionRequest([
+            'peer' => new PeerOptions([
+                'name' => 'peer1',
+                'requests' => 'localhost:7051',
+            ]),
+        ]);
+
+        $this->endorserClient->method('ProcessProposal')
+            ->willReturn($this->unaryCall);
+
+        $this->unaryCall->method('wait')
+            ->willReturn([
+                $proposalResponse = new ProposalResponse(),
+                [
+                    'code' => 0,
+                ]
+            ]);
+
+        $response = $this->sut->processProposal($proposal, $context);
+
+        self::assertInstanceOf(ProposalResponse::class, $response);
     }
 }

@@ -22,7 +22,6 @@ namespace AmericanExpress\HyperledgerFabricClient\Organization;
 
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 
 interface OrganizationOptionsInterface
 {
@@ -63,8 +62,7 @@ interface OrganizationOptionsInterface
     public function getPeerByName(string $name): ?PeerOptionsInterface;
 
     /**
-     * @param TransactionRequest|null $context
-     * @return PeerOptionsInterface
+     * @return PeerOptionsInterface|null
      */
-    public function getPeerByTransactionRequest(TransactionRequest $context = null): PeerOptionsInterface;
+    public function getDefaultPeer(): ?PeerOptionsInterface;
 }

@@ -24,7 +24,6 @@ use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
 use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 
 class OrganizationOptions extends AbstractOptions implements OrganizationOptionsInterface
 {
@@ -177,11 +176,10 @@ class OrganizationOptions extends AbstractOptions implements OrganizationOptions
     }
 
     /**
-     * @param TransactionRequest|null $context
-     * @return PeerOptionsInterface
+     * @return PeerOptionsInterface|null
      * @throws UnexpectedValueException
      */
-    public function getPeerByTransactionRequest(TransactionRequest $context = null): PeerOptionsInterface
+    public function getDefaultPeer(): ?PeerOptionsInterface
     {
         if (count($this->peers) < 1) {
             throw new UnexpectedValueException(sprintf(
@@ -190,30 +188,6 @@ class OrganizationOptions extends AbstractOptions implements OrganizationOptions
             ));
         }
 
-        $peerName = $context ? $context->getPeer() : null;
-
-        if (!$peerName) {
-            return $this->getDefaultPeer();
-        }
-
-        $peer = $this->getPeerByName($peerName);
-
-        if ($peer) {
-            return $peer;
-        }
-
-        throw new UnexpectedValueException(sprintf(
-            'Peer `%s` is invalid for organization `%s`',
-            $context->getPeer(),
-            $this->name
-        ));
-    }
-
-    /**
-     * @return PeerOptionsInterface|null
-     */
-    public function getDefaultPeer(): ?PeerOptionsInterface
-    {
         return \reset($this->peers);
     }
 }

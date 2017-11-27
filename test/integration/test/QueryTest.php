@@ -22,6 +22,7 @@ namespace AmericanExpressTest\Integration\Test;
 
 use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpressTest\Integration\TestAsset\E2EUtils;
 use PHPUnit\Framework\TestCase;
@@ -38,8 +39,24 @@ class QueryTest extends TestCase
     public function testChainCodeEntityQuery()
     {
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
+
+        $fabricProposal = ClientFactory::fromConfig($config, 'peerOrg1')
+            ->getChannel('foo')
+            ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
+            ->invoke('query', 'a');
+
+        $payload = $fabricProposal->getPayload();
+        $this->assertNotNull($payload);
+    }
+
+    public function testQueryChaincodeWithCustomPeer()
+    {
+        $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
+
         $request = new TransactionRequest([
-            'peer' => 'peer1'
+            'peer' => new PeerOptions([
+                'requests' => 'localhost:7051',
+            ]),
         ]);
 
         $fabricProposal = ClientFactory::fromConfig($config, 'peerOrg1')

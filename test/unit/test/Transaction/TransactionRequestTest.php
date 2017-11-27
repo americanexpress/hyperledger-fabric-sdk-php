@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use PHPUnit\Framework\TestCase;
 
@@ -40,19 +41,29 @@ class TransactionRequestTest extends TestCase
 
     public function testPeer()
     {
+        self::assertFalse($this->sut->hasPeer());
         self::assertNull($this->sut->getPeer());
 
-        $this->sut->setPeer('peer1');
+        $peer = new PeerOptions([
+            'name' => 'peer1',
+        ]);
 
-        self::assertSame('peer1', $this->sut->getPeer());
+        $this->sut->setPeer($peer);
+
+        self::assertTrue($this->sut->hasPeer());
+        self::assertSame($peer, $this->sut->getPeer());
     }
 
     public function testFromArray()
     {
-        $sut = new TransactionRequest([
-            'peer' => 'peer1',
+        $peer = new PeerOptions([
+            'name' => 'peer1',
         ]);
 
-        self::assertSame('peer1', $sut->getPeer());
+        $sut = new TransactionRequest([
+            'peer' => $peer,
+        ]);
+
+        self::assertSame($peer, $sut->getPeer());
     }
 }

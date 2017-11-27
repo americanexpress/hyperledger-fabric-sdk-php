@@ -22,6 +22,7 @@ namespace AmericanExpressTest\Integration\TestAsset;
 
 use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 
@@ -36,7 +37,9 @@ class E2EUtils
     {
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
         $request = new TransactionRequest([
-            'peer' => 'peer1'
+            'peer' => new PeerOptions([
+                'requests' => 'localhost:7051',
+            ]),
         ]);
 
         $fabricProposal = ClientFactory::fromConfig($config, $org)

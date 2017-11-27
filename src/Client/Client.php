@@ -142,11 +142,14 @@ final class Client implements ClientInterface
         SignedProposal $proposal,
         TransactionRequest $context = null
     ): ProposalResponse {
-        $host = $this->user->getOrganization()
-            ->getPeerByTransactionRequest($context)
-            ->getRequests();
 
-        $endorserClient = $this->endorserClients->get($host);
+        if ($context && $context->hasPeer()) {
+            $peer = $context->getPeer();
+        } else {
+            $peer = $this->user->getOrganization()->getDefaultPeer();
+        }
+
+        $endorserClient = $this->endorserClients->get($peer->getRequests());
 
         $simpleSurfaceActiveCall = $endorserClient->ProcessProposal($proposal);
 

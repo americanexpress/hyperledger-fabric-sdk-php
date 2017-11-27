@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Organization;
 
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use PHPUnit\Framework\TestCase;
@@ -198,75 +199,42 @@ class OrganizationOptionsTest extends TestCase
         self::assertNull($sut->getPeerByName('peer3'));
     }
 
-    public function testGetPeerByValidNameFromTransactionRequest()
-    {
-        $sut = new OrganizationOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                ],
-            ],
-        ]);
-
-        $context = new TransactionRequest([
-            'peer' => 'peer1',
-        ]);
-
-        $result = $sut->getPeerByTransactionRequest($context);
-
-        self::assertInstanceOf(PeerOptionsInterface::class, $result);
-        self::assertSame('peer1', $result->getName());
-    }
-
     /**
      * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
      */
-    public function testGetPeerByInvalidNameFromTransactionRequest()
+    public function testGetInvalidDefaultPeer()
     {
-        $sut = new OrganizationOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                ],
-            ],
-        ]);
-
-        $context = new TransactionRequest([
-            'peer' => 'FooBar',
-        ]);
-
-        $sut->getPeerByTransactionRequest($context);
+        $this->sut->getDefaultPeer();
     }
 
-    public function testGetDefaultPeerByTransactionRequest()
+    public function testGetDefaultPeer()
     {
         $sut = new OrganizationOptions([
             'peers' => [
                 [
                     'name' => 'peer1',
+                    'requests' => 'localhost:7051',
+                    'events' => 'localhost:7053',
+                    'server-hostname' => 'peer1.org1.example.com',
+                    'tls_cacerts' => __FILE__,
+                ],
+                [
+                    'name' => 'peer2',
+                    'requests' => 'localhost:8051',
+                    'events' => 'localhost:8053',
+                    'server-hostname' => 'peer2.org1.example.com',
+                    'tls_cacerts' => __FILE__,
                 ],
             ],
         ]);
 
-        $context = new TransactionRequest();
-
-        $result = $sut->getPeerByTransactionRequest($context);
+        $result = $sut->getDefaultPeer();
 
         self::assertInstanceOf(PeerOptionsInterface::class, $result);
         self::assertSame('peer1', $result->getName());
-    }
-
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
-     */
-    public function testGetPeerFromEmptyCollectionByTransactionRequest()
-    {
-        $sut = new OrganizationOptions([
-            'peers' => [],
-        ]);
-
-        $context = new TransactionRequest();
-
-        $sut->getPeerByTransactionRequest($context);
+        self::assertSame('localhost:7051', $result->getRequests());
+        self::assertSame('localhost:7053', $result->getEvents());
+        self::assertSame('peer1.org1.example.com', $result->getServerHostname());
+        self::assertSame(__FILE__, $result->getTlsCaCerts());
     }
 }

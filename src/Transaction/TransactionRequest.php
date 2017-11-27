@@ -21,28 +21,37 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 
 class TransactionRequest extends AbstractOptions
 {
     /**
-     * @var string|null
+     * @var PeerOptionsInterface|null
      */
     private $peer;
 
     /**
-     * @return string|null
+     * @return PeerOptionsInterface|null
      */
-    public function getPeer(): ?string
+    public function getPeer(): ?PeerOptionsInterface
     {
         return $this->peer;
     }
 
     /**
-     * @param string $peer
+     * @param PeerOptionsInterface $peer
      * @return void
      */
-    public function setPeer(string $peer): void
+    public function setPeer(PeerOptionsInterface $peer): void
     {
         $this->peer = $peer;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPeer(): bool
+    {
+        return (bool) $this->peer;
     }
 }
