@@ -46,7 +46,6 @@ final class ClientConfig implements ClientConfigInterface
                 'epoch' => 0,
                 'crypto-hash-algo' => 'sha256',
                 'nonce-size'  => 24,
-                'orderers' => [],
                 'organizations' => [],
             ],
             $config
