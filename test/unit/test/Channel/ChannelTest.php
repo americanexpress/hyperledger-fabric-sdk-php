@@ -24,11 +24,11 @@ use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Channel\Channel;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,13 +57,15 @@ class ChannelTest extends TestCase
     public function testQueryByChaincode()
     {
         $this->client->method('processChannelProposal')
-            ->willReturn($proposalResponse = new ProposalResponse());
+            ->willReturn($proposalResponse = new ResponseCollection());
 
         $result = $this->sut->queryByChainCode(
             new TransactionOptions([
-                'peer' => new PeerOptions([
-                    'name' => 'peer1',
-                ]),
+                'peers' => [
+                    new PeerOptions([
+                        'name' => 'peer1',
+                    ]),
+                ],
             ]),
             (new ChaincodeID())
                 ->setPath('FizBuz')
@@ -88,7 +90,7 @@ class ChannelTest extends TestCase
     public function testChannelCanProcessChaincodeProposal()
     {
         $this->client->method('processChannelProposal')
-            ->willReturn($proposalResponse = new ProposalResponse());
+            ->willReturn($proposalResponse = new ResponseCollection());
 
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId(
             (new ChaincodeID())
@@ -104,9 +106,11 @@ class ChannelTest extends TestCase
             $chaincodeProposalPayload,
             $chaincodeHeaderExtension,
             new TransactionOptions([
-                'peer' => new PeerOptions([
-                    'name' => 'peer1',
-                ]),
+                'peers' => [
+                    new PeerOptions([
+                        'name' => 'peer1',
+                    ]),
+                ],
             ])
         );
 

@@ -21,37 +21,51 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 
 class TransactionOptions extends AbstractOptions
 {
     /**
-     * @var PeerOptionsInterface|null
+     * @var PeerOptionsInterface[]
      */
-    private $peer;
+    private $peers = [];
 
     /**
-     * @return PeerOptionsInterface|null
+     * @return PeerOptionsInterface[]
      */
-    public function getPeer(): ?PeerOptionsInterface
+    public function getPeers(): array
     {
-        return $this->peer;
+        return $this->peers;
     }
 
     /**
-     * @param PeerOptionsInterface $peer
+     * @param PeerOptionsInterface[] $peers
      * @return void
      */
-    public function setPeer(PeerOptionsInterface $peer): void
+    public function setPeers(array $peers): void
     {
-        $this->peer = $peer;
+        $peers = array_map(function ($peer): PeerOptionsInterface {
+            return $peer instanceof PeerOptionsInterface ? $peer : new PeerOptions($peer);
+        }, $peers);
+
+        $this->peers = [];
+        $this->addPeers(...$peers);
+    }
+
+    /**
+     * @param PeerOptionsInterface[] ...$peers
+     */
+    public function addPeers(PeerOptionsInterface ...$peers): void
+    {
+        $this->peers = array_merge($this->peers, $peers);
     }
 
     /**
      * @return bool
      */
-    public function hasPeer(): bool
+    public function hasPeers(): bool
     {
-        return (bool) $this->peer;
+        return count($this->peers) > 0;
     }
 }

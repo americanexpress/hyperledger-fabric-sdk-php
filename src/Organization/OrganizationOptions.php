@@ -161,33 +161,4 @@ class OrganizationOptions extends AbstractOptions implements OrganizationOptions
             return $peer instanceof PeerOptionsInterface ? $peer : new PeerOptions($peer);
         }, $peers);
     }
-
-    /**
-     * @param string $name
-     * @return PeerOptionsInterface|null
-     */
-    public function getPeerByName(string $name): ?PeerOptionsInterface
-    {
-        $peers = array_filter($this->peers, function (PeerOptionsInterface $peer) use ($name): bool {
-            return $peer->getName() === $name;
-        });
-
-        return count($peers) > 0 ? reset($peers) : null;
-    }
-
-    /**
-     * @return PeerOptionsInterface|null
-     * @throws UnexpectedValueException
-     */
-    public function getDefaultPeer(): ?PeerOptionsInterface
-    {
-        if (count($this->peers) < 1) {
-            throw new UnexpectedValueException(sprintf(
-                'Organization `%s` has no peers.',
-                $this->name
-            ));
-        }
-
-        return \reset($this->peers);
-    }
 }

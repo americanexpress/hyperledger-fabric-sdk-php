@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
+use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
 interface ChannelProposalProcessorInterface
 {
@@ -30,11 +30,11 @@ interface ChannelProposalProcessorInterface
      * @param ChannelHeader $channelHeader
      * @param string $payload
      * @param TransactionOptions|null $options
-     * @return ProposalResponse
+     * @return ResponseCollection
      */
     public function processChannelProposal(
         ChannelHeader $channelHeader,
         string $payload,
         TransactionOptions $options = null
-    ): ProposalResponse;
+    ): ResponseCollection;
 }

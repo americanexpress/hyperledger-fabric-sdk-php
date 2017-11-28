@@ -23,6 +23,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Peer;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
+use AmericanExpress\HyperledgerFabricClient\Proposal\Response;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
@@ -86,7 +87,8 @@ class PeerTest extends TestCase
 
         $response = $this->sut->processSignedProposal(new SignedProposal());
 
-        self::assertInstanceOf(ProposalResponse::class, $response);
+        self::assertInstanceOf(Response::class, $response);
+        self::assertFalse($response->isException());
     }
 
     public function testProcessChannelProposalWithCustomPeer()
@@ -104,25 +106,21 @@ class PeerTest extends TestCase
 
         $response = $this->sut->processSignedProposal(new SignedProposal());
 
-        self::assertInstanceOf(ProposalResponse::class, $response);
+        self::assertInstanceOf(Response::class, $response);
+        self::assertFalse($response->isException());
     }
 
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
-     */
     public function testProcessProposalRequiresUnaryCall()
     {
         $this->endorserClient->method('ProcessProposal')
             ->willReturn(new \stdClass());
 
-        $this->sut->processSignedProposal(new SignedProposal());
+        $response = $this->sut->processSignedProposal(new SignedProposal());
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertTrue($response->isException());
     }
 
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
-     * @expectedExceptionMessage Connect failed
-     * @expectedExceptionCode 14
-     */
     public function testProcessSignedProposalHandlesConnectionError()
     {
         $this->endorserClient->method('ProcessProposal')
@@ -138,6 +136,9 @@ class PeerTest extends TestCase
                 ]
             ]);
 
-        $this->sut->processSignedProposal(new SignedProposal());
+        $response = $this->sut->processSignedProposal(new SignedProposal());
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertTrue($response->isException());
     }
 }

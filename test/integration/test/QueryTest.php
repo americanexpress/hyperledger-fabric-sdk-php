@@ -31,22 +31,22 @@ class QueryTest extends TestCase
 {
     public function testQueryChainCode()
     {
-        $e2e = new E2EUtils();
-        $result = $e2e->queryChaincode('peerOrg1');
-        $this->assertNotNull($result);
+        $responses = (new E2EUtils())->queryChaincode('peerOrg1');
+        $this->assertCount(1, $responses->getProposalResponses());
+        $this->assertCount(0, $responses->getExceptions());
     }
 
     public function testChainCodeEntityQuery()
     {
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
 
-        $fabricProposal = ClientFactory::fromConfig($config, 'peerOrg1')
+        $responses = ClientFactory::fromConfig($config, 'peerOrg1')
             ->getChannel('foo')
             ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
             ->invoke('query', 'a');
 
-        $payload = $fabricProposal->getPayload();
-        $this->assertNotNull($payload);
+        $this->assertCount(1, $responses->getProposalResponses());
+        $this->assertCount(0, $responses->getExceptions());
     }
 
     public function testQueryChaincodeWithCustomPeer()
@@ -54,17 +54,19 @@ class QueryTest extends TestCase
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
 
         $request = new TransactionOptions([
-            'peer' => new PeerOptions([
-                'requests' => 'localhost:7051',
-            ]),
+            'peers' => [
+                new PeerOptions([
+                    'requests' => 'localhost:7051',
+                ]),
+            ],
         ]);
 
-        $fabricProposal = ClientFactory::fromConfig($config, 'peerOrg1')
+        $responses = ClientFactory::fromConfig($config, 'peerOrg1')
             ->getChannel('foo')
             ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
             ->invoke('query', 'a', $request);
 
-        $payload = $fabricProposal->getPayload();
-        $this->assertNotNull($payload);
+        $this->assertCount(1, $responses->getProposalResponses());
+        $this->assertCount(0, $responses->getExceptions());
     }
 }

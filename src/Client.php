@@ -26,6 +26,8 @@ use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProposalProcessorInte
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
@@ -36,7 +38,6 @@ use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
 use Hyperledger\Fabric\Protos\Common\Header;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 
 final class Client implements ChannelProviderInterface, ChannelProposalProcessorInterface
@@ -109,10 +110,12 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
     /**
      * @param Proposal $proposal
      * @param TransactionOptions|null $options
-     * @return ProposalResponse
+     * @return ResponseCollection
      */
-    private function processProposal(Proposal $proposal, TransactionOptions $options = null): ProposalResponse
-    {
+    private function processProposal(
+        Proposal $proposal,
+        TransactionOptions $options = null
+    ): ResponseCollection {
         $privateKey = $this->user->getOrganization()->getPrivateKey();
 
         $signedProposal = $this->signatory->signProposal($proposal, new \SplFileObject($privateKey));
@@ -123,21 +126,27 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
     /**
      * @param SignedProposal $proposal
      * @param TransactionOptions|null $options
-     * @return ProposalResponse
+     * @return ResponseCollection
      */
     private function processSignedProposal(
         SignedProposal $proposal,
         TransactionOptions $options = null
-    ): ProposalResponse {
-        if ($options && $options->hasPeer()) {
-            $peerOptions = $options->getPeer();
+    ): ResponseCollection {
+        if ($options && $options->hasPeers()) {
+            $peerOptionsCollection = $options->getPeers();
         } else {
-            $peerOptions = $this->user->getOrganization()->getDefaultPeer();
+            $peerOptionsCollection = $this->user->getOrganization()->getPeers();
         }
 
-        $peer = new Peer($peerOptions, $this->endorserClients);
+        $endorserClients = $this->endorserClients;
 
-        return $peer->processSignedProposal($proposal);
+        $peers = array_map(function (PeerOptionsInterface $peerOptions) use ($endorserClients) {
+            return new Peer($peerOptions, $endorserClients);
+        }, $peerOptionsCollection);
+
+        return new ResponseCollection(array_map(function (Peer $peer) use ($proposal) {
+            return $peer->processSignedProposal($proposal);
+        }, $peers));
     }
 
     /**
@@ -161,13 +170,13 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
      * @param ChannelHeader $channelHeader
      * @param string $payload
      * @param TransactionOptions|null $options
-     * @return ProposalResponse
+     * @return ResponseCollection
      */
     public function processChannelProposal(
         ChannelHeader $channelHeader,
         string $payload,
         TransactionOptions $options = null
-    ): ProposalResponse {
+    ): ResponseCollection {
         $header = $this->createHeaderFromChannelHeader($channelHeader);
         $proposal = ProposalFactory::create($header, $payload);
 

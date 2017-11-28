@@ -23,11 +23,11 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Chaincode\ChaincodeProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -104,7 +104,7 @@ class ChaincodeTest extends TestCase
     public function testInvokeReturnsResponseFromChannel()
     {
         $this->channel->method('processChaincodeProposal')
-            ->willReturn($proposalResponse = new ProposalResponse());
+            ->willReturn($proposalResponse = new ResponseCollection());
 
         $response = $this->sut->invoke('query', 'a');
 
@@ -114,7 +114,7 @@ class ChaincodeTest extends TestCase
     public function testAnyUnspecifiedMethodReturnsResponseFromChannel()
     {
         $this->channel->method('processChaincodeProposal')
-            ->willReturn($proposalResponse = new ProposalResponse());
+            ->willReturn($proposalResponse = new ResponseCollection());
 
         $response = $this->sut->somethingElseEntirely('query', 'a');
 
@@ -156,9 +156,11 @@ class ChaincodeTest extends TestCase
     public function testCallPassesTransactionRequestToChannel()
     {
         $transactionRequest = new TransactionOptions([
-            'peer' => new PeerOptions([
-                'name' => 'peer1',
-            ]),
+            'peers' => [
+                new PeerOptions([
+                    'name' => 'peer1',
+                ]),
+            ],
         ]);
 
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId(
@@ -178,9 +180,11 @@ class ChaincodeTest extends TestCase
     public function testCallPassesTransactionRequestToChannelAsFinalArgument()
     {
         $transactionRequest = new TransactionOptions([
-            'peer' => new PeerOptions([
-                'name' => 'peer1',
-            ]),
+            'peers' => [
+                new PeerOptions([
+                    'name' => 'peer1',
+                ]),
+            ],
         ]);
 
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId(
@@ -200,9 +204,11 @@ class ChaincodeTest extends TestCase
     public function testInvokePassesTransactionRequestToChannelAsFinalArgument()
     {
         $transactionRequest = new TransactionOptions([
-            'peer' => new PeerOptions([
-                'name' => 'peer1',
-            ]),
+            'peers' => [
+                new PeerOptions([
+                    'name' => 'peer1',
+                ]),
+            ],
         ]);
 
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId(

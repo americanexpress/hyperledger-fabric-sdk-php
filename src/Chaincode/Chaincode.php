@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Chaincode;
 
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeIdFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
@@ -37,12 +38,12 @@ class Chaincode
     /**
      * @var string $version
      */
-    private $version = '';
+    private $version;
 
     /**
      * @var string $path
      */
-    private $path = '';
+    private $path;
 
     /**
      * @var ChaincodeProposalProcessorInterface $channel
@@ -95,10 +96,10 @@ class Chaincode
 
     /**
      * @param string | array $nameOrDetails
-     * @return array
+     * @return string[]
      * @throws InvalidArgumentException
      */
-    private function normalizeName($nameOrDetails)
+    private function normalizeName($nameOrDetails): array
     {
         if (\is_string($nameOrDetails)) {
             return ['name' => $nameOrDetails, 'version' => '', 'path' => ''];
@@ -126,13 +127,13 @@ class Chaincode
      * @param string $name
      * @param mixed[] $args
      * @param TransactionOptions|null $options
-     * @return ProposalResponse
+     * @return ResponseCollection
      */
     private function executeCommand(
         string $name,
         array $args = [],
         TransactionOptions $options = null
-    ): ProposalResponse {
+    ): ResponseCollection {
         $chaincodeId = ChaincodeIdFactory::create(
             $this->path,
             $this->name,
@@ -179,9 +180,9 @@ class Chaincode
      *
      * @param string $name
      * @param array $arguments
-     * @return \Hyperledger\Fabric\Protos\Peer\ProposalResponse
+     * @return ResponseCollection
      */
-    public function __call(string $name, array $arguments = []): ProposalResponse
+    public function __call(string $name, array $arguments = []): ResponseCollection
     {
         $options = $this->extractTransactionOptions($arguments);
         if ($options !== null) {
@@ -196,9 +197,9 @@ class Chaincode
      * Typing the default call to a Chaincode (invoke)
      *
      * @param array ...$args
-     * @return \Hyperledger\Fabric\Protos\Peer\ProposalResponse
+     * @return ResponseCollection
      */
-    public function invoke(...$args)
+    public function invoke(...$args): ResponseCollection
     {
         return $this->__call('invoke', $args);
     }

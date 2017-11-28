@@ -39,19 +39,26 @@ class TransactionOptionsTest extends TestCase
         $this->sut = new TransactionOptions();
     }
 
-    public function testPeer()
+    public function testDefaultPeers()
     {
-        self::assertFalse($this->sut->hasPeer());
-        self::assertNull($this->sut->getPeer());
+        self::assertFalse($this->sut->hasPeers());
+        self::assertCount(0, $this->sut->getPeers());
+    }
+
+    public function testAddOnePeer()
+    {
+        self::assertFalse($this->sut->hasPeers());
+        self::assertCount(0, $this->sut->getPeers());
 
         $peer = new PeerOptions([
             'name' => 'peer1',
         ]);
 
-        $this->sut->setPeer($peer);
+        $this->sut->addPeers($peer);
 
-        self::assertTrue($this->sut->hasPeer());
-        self::assertSame($peer, $this->sut->getPeer());
+        self::assertTrue($this->sut->hasPeers());
+        self::assertCount(1, $this->sut->getPeers());
+        self::assertSame([$peer], $this->sut->getPeers());
     }
 
     public function testFromArray()
@@ -61,9 +68,37 @@ class TransactionOptionsTest extends TestCase
         ]);
 
         $sut = new TransactionOptions([
-            'peer' => $peer,
+            'peers' => [$peer],
         ]);
 
-        self::assertSame($peer, $sut->getPeer());
+        self::assertSame([$peer], $sut->getPeers());
+    }
+
+    public function testSetPeers()
+    {
+        $peer = new PeerOptions([
+            'name' => 'peer1',
+        ]);
+
+        $this->sut->setPeers([$peer]);
+
+        self::assertSame([$peer], $this->sut->getPeers());
+    }
+
+    public function testAddManyPeers()
+    {
+        $this->sut->addPeers(
+            new PeerOptions([
+                'name' => 'peer1',
+            ]),
+            new PeerOptions([
+                'name' => 'peer2',
+            ]),
+            new PeerOptions([
+                'name' => 'peer3',
+            ])
+        );
+
+        self::assertCount(3, $this->sut->getPeers());
     }
 }

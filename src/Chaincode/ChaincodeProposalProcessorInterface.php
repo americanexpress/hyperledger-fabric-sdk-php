@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Chaincode;
 
+use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
 interface ChaincodeProposalProcessorInterface
 {
@@ -34,11 +34,11 @@ interface ChaincodeProposalProcessorInterface
      * @param ChaincodeProposalPayload $payload
      * @param ChaincodeHeaderExtension $extension
      * @param TransactionOptions|null $options
-     * @return ProposalResponse
+     * @return ResponseCollection
      */
     public function processChaincodeProposal(
         ChaincodeProposalPayload $payload,
         ChaincodeHeaderExtension $extension,
         TransactionOptions $options = null
-    ): ProposalResponse;
+    ): ResponseCollection;
 }

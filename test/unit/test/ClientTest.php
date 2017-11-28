@@ -25,6 +25,7 @@ use AmericanExpress\HyperledgerFabricClient\Client;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
@@ -131,7 +132,9 @@ class ClientTest extends TestCase
 
         $response = $this->sut->processChannelProposal($channelHeader, 'test-payload');
 
-        self::assertInstanceOf(ProposalResponse::class, $response);
+        self::assertInstanceOf(ResponseCollection::class, $response);
+        self::assertCount(1, $response->getProposalResponses());
+        self::assertCount(0, $response->getExceptions());
     }
 
     public function testProcessChannelProposalWithCustomPeer()
@@ -139,10 +142,12 @@ class ClientTest extends TestCase
         $channelHeader = ChannelHeaderFactory::create('test-channel');
 
         $context = new TransactionOptions([
-            'peer' => new PeerOptions([
-                'name' => 'peer1',
-                'requests' => 'localhost:7051',
-            ]),
+            'peers' => [
+                new PeerOptions([
+                    'name' => 'peer1',
+                    'requests' => 'localhost:7051',
+                ]),
+            ],
         ]);
 
         $this->endorserClient->method('ProcessProposal')
@@ -158,12 +163,11 @@ class ClientTest extends TestCase
 
         $response = $this->sut->processChannelProposal($channelHeader, 'test-payload', $context);
 
-        self::assertInstanceOf(ProposalResponse::class, $response);
+        self::assertInstanceOf(ResponseCollection::class, $response);
+        self::assertCount(1, $response->getProposalResponses());
+        self::assertCount(0, $response->getExceptions());
     }
 
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
-     */
     public function testProcessProposalRequiresUnaryCall()
     {
         $this->endorserClient->method('ProcessProposal')
@@ -171,14 +175,13 @@ class ClientTest extends TestCase
 
         $channelHeader = ChannelHeaderFactory::create('test-channel');
 
-        $this->sut->processChannelProposal($channelHeader, 'test-payload');
+        $response = $this->sut->processChannelProposal($channelHeader, 'test-payload');
+
+        self::assertInstanceOf(ResponseCollection::class, $response);
+        self::assertCount(0, $response->getProposalResponses());
+        self::assertCount(1, $response->getExceptions());
     }
 
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
-     * @expectedExceptionMessage Connect failed
-     * @expectedExceptionCode 14
-     */
     public function testProcessSignedProposalHandlesConnectionError()
     {
         $this->endorserClient->method('ProcessProposal')
@@ -196,6 +199,10 @@ class ClientTest extends TestCase
 
         $channelHeader = ChannelHeaderFactory::create('test-channel');
 
-        $this->sut->processChannelProposal($channelHeader, 'test-payload');
+        $response = $this->sut->processChannelProposal($channelHeader, 'test-payload');
+
+        self::assertInstanceOf(ResponseCollection::class, $response);
+        self::assertCount(0, $response->getProposalResponses());
+        self::assertCount(1, $response->getExceptions());
     }
 }

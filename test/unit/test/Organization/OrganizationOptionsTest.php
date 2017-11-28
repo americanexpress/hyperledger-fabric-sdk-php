@@ -116,47 +116,6 @@ class OrganizationOptionsTest extends TestCase
         self::assertInstanceOf(PeerOptionsInterface::class, $this->sut->getPeers()[1]);
     }
 
-    public function testGetPeerByName()
-    {
-        $this->sut->setPeers([
-            [
-                'name' => 'peer1',
-                'requests' => 'localhost:7051',
-                'events' => 'localhost:7053',
-                'server-hostname' => 'peer1.org1.example.com',
-                'tls_cacerts' => __FILE__,
-            ],
-            [
-                'name' => 'peer2',
-                'requests' => 'localhost:8051',
-                'events' => 'localhost:8053',
-                'server-hostname' => 'peer2.org1.example.com',
-                'tls_cacerts' => __FILE__,
-            ],
-        ]);
-
-        $peer1 = $this->sut->getPeerByName('peer1');
-        self::assertInstanceOf(PeerOptionsInterface::class, $peer1);
-        self::assertSame('peer1', $peer1->getName());
-        self::assertSame('localhost:7051', $peer1->getRequests());
-        self::assertSame('localhost:7053', $peer1->getEvents());
-        self::assertSame('peer1.org1.example.com', $peer1->getServerHostname());
-        self::assertSame(__FILE__, $peer1->getTlsCaCerts());
-
-        $peer2 = $this->sut->getPeerByName('peer2');
-        self::assertInstanceOf(PeerOptionsInterface::class, $peer2);
-        self::assertSame('peer2', $peer2->getName());
-        self::assertSame('localhost:8051', $peer2->getRequests());
-        self::assertSame('localhost:8053', $peer2->getEvents());
-        self::assertSame('peer2.org1.example.com', $peer2->getServerHostname());
-        self::assertSame(__FILE__, $peer2->getTlsCaCerts());
-    }
-
-    public function testGetPeerByInvalidName()
-    {
-        self::assertNull($this->sut->getPeerByName('peer1'));
-    }
-
     public function testFromArray()
     {
         $sut = new OrganizationOptions([
@@ -192,47 +151,6 @@ class OrganizationOptionsTest extends TestCase
         self::assertSame('ca-org1', $sut->getCa()['name']);
         self::assertSame(__FILE__, $sut->getAdminCerts());
         self::assertSame(__FILE__, $sut->getPrivateKey());
-        self::assertInstanceOf(PeerOptionsInterface::class, $sut->getPeerByName('peer1'));
-        self::assertInstanceOf(PeerOptionsInterface::class, $sut->getPeerByName('peer2'));
-        self::assertNull($sut->getPeerByName('peer3'));
-    }
-
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
-     */
-    public function testGetInvalidDefaultPeer()
-    {
-        $this->sut->getDefaultPeer();
-    }
-
-    public function testGetDefaultPeer()
-    {
-        $sut = new OrganizationOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                    'requests' => 'localhost:7051',
-                    'events' => 'localhost:7053',
-                    'server-hostname' => 'peer1.org1.example.com',
-                    'tls_cacerts' => __FILE__,
-                ],
-                [
-                    'name' => 'peer2',
-                    'requests' => 'localhost:8051',
-                    'events' => 'localhost:8053',
-                    'server-hostname' => 'peer2.org1.example.com',
-                    'tls_cacerts' => __FILE__,
-                ],
-            ],
-        ]);
-
-        $result = $sut->getDefaultPeer();
-
-        self::assertInstanceOf(PeerOptionsInterface::class, $result);
-        self::assertSame('peer1', $result->getName());
-        self::assertSame('localhost:7051', $result->getRequests());
-        self::assertSame('localhost:7053', $result->getEvents());
-        self::assertSame('peer1.org1.example.com', $result->getServerHostname());
-        self::assertSame(__FILE__, $result->getTlsCaCerts());
+        self::assertCount(2, $sut->getPeers());
     }
 }

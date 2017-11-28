@@ -24,6 +24,7 @@ use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
+use AmericanExpress\HyperledgerFabricClient\Proposal\Response;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Grpc\UnaryCall;
@@ -56,11 +57,9 @@ class Peer implements PeerInterface
 
     /**
      * @param SignedProposal $proposal
-     * @return ProposalResponse
-     * @throws RuntimeException
-     * @throws UnexpectedValueException
+     * @return Response
      */
-    public function processSignedProposal(SignedProposal $proposal): ProposalResponse {
+    public function processSignedProposal(SignedProposal $proposal): Response {
         $host = $this->options->getRequests();
 
         $endorserClient = $this->endorserClients->get($host);
@@ -70,17 +69,19 @@ class Peer implements PeerInterface
         try {
             Assertion::isInstanceOf($simpleSurfaceActiveCall, UnaryCall::class);
         } catch (AssertionFailedException $e) {
-            throw UnexpectedValueException::fromException($e);
+            return Response::fromException(UnexpectedValueException::fromException($e));
         }
 
         /** @var UnaryCall $simpleSurfaceActiveCall */
         [$proposalResponse, $status] = $simpleSurfaceActiveCall->wait();
 
         if ($proposalResponse instanceof ProposalResponse) {
-            return $proposalResponse;
+            return Response::fromProposalResponse($proposalResponse);
         }
 
         $status = (array) $status;
-        throw new RuntimeException(get_in($status, ['details']), get_in($status, ['code']));
+        return Response::fromException(
+            new RuntimeException(get_in($status, ['details']), get_in($status, ['code']))
+        );
     }
 }

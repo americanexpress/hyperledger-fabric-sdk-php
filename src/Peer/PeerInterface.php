@@ -20,18 +20,14 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Peer;
 
-use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
-use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
+use AmericanExpress\HyperledgerFabricClient\Proposal\Response;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 
 interface PeerInterface
 {
     /**
      * @param SignedProposal $proposal
-     * @return ProposalResponse
-     * @throws RuntimeException
-     * @throws UnexpectedValueException
+     * @return Response
      */
-    public function processSignedProposal(SignedProposal $proposal): ProposalResponse;
+    public function processSignedProposal(SignedProposal $proposal): Response;
 }

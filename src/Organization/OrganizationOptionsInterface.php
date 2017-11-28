@@ -54,15 +54,4 @@ interface OrganizationOptionsInterface
      * @return PeerOptions[]
      */
     public function getPeers(): array;
-
-    /**
-     * @param string $name
-     * @return PeerOptionsInterface|null
-     */
-    public function getPeerByName(string $name): ?PeerOptionsInterface;
-
-    /**
-     * @return PeerOptionsInterface|null
-     */
-    public function getDefaultPeer(): ?PeerOptionsInterface;
 }

@@ -22,6 +22,7 @@ namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Chaincode\ChaincodeProposalProcessorInterface;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
@@ -57,13 +58,13 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
      * @param TransactionOptions $request
      * @param ChaincodeID $chaincodeId
      * @param mixed[] $args
-     * @return ProposalResponse
+     * @return ResponseCollection
      */
     public function queryByChainCode(
         TransactionOptions $request,
         ChaincodeID $chaincodeId,
         array $args = []
-    ): ProposalResponse {
+    ): ResponseCollection {
         $chainCode = $this->getChainCode([
             'name' => $chaincodeId->getName(),
             'version' => $chaincodeId->getPath(),
@@ -95,13 +96,13 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
      * @param ChaincodeProposalPayload $payload
      * @param ChaincodeHeaderExtension $extension
      * @param TransactionOptions|null $options
-     * @return ProposalResponse
+     * @return ResponseCollection
      */
     public function processChaincodeProposal(
         ChaincodeProposalPayload $payload,
         ChaincodeHeaderExtension $extension,
         TransactionOptions $options = null
-    ): ProposalResponse {
+    ): ResponseCollection {
         $channelHeader = ChannelHeaderFactory::create($this->name);
         $channelHeader->setExtension($extension->serializeToString());
 
