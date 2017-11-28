@@ -112,6 +112,45 @@ class Chaincode
     }
 
     /**
+     * @param mixed $value
+     * @param mixed[] $array
+     * @return mixed[]
+     */
+    private function prependValueToArray($value, array $array): array
+    {
+        array_unshift($array, $value);
+        return $array;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed[] $args
+     * @param TransactionRequest|null $context
+     * @return ProposalResponse
+     */
+    private function executeCommand(string $name, array $args = [], TransactionRequest $context = null): ProposalResponse
+    {
+        $chaincodeId = ChaincodeIdFactory::create(
+            $this->path,
+            $this->name,
+            $this->version
+        );
+
+        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
+
+        $nameAndArguments = $this->prependValueToArray($name, $args);
+        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs(
+            $nameAndArguments
+        );
+
+        return $this->channel->processChaincodeProposal(
+            $chaincodeProposalPayload,
+            $chaincodeHeaderExtension,
+            $context
+        );
+    }
+
+    /**
      * @param mixed[] $arguments
      * @return TransactionRequest|null
      */
@@ -131,17 +170,6 @@ class Chaincode
     }
 
     /**
-     * @param mixed $value
-     * @param mixed[] $array
-     * @return mixed[]
-     */
-    private function prependValueToArray($value, array $array): array
-    {
-        array_unshift($array, $value);
-        return $array;
-    }
-
-    /**
      *
      * Execute a proposal against a Chaincode. Because Chaincodes have variable methods, __call allows for dynamic
      * function submission
@@ -150,32 +178,14 @@ class Chaincode
      * @param array $arguments
      * @return \Hyperledger\Fabric\Protos\Peer\ProposalResponse
      */
-    public function __call(string $name, array $arguments): ProposalResponse
+    public function __call(string $name, array $arguments = []): ProposalResponse
     {
-        $chaincodeId = ChaincodeIdFactory::create(
-            $this->path,
-            $this->name,
-            $this->version
-        );
-
-        $normalizedArguments = $arguments;
         $transactionRequest = $this->extractTransactionRequest($arguments);
         if($transactionRequest !== null) {
-            array_pop($normalizedArguments);
+            array_pop($arguments);
         }
 
-        $nameAndArguments = $this->prependValueToArray($name, $normalizedArguments);
-
-        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
-        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs(
-            $nameAndArguments
-        );
-
-        return $this->channel->processChaincodeProposal(
-            $chaincodeProposalPayload,
-            $chaincodeHeaderExtension,
-            $transactionRequest
-        );
+        return $this->executeCommand($name, $arguments, $transactionRequest);
     }
 
     /**
