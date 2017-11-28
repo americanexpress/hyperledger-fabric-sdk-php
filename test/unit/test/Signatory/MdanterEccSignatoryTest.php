@@ -99,9 +99,9 @@ TAG
                 }
             }
         );
-        $transactionContext = $transactionContextFactory->fromSerializedIdentity(
-            SerializedIdentityFactory::fromFile('1234', new \SplFileObject($this->privateKey->url()))
-        );
+        $identity = SerializedIdentityFactory::fromFile('1234', new \SplFileObject($this->privateKey->url()));
+        $transactionContext = $transactionContextFactory->fromSerializedIdentity($identity);
+
         $channelHeader = ChannelHeaderFactory::create(
             'MyChannelId'
         );
@@ -119,7 +119,7 @@ TAG
         $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
 
         $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
-            $transactionContext->getSerializedIdentity(),
+            $identity,
             $transactionContext->getNonce()
         ));
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);

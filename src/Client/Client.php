@@ -168,26 +168,17 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
     }
 
     /**
-     * @return TransactionId
-     */
-    private function createTransactionId(): TransactionId
-    {
-        $identity = $this->user->getIdentity();
-
-        return $this->transactionIdGenerator->fromSerializedIdentity($identity);
-    }
-
-    /**
      * @param ChannelHeader $channelHeader
      * @return Header
      */
     private function createHeaderFromChannelHeader(ChannelHeader $channelHeader): Header
     {
-        $transactionId = $this->createTransactionId();
+        $identity = $this->user->getIdentity();
+        $transactionId = $this->transactionIdGenerator->fromSerializedIdentity($identity);
         $channelHeader->setTxId($transactionId->getId());
         $channelHeader->setEpoch($this->epoch);
         $signatureHeader = SignatureHeaderFactory::create(
-            $transactionId->getSerializedIdentity(),
+            $identity,
             $transactionId->getNonce()
         );
         return HeaderFactory::create($channelHeader, $signatureHeader);

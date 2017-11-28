@@ -25,9 +25,9 @@ use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 class TransactionId
 {
     /**
-     * @var SerializedIdentity
+     * @var string
      */
-    private $serializedIdentity;
+    private $id;
 
     /**
      * @var string
@@ -35,18 +35,11 @@ class TransactionId
     private $nonce;
 
     /**
-     * @var string
-     */
-    private $id;
-
-    /**
-     * @param SerializedIdentity $serializedIdentity
      * @param string $nonce
      * @param string $id
      */
-    public function __construct(SerializedIdentity $serializedIdentity, string $nonce, string $id)
+    public function __construct(string $nonce, string $id)
     {
-        $this->serializedIdentity = $serializedIdentity;
         $this->nonce = $nonce;
         $this->id = $id;
     }
@@ -57,14 +50,6 @@ class TransactionId
     public function getId(): string
     {
         return $this->id;
-    }
-
-    /**
-     * @return SerializedIdentity
-     */
-    public function getSerializedIdentity(): SerializedIdentity
-    {
-        return $this->serializedIdentity;
     }
 
     /**

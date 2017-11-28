@@ -31,13 +31,11 @@ class TransactionIdTest extends TestCase
 {
     public function testValues()
     {
-        $serializedIdentity = new SerializedIdentity();
         $nonce = 'u4i6o2j6n6';
         $txId = 'i3o6kf8t0ek';
 
-        $sut = new TransactionId($serializedIdentity, $nonce, $txId);
+        $sut = new TransactionId($nonce, $txId);
 
-        self::assertSame($serializedIdentity, $sut->getSerializedIdentity());
         self::assertSame($nonce, $sut->getNonce());
         self::assertSame($txId, $sut->getId());
     }

@@ -63,7 +63,6 @@ class TransactionIdGeneratorTest extends TestCase
         self::assertInstanceOf(TransactionId::class, $result);
         self::assertInternalType('string', $result->getId());
         self::assertNotEmpty($result);
-        self::assertSame($serializedIdentity, $result->getSerializedIdentity());
         self::assertSame('qur48f7e9', $result->getNonce());
     }
 }
