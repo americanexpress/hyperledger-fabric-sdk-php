@@ -23,7 +23,7 @@ $config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
 $response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config)
     ->getChannel('foo')
     ->getChaincode('example_cc')
-    ->invoke('query', 'a', $request);
+    ->invoke('query', 'a');
 ```
 
 Query specific organization:
@@ -34,7 +34,7 @@ $config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
 $response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config, 'peerOrg1')
     ->getChannel('foo')
     ->getChaincode('example_cc')
-    ->invoke('query', 'a', $request);
+    ->invoke('query', 'a');
 ```
 
 Query specific organization and peer:
@@ -42,13 +42,13 @@ Query specific organization and peer:
 $config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
     // See `test/integration/config.php` for an example.
 ]);
-$request = new \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest([
+$options = new \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions([
     'peer' => 'peer1',
 ]);
 $response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config, 'peerOrg1')
     ->getChannel('foo')
-    ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
-    ->invoke('query', 'a', $request);
+    ->getChaincode('example_cc')
+    ->invoke('query', 'a', $options);
 ```
 
 Query chaincode by path and version:
@@ -59,7 +59,7 @@ $config = new \AmericanExpress\HyperledgerFabricClient\Config\ClientConfig([
 $response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromConfig($config)
     ->getChannel('foo')
     ->getChaincode(['name' => 'example_cc', 'version' => '1', 'path' => 'github.com/example_cc'])
-    ->invoke('query', 'a', $request);
+    ->invoke('query', 'a');
 ```
 
 ## Phase 1
