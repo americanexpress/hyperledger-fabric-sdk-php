@@ -31,7 +31,7 @@ use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Chaincode
+ * @covers \AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode
  */
 class ChaincodeTest extends TestCase
 {

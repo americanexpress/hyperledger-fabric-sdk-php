@@ -25,7 +25,7 @@ use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\EndorserClientManager
+ * @covers \AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager
  */
 class EndorserClientManagerTest extends TestCase
 {

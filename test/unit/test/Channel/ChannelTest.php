@@ -32,7 +32,7 @@ use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Channel
+ * @covers \AmericanExpress\HyperledgerFabricClient\Channel\Channel
  */
 class ChannelTest extends TestCase
 {
