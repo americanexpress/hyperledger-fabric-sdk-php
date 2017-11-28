@@ -22,25 +22,25 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionId;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGeneratorInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifier;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGenerator;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator
+ * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGenerator
  */
-class TransactionIdGeneratorTest extends TestCase
+class TransactionIdentifierGeneratorTest extends TestCase
 {
     /**
-     * @var TransactionIdGeneratorInterface
+     * @var TransactionIdentifierGeneratorInterface
      */
     private $sut;
 
     protected function setUp()
     {
-        $this->sut = new TransactionIdGenerator(new class implements NonceGeneratorInterface {
+        $this->sut = new TransactionIdentifierGenerator(new class implements NonceGeneratorInterface {
             public function generateNonce(): string
             {
                 return 'qur48f7e9';
@@ -60,7 +60,7 @@ class TransactionIdGeneratorTest extends TestCase
 
         $result = $this->sut->fromSerializedIdentity($serializedIdentity);
 
-        self::assertInstanceOf(TransactionId::class, $result);
+        self::assertInstanceOf(TransactionIdentifier::class, $result);
         self::assertInternalType('string', $result->getId());
         self::assertNotEmpty($result);
         self::assertSame('qur48f7e9', $result->getNonce());

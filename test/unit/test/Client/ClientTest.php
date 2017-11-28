@@ -27,7 +27,7 @@ use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGeneratorInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\User\UserContext;
 use Grpc\UnaryCall;
@@ -57,7 +57,7 @@ class ClientTest extends TestCase
     private $endorserClient;
 
     /**
-     * @var TransactionIdGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TransactionIdentifierGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $transactionIdGenerator;
 
@@ -101,7 +101,7 @@ class ClientTest extends TestCase
             'privateKey' => __FILE__,
         ]));
 
-        $this->transactionIdGenerator = $this->getMockBuilder(TransactionIdGeneratorInterface::class)
+        $this->transactionIdGenerator = $this->getMockBuilder(TransactionIdentifierGeneratorInterface::class)
             ->getMock();
 
         $this->sut = new Client($user, $this->signatory, $endorserClients, $this->transactionIdGenerator);

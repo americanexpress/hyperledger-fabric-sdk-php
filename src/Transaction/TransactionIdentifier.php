@@ -18,25 +18,43 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
+namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionId;
-use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
-use PHPUnit\Framework\TestCase;
-
-/**
- * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionId
- */
-class TransactionIdTest extends TestCase
+class TransactionIdentifier
 {
-    public function testValues()
+    /**
+     * @var string
+     */
+    private $id;
+
+    /**
+     * @var string
+     */
+    private $nonce;
+
+    /**
+     * @param string $id
+     * @param string $nonce
+     */
+    public function __construct(string $id, string $nonce)
     {
-        $nonce = 'u4i6o2j6n6';
-        $txId = 'i3o6kf8t0ek';
+        $this->nonce = $nonce;
+        $this->id = $id;
+    }
 
-        $sut = new TransactionId($txId, $nonce);
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-        self::assertSame($nonce, $sut->getNonce());
-        self::assertSame($txId, $sut->getId());
+    /**
+     * @return string
+     */
+    public function getNonce(): string
+    {
+        return $this->nonce;
     }
 }

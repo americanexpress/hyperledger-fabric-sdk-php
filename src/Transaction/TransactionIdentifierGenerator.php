@@ -26,7 +26,7 @@ use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use AmericanExpress\HyperledgerFabricClient\Serializer\SignedCharStringSerializer;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
-final class TransactionIdGenerator implements TransactionIdGeneratorInterface
+final class TransactionIdentifierGenerator implements TransactionIdentifierGeneratorInterface
 {
     /**
      * @var NonceGeneratorInterface
@@ -64,9 +64,9 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
 
     /**
      * @param SerializedIdentity $serializedIdentity
-     * @return TransactionId
+     * @return TransactionIdentifier
      */
-    public function fromSerializedIdentity(SerializedIdentity $serializedIdentity): TransactionId
+    public function fromSerializedIdentity(SerializedIdentity $serializedIdentity): TransactionIdentifier
     {
         $nonce = $this->nonceGenerator->generateNonce();
 
@@ -78,7 +78,7 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
 
         $compString = $this->asciiCharStringSerializer->serialize($comp);
 
-        return new TransactionId(
+        return new TransactionIdentifier(
             \hash((string) $this->hashAlgorithm, $compString),
             $nonce
         );

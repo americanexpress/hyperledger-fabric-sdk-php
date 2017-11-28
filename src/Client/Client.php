@@ -31,8 +31,8 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionId;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGeneratorInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifier;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Assert\Assertion;
@@ -68,7 +68,7 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
     private $channels = [];
 
     /**
-     * @var TransactionIdGeneratorInterface
+     * @var TransactionIdentifierGeneratorInterface
      */
     private $transactionIdGenerator;
 
@@ -82,14 +82,14 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
      * @param UserContextInterface $user
      * @param SignatoryInterface $signatory
      * @param EndorserClientManagerInterface $endorserClients
-     * @param TransactionIdGeneratorInterface $transactionIdGenerator
+     * @param TransactionIdentifierGeneratorInterface $transactionIdGenerator
      * @param int $epoch
      */
     public function __construct(
         UserContextInterface $user,
         SignatoryInterface $signatory,
         EndorserClientManagerInterface $endorserClients,
-        TransactionIdGeneratorInterface $transactionIdGenerator,
+        TransactionIdentifierGeneratorInterface $transactionIdGenerator,
         int $epoch = 0
     ) {
         $this->user = $user;

@@ -31,7 +31,7 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFacto
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGenerator;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use org\bovigo\vfs\vfsStream;
@@ -91,7 +91,7 @@ TAG
      */
     public function testGetS(string $dateTime, string $encodedProposalBytes, string $encodedSignature)
     {
-        $transactionContextFactory = new TransactionIdGenerator(
+        $transactionContextFactory = new TransactionIdentifierGenerator(
             new class implements NonceGeneratorInterface {
                 public function generateNonce(): string
                 {
