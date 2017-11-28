@@ -21,10 +21,9 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Client;
 
 use AmericanExpress\HyperledgerFabricClient\Channel;
-use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
+use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\ChannelProposalProcessorInterface;
-use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
@@ -32,8 +31,8 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionId;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Assert\Assertion;
@@ -41,14 +40,12 @@ use Assert\AssertionFailedException;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
 use Hyperledger\Fabric\Protos\Common\Header;
-use Hyperledger\Fabric\Protos\Common\SignatureHeader;
-use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use function igorw\get_in;
 
-final class Client implements ClientInterface, ChannelProposalProcessorInterface
+final class Client implements ChannelProviderInterface, ChannelProposalProcessorInterface
 {
     /**
      * @var UserContextInterface
@@ -66,40 +63,40 @@ final class Client implements ClientInterface, ChannelProposalProcessorInterface
     private $signatory;
 
     /**
-     * @var ClientConfigInterface
-     */
-    private $config;
-
-    /**
      * @var ChannelInterface[]
      */
     private $channels = [];
 
     /**
-     * @var TransactionContextFactoryInterface
+     * @var TransactionIdGeneratorInterface
      */
-    private $transactionContextFactory;
+    private $transactionIdGenerator;
+
+    /**
+     * @var int
+     */
+    private $epoch;
 
     /**
      * Client constructor.
      * @param UserContextInterface $user
      * @param SignatoryInterface $signatory
      * @param EndorserClientManagerInterface $endorserClients
-     * @param ClientConfigInterface $config
-     * @param TransactionContextFactoryInterface $transactionContextFactory
+     * @param TransactionIdGeneratorInterface $transactionIdGenerator
+     * @param int $epoch
      */
     public function __construct(
         UserContextInterface $user,
         SignatoryInterface $signatory,
         EndorserClientManagerInterface $endorserClients,
-        ClientConfigInterface $config,
-        TransactionContextFactoryInterface $transactionContextFactory
+        TransactionIdGeneratorInterface $transactionIdGenerator,
+        int $epoch = 0
     ) {
         $this->user = $user;
         $this->signatory = $signatory;
         $this->endorserClients = $endorserClients;
-        $this->config = $config;
-        $this->transactionContextFactory = $transactionContextFactory;
+        $this->transactionIdGenerator = $transactionIdGenerator;
+        $this->epoch = $epoch;
     }
 
     /**
@@ -122,7 +119,7 @@ final class Client implements ClientInterface, ChannelProposalProcessorInterface
      * @throws UnexpectedValueException
      * @throws RuntimeException
      */
-    public function processProposal(Proposal $proposal, TransactionRequest $context = null): ProposalResponse
+    private function processProposal(Proposal $proposal, TransactionRequest $context = null): ProposalResponse
     {
         $privateKey = $this->user->getOrganization()->getPrivateKey();
 
@@ -171,13 +168,13 @@ final class Client implements ClientInterface, ChannelProposalProcessorInterface
     }
 
     /**
-     * @return TransactionContext
+     * @return TransactionId
      */
-    public function createTransactionContext(): TransactionContext
+    private function createTransactionId(): TransactionId
     {
         $identity = $this->user->getIdentity();
 
-        return $this->transactionContextFactory->fromSerializedIdentity($identity);
+        return $this->transactionIdGenerator->fromSerializedIdentity($identity);
     }
 
     /**
@@ -186,12 +183,12 @@ final class Client implements ClientInterface, ChannelProposalProcessorInterface
      */
     private function createHeaderFromChannelHeader(ChannelHeader $channelHeader): Header
     {
-        $transactionContext = $this->createTransactionContext();
-        $channelHeader->setTxId($transactionContext->getTxId());
-        $channelHeader->setEpoch($transactionContext->getEpoch());
+        $transactionId = $this->createTransactionId();
+        $channelHeader->setTxId($transactionId->getId());
+        $channelHeader->setEpoch($this->epoch);
         $signatureHeader = SignatureHeaderFactory::create(
-            $transactionContext->getSerializedIdentity(),
-            $transactionContext->getNonce()
+            $transactionId->getSerializedIdentity(),
+            $transactionId->getNonce()
         );
         return HeaderFactory::create($channelHeader, $signatureHeader);
     }

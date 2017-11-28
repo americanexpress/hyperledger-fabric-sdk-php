@@ -20,11 +20,9 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\ProtoFactory;
 
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
 use Hyperledger\Fabric\Protos\Common\Header;
 use Hyperledger\Fabric\Protos\Common\SignatureHeader;
-use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
 class HeaderFactory
 {

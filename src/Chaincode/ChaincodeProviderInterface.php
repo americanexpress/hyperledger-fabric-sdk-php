@@ -18,15 +18,18 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Transaction;
+namespace AmericanExpress\HyperledgerFabricClient\Chaincode;
 
-use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
+use AmericanExpress\HyperledgerFabricClient\Chaincode;
 
-interface TransactionContextFactoryInterface
+interface ChaincodeProviderInterface
 {
     /**
-     * @param SerializedIdentity $identity
-     * @return TransactionContext
+     *
+     * Returns a named Chaincode for a channel
+     *
+     * @param string | array $nameOrVersionedName
+     * @return Chaincode
      */
-    public function fromSerializedIdentity(SerializedIdentity $identity): TransactionContext;
+    public function getChaincode($nameOrVersionedName): Chaincode;
 }

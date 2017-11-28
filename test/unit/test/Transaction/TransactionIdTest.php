@@ -20,27 +20,25 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionId;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext
+ * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionId
  */
-class TransactionContextTest extends TestCase
+class TransactionIdTest extends TestCase
 {
     public function testValues()
     {
         $serializedIdentity = new SerializedIdentity();
         $nonce = 'u4i6o2j6n6';
         $txId = 'i3o6kf8t0ek';
-        $epoch = 54321;
 
-        $sut = new TransactionContext($serializedIdentity, $nonce, $txId, $epoch);
+        $sut = new TransactionId($serializedIdentity, $nonce, $txId);
 
         self::assertSame($serializedIdentity, $sut->getSerializedIdentity());
         self::assertSame($nonce, $sut->getNonce());
-        self::assertSame($txId, $sut->getTxId());
-        self::assertSame($epoch, $sut->getEpoch());
+        self::assertSame($txId, $sut->getId());
     }
 }

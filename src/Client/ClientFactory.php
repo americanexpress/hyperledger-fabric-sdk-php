@@ -24,7 +24,6 @@ use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManager;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextFactory;
 
@@ -33,24 +32,23 @@ class ClientFactory
     /**
      * @param ClientConfigInterface $config
      * @param string|null $organization
-     * @return ClientInterface
+     * @return Client
      */
     public static function fromConfig(
         ClientConfigInterface $config,
         string $organization = null
-    ): ClientInterface {
+    ): Client {
         $user = UserContextFactory::fromConfig($config, $organization);
 
         $signatory = new MdanterEccSignatory($config->getHashAlgorithm());
 
         $endorserClients = new EndorserClientManager();
 
-        $transactionContextFactory = new TransactionContextFactory(
+        $transactionContextFactory = new TransactionIdGenerator(
             new RandomBytesNonceGenerator($config->getNonceSize()),
-            new TransactionIdGenerator($config->getHashAlgorithm()),
-            $config->getEpoch()
+            $config->getHashAlgorithm()
         );
 
-        return new Client($user, $signatory, $endorserClients, $config, $transactionContextFactory);
+        return new Client($user, $signatory, $endorserClients, $transactionContextFactory);
     }
 }

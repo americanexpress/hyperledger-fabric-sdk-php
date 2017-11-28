@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
+use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Serializer\AsciiCharStringSerializer;
 use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use AmericanExpress\HyperledgerFabricClient\Serializer\SignedCharStringSerializer;
@@ -27,6 +28,11 @@ use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
 final class TransactionIdGenerator implements TransactionIdGeneratorInterface
 {
+    /**
+     * @var NonceGeneratorInterface
+     */
+    private $nonceGenerator;
+
     /**
      * @var HashAlgorithm
      */
@@ -43,11 +49,14 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
     private $signedCharStringSerializer;
 
     /**
+     * @param NonceGeneratorInterface $nonceGenerator
      * @param HashAlgorithm $hashAlgorithm
-     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
-    public function __construct(HashAlgorithm $hashAlgorithm = null)
-    {
+    public function __construct(
+        NonceGeneratorInterface $nonceGenerator,
+        HashAlgorithm $hashAlgorithm = null
+    ) {
+        $this->nonceGenerator = $nonceGenerator;
         $this->hashAlgorithm = $hashAlgorithm ?: new HashAlgorithm();
         $this->asciiCharStringSerializer = new AsciiCharStringSerializer();
         $this->signedCharStringSerializer = new SignedCharStringSerializer();
@@ -55,11 +64,12 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
 
     /**
      * @param SerializedIdentity $serializedIdentity
-     * @param string $nonce
-     * @return string
+     * @return TransactionId
      */
-    public function fromSerializedIdentity(SerializedIdentity $serializedIdentity, string $nonce): string
+    public function fromSerializedIdentity(SerializedIdentity $serializedIdentity): TransactionId
     {
+        $nonce = $this->nonceGenerator->generateNonce();
+
         $noArray = $this->signedCharStringSerializer->deserialize($nonce);
 
         $identityArray = $this->signedCharStringSerializer->deserialize($serializedIdentity->serializeToString());
@@ -68,6 +78,10 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
 
         $compString = $this->asciiCharStringSerializer->serialize($comp);
 
-        return \hash((string) $this->hashAlgorithm, $compString);
+        return new TransactionId(
+            $serializedIdentity,
+            $nonce,
+            \hash((string) $this->hashAlgorithm, $compString)
+        );
     }
 }

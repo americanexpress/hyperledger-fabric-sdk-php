@@ -20,7 +20,9 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
+use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionId;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGeneratorInterface;
 use org\bovigo\vfs\vfsStream;
@@ -38,7 +40,12 @@ class TransactionIdGeneratorTest extends TestCase
 
     protected function setUp()
     {
-        $this->sut = new TransactionIdGenerator();
+        $this->sut = new TransactionIdGenerator(new class implements NonceGeneratorInterface {
+            public function generateNonce(): string
+            {
+                return 'qur48f7e9';
+            }
+        });
     }
 
     public function testCreateTxId()
@@ -51,9 +58,12 @@ class TransactionIdGeneratorTest extends TestCase
 
         $serializedIdentity = SerializedIdentityFactory::fromBytes('FooBar', 'FizBuz');
 
-        $result = $this->sut->fromSerializedIdentity($serializedIdentity, 'qur48f7e9');
+        $result = $this->sut->fromSerializedIdentity($serializedIdentity);
 
-        self::assertInternalType('string', $result);
+        self::assertInstanceOf(TransactionId::class, $result);
+        self::assertInternalType('string', $result->getId());
         self::assertNotEmpty($result);
+        self::assertSame($serializedIdentity, $result->getSerializedIdentity());
+        self::assertSame('qur48f7e9', $result->getNonce());
     }
 }

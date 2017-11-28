@@ -41,5 +41,8 @@ class ChannelHeaderFactoryTest extends TestCase
         self::assertSame(1, $result->getVersion());
         self::assertInstanceOf(Timestamp::class, $result->getTimestamp());
         self::assertSame('MyChannelId', $result->getChannelId());
+        self::assertSame('', $result->getTxId());
+        self::assertSame(0, $result->getEpoch());
+        self::assertSame('', $result->getExtension());
     }
 }

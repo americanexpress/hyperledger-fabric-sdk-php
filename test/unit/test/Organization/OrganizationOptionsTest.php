@@ -21,9 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Organization;
 
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use PHPUnit\Framework\TestCase;
 
 /**

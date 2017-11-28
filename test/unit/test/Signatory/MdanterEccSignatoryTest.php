@@ -31,7 +31,6 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFacto
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGenerator;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
@@ -92,26 +91,23 @@ TAG
      */
     public function testGetS(string $dateTime, string $encodedProposalBytes, string $encodedSignature)
     {
-        $transactionContextFactory = new TransactionContextFactory(
+        $transactionContextFactory = new TransactionIdGenerator(
             new class implements NonceGeneratorInterface {
                 public function generateNonce(): string
                 {
                     return 'u23m5k4hf86j';
                 }
-            },
-            new TransactionIdGenerator()
+            }
         );
         $transactionContext = $transactionContextFactory->fromSerializedIdentity(
             SerializedIdentityFactory::fromFile('1234', new \SplFileObject($this->privateKey->url()))
         );
         $channelHeader = ChannelHeaderFactory::create(
-            'MyChannelId',
-            3,
-            1,
-            TimestampFactory::fromDateTime(new \DateTime($dateTime))
+            'MyChannelId'
         );
-        $channelHeader->setTxId($transactionContext->getTxId());
-        $channelHeader->setEpoch($transactionContext->getEpoch());
+        $channelHeader->setTxId($transactionContext->getId());
+        $channelHeader->setEpoch(0);
+        $channelHeader->setTimestamp(TimestampFactory::fromDateTime(new \DateTime($dateTime)));
 
         $chaincodeId = ChaincodeIdFactory::create(
             'MyChaincodePath',
@@ -124,8 +120,8 @@ TAG
 
         $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
             $transactionContext->getSerializedIdentity(),
-            $transactionContext->getNonce())
-        );
+            $transactionContext->getNonce()
+        ));
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
         $proposal = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
 

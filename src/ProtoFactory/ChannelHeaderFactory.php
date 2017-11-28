@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\ProtoFactory;
 
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use Google\Protobuf\Timestamp;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
 
@@ -32,7 +31,7 @@ class ChannelHeaderFactory
      * @param string $channelId
      * @param int $type
      * @param int $version
-     * @param Timestamp $timestamp
+     * @param Timestamp|null $timestamp
      * @return ChannelHeader
      */
     public static function create(

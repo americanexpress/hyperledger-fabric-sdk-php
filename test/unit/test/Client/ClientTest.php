@@ -22,20 +22,17 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Client;
 
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Client\Client;
-use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use AmericanExpress\HyperledgerFabricClient\User\UserContext;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
-use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
 
@@ -60,9 +57,9 @@ class ClientTest extends TestCase
     private $endorserClient;
 
     /**
-     * @var TransactionContextFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TransactionIdGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $transactionContextFactory;
+    private $transactionIdGenerator;
 
     /**
      * @var Client
@@ -91,8 +88,6 @@ class ClientTest extends TestCase
 
         $identity = new SerializedIdentity();
 
-        $config = new ClientConfig([]);
-
         $user = new UserContext($identity, new OrganizationOptions([
             'peers' => [
                 [
@@ -106,10 +101,10 @@ class ClientTest extends TestCase
             'privateKey' => __FILE__,
         ]));
 
-        $this->transactionContextFactory = $this->getMockBuilder(TransactionContextFactoryInterface::class)
+        $this->transactionIdGenerator = $this->getMockBuilder(TransactionIdGeneratorInterface::class)
             ->getMock();
 
-        $this->sut = new Client($user, $this->signatory, $endorserClients, $config, $this->transactionContextFactory);
+        $this->sut = new Client($user, $this->signatory, $endorserClients, $this->transactionIdGenerator);
     }
 
     public function testGetChannel()
@@ -119,26 +114,6 @@ class ClientTest extends TestCase
         self::assertInstanceOf(ChannelInterface::class, $result);
 
         self::assertSame($result, $this->sut->getChannel('foo'));
-    }
-
-    public function testProcessProposal()
-    {
-        $proposal = new Proposal();
-
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn($this->unaryCall);
-
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                $proposalResponse = new ProposalResponse(),
-                [
-                    'code' => 0,
-                ]
-            ]);
-
-        $response = $this->sut->processProposal($proposal);
-
-        self::assertInstanceOf(ProposalResponse::class, $response);
     }
 
     public function testProcessChannelProposal()
@@ -155,83 +130,6 @@ class ClientTest extends TestCase
             ]);
 
         $response = $this->sut->processChannelProposal($channelHeader, 'test-payload');
-
-        self::assertInstanceOf(ProposalResponse::class, $response);
-    }
-
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
-     */
-    public function testProcessProposalRequiresUnaryCall()
-    {
-        $proposal = new Proposal();
-
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn(new \stdClass());
-
-        $this->sut->processProposal($proposal);
-    }
-
-    /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
-     * @expectedExceptionMessage Connect failed
-     * @expectedExceptionCode 14
-     */
-    public function testProcessSignedProposalHandlesConnectionError()
-    {
-        $proposal = new Proposal();
-
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn($this->unaryCall);
-
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                null,
-                [
-                    'code' => 14,
-                    'details' => 'Connect failed',
-                    'metadata' => [],
-                ]
-            ]);
-
-        $this->sut->processProposal($proposal);
-    }
-
-    public function testCreateTransactionContext()
-    {
-        $transactionContext = new TransactionContext(new SerializedIdentity(), 'FooBar', 'FizBuz');
-
-        $this->transactionContextFactory->method('fromSerializedIdentity')
-            ->willReturn($transactionContext);
-
-        $result = $this->sut->createTransactionContext();
-
-        self::assertSame($transactionContext, $result);
-    }
-
-    public function testProcessProposalWithCustomPeer()
-    {
-        $proposal = new Proposal();
-
-        $context = new TransactionRequest([
-            'peer' => new PeerOptions([
-                'name' => 'peer1',
-                'requests' => 'localhost:7051',
-            ]),
-        ]);
-
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn($this->unaryCall);
-
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                $proposalResponse = new ProposalResponse(),
-                [
-                    'code' => 0,
-                ]
-            ]);
-
-        $response = $this->sut->processProposal($proposal, $context);
 
         self::assertInstanceOf(ProposalResponse::class, $response);
     }
@@ -261,5 +159,43 @@ class ClientTest extends TestCase
         $response = $this->sut->processChannelProposal($channelHeader, 'test-payload', $context);
 
         self::assertInstanceOf(ProposalResponse::class, $response);
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
+     */
+    public function testProcessProposalRequiresUnaryCall()
+    {
+        $this->endorserClient->method('ProcessProposal')
+            ->willReturn(new \stdClass());
+
+        $channelHeader = ChannelHeaderFactory::create('test-channel');
+
+        $this->sut->processChannelProposal($channelHeader, 'test-payload');
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException
+     * @expectedExceptionMessage Connect failed
+     * @expectedExceptionCode 14
+     */
+    public function testProcessSignedProposalHandlesConnectionError()
+    {
+        $this->endorserClient->method('ProcessProposal')
+            ->willReturn($this->unaryCall);
+
+        $this->unaryCall->method('wait')
+            ->willReturn([
+                null,
+                [
+                    'code' => 14,
+                    'details' => 'Connect failed',
+                    'metadata' => [],
+                ]
+            ]);
+
+        $channelHeader = ChannelHeaderFactory::create('test-channel');
+
+        $this->sut->processChannelProposal($channelHeader, 'test-payload');
     }
 }

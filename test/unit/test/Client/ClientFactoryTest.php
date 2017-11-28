@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Client;
 
+use AmericanExpress\HyperledgerFabricClient\Client\Client;
 use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
-use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use PHPUnit\Framework\TestCase;
 
@@ -44,7 +44,7 @@ class ClientFactoryTest extends TestCase
 
         $client = ClientFactory::fromConfig($config, 'peerOrg1');
 
-        self::assertInstanceOf(ClientInterface::class, $client);
+        self::assertInstanceOf(Client::class, $client);
     }
 
     /**

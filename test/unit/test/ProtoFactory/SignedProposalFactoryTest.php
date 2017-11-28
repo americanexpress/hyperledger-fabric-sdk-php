@@ -27,7 +27,6 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignedProposalFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use PHPUnit\Framework\TestCase;
 

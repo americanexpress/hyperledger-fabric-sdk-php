@@ -37,13 +37,4 @@ interface ChannelInterface
         ChaincodeID $chaincodeId,
         array $args = []
     ): ProposalResponse;
-
-    /**
-     *
-     * Returns a named Chaincode for a channel
-     *
-     * @param string | array $nameOrVersionedName
-     * @return Chaincode
-     */
-    public function getChaincode($nameOrVersionedName): Chaincode;
 }

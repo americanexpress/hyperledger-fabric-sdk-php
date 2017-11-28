@@ -22,7 +22,7 @@ namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
-class TransactionContext
+class TransactionId
 {
     /**
      * @var SerializedIdentity
@@ -37,25 +37,26 @@ class TransactionContext
     /**
      * @var string
      */
-    private $txId;
-
-    /**
-     * @var int
-     */
-    private $epoch;
+    private $id;
 
     /**
      * @param SerializedIdentity $serializedIdentity
      * @param string $nonce
-     * @param string $txId
-     * @param int $epoch
+     * @param string $id
      */
-    public function __construct(SerializedIdentity $serializedIdentity, string $nonce, string $txId, int $epoch = 0)
+    public function __construct(SerializedIdentity $serializedIdentity, string $nonce, string $id)
     {
         $this->serializedIdentity = $serializedIdentity;
         $this->nonce = $nonce;
-        $this->txId = $txId;
-        $this->epoch = $epoch;
+        $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
     }
 
     /**
@@ -72,21 +73,5 @@ class TransactionContext
     public function getNonce(): string
     {
         return $this->nonce;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTxId(): string
-    {
-        return $this->txId;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEpoch(): int
-    {
-        return $this->epoch;
     }
 }

@@ -26,8 +26,7 @@ interface TransactionIdGeneratorInterface
 {
     /**
      * @param SerializedIdentity $serializedIdentity
-     * @param string $nonce
-     * @return string
+     * @return TransactionId
      */
-    public function fromSerializedIdentity(SerializedIdentity $serializedIdentity, string $nonce): string;
+    public function fromSerializedIdentity(SerializedIdentity $serializedIdentity): TransactionId;
 }
