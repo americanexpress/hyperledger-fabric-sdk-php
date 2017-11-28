@@ -20,20 +20,20 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
 interface ChannelInterface
 {
     /**
-     * @param TransactionRequest $request
+     * @param TransactionOptions $request
      * @param ChaincodeID $chaincodeId
      * @param mixed[] $args
      * @return ProposalResponse
      */
     public function queryByChainCode(
-        TransactionRequest $request,
+        TransactionOptions $request,
         ChaincodeID $chaincodeId,
         array $args = []
     ): ProposalResponse;

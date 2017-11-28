@@ -28,7 +28,7 @@ use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use AmericanExpress\HyperledgerFabricClient\User\UserContext;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
@@ -138,7 +138,7 @@ class ClientTest extends TestCase
     {
         $channelHeader = ChannelHeaderFactory::create('test-channel');
 
-        $context = new TransactionRequest([
+        $context = new TransactionOptions([
             'peer' => new PeerOptions([
                 'name' => 'peer1',
                 'requests' => 'localhost:7051',

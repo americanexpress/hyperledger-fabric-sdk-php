@@ -65,7 +65,7 @@ final class ClientConfig implements ClientConfigInterface
             }
         }
 
-        $this->config['organizations'] = array_map(function(array $data) {
+        $this->config['organizations'] = array_map(function (array $data) {
             return new OrganizationOptions($data);
         }, $this->config['organizations']);
     }

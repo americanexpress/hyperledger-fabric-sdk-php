@@ -24,7 +24,7 @@ use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeIdFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
 class Chaincode
@@ -125,11 +125,14 @@ class Chaincode
     /**
      * @param string $name
      * @param mixed[] $args
-     * @param TransactionRequest|null $context
+     * @param TransactionOptions|null $options
      * @return ProposalResponse
      */
-    private function executeCommand(string $name, array $args = [], TransactionRequest $context = null): ProposalResponse
-    {
+    private function executeCommand(
+        string $name,
+        array $args = [],
+        TransactionOptions $options = null
+    ): ProposalResponse {
         $chaincodeId = ChaincodeIdFactory::create(
             $this->path,
             $this->name,
@@ -146,22 +149,22 @@ class Chaincode
         return $this->channel->processChaincodeProposal(
             $chaincodeProposalPayload,
             $chaincodeHeaderExtension,
-            $context
+            $options
         );
     }
 
     /**
      * @param mixed[] $arguments
-     * @return TransactionRequest|null
+     * @return TransactionOptions|null
      */
-    private function extractTransactionRequest(array $arguments): ?TransactionRequest
+    private function extractTransactionOptions(array $arguments): ?TransactionOptions
     {
         $transactionRequest = null;
         if (count($arguments) > 0) {
             $lastArgumentIndex = count($arguments) - 1;
             $lastArgument = $arguments[$lastArgumentIndex];
 
-            if ($lastArgument instanceof TransactionRequest) {
+            if ($lastArgument instanceof TransactionOptions) {
                 $transactionRequest = $lastArgument;
             }
         }
@@ -180,12 +183,12 @@ class Chaincode
      */
     public function __call(string $name, array $arguments = []): ProposalResponse
     {
-        $transactionRequest = $this->extractTransactionRequest($arguments);
-        if($transactionRequest !== null) {
+        $options = $this->extractTransactionOptions($arguments);
+        if ($options !== null) {
             array_pop($arguments);
         }
 
-        return $this->executeCommand($name, $arguments, $transactionRequest);
+        return $this->executeCommand($name, $arguments, $options);
     }
 
     /**

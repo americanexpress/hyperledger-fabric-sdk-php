@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifier;
-use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use PHPUnit\Framework\TestCase;
 
 /**

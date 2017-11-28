@@ -21,22 +21,22 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest
+ * @covers \AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions
  */
-class TransactionRequestTest extends TestCase
+class TransactionOptionsTest extends TestCase
 {
     /**
-     * @var TransactionRequest
+     * @var TransactionOptions
      */
     private $sut;
 
     protected function setUp()
     {
-        $this->sut = new TransactionRequest();
+        $this->sut = new TransactionOptions();
     }
 
     public function testPeer()
@@ -60,7 +60,7 @@ class TransactionRequestTest extends TestCase
             'name' => 'peer1',
         ]);
 
-        $sut = new TransactionRequest([
+        $sut = new TransactionOptions([
             'peer' => $peer,
         ]);
 

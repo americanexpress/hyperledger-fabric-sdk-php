@@ -23,7 +23,7 @@ namespace AmericanExpressTest\Integration\Test;
 use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use AmericanExpressTest\Integration\TestAsset\E2EUtils;
 use PHPUnit\Framework\TestCase;
 
@@ -53,7 +53,7 @@ class QueryTest extends TestCase
     {
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
 
-        $request = new TransactionRequest([
+        $request = new TransactionOptions([
             'peer' => new PeerOptions([
                 'requests' => 'localhost:7051',
             ]),

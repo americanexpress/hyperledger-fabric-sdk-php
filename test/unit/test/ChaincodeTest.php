@@ -25,7 +25,7 @@ use AmericanExpress\HyperledgerFabricClient\ChaincodeProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
@@ -155,7 +155,7 @@ class ChaincodeTest extends TestCase
 
     public function testCallPassesTransactionRequestToChannel()
     {
-        $transactionRequest = new TransactionRequest([
+        $transactionRequest = new TransactionOptions([
             'peer' => new PeerOptions([
                 'name' => 'peer1',
             ]),
@@ -177,7 +177,7 @@ class ChaincodeTest extends TestCase
 
     public function testCallPassesTransactionRequestToChannelAsFinalArgument()
     {
-        $transactionRequest = new TransactionRequest([
+        $transactionRequest = new TransactionOptions([
             'peer' => new PeerOptions([
                 'name' => 'peer1',
             ]),
@@ -199,7 +199,7 @@ class ChaincodeTest extends TestCase
 
     public function testInvokePassesTransactionRequestToChannelAsFinalArgument()
     {
-        $transactionRequest = new TransactionRequest([
+        $transactionRequest = new TransactionOptions([
             'peer' => new PeerOptions([
                 'name' => 'peer1',
             ]),

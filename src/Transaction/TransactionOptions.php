@@ -23,7 +23,7 @@ namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 
-class TransactionRequest extends AbstractOptions
+class TransactionOptions extends AbstractOptions
 {
     /**
      * @var PeerOptionsInterface|null

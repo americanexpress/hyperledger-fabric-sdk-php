@@ -31,9 +31,8 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifier;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
@@ -114,34 +113,31 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
 
     /**
      * @param Proposal $proposal
-     * @param TransactionRequest|null $context
+     * @param TransactionOptions|null $options
      * @return ProposalResponse
-     * @throws UnexpectedValueException
-     * @throws RuntimeException
      */
-    private function processProposal(Proposal $proposal, TransactionRequest $context = null): ProposalResponse
+    private function processProposal(Proposal $proposal, TransactionOptions $options = null): ProposalResponse
     {
         $privateKey = $this->user->getOrganization()->getPrivateKey();
 
         $signedProposal = $this->signatory->signProposal($proposal, new \SplFileObject($privateKey));
 
-        return $this->processSignedProposal($signedProposal, $context);
+        return $this->processSignedProposal($signedProposal, $options);
     }
 
     /**
      * @param SignedProposal $proposal
-     * @param TransactionRequest|null $context
+     * @param TransactionOptions|null $options
      * @return ProposalResponse
      * @throws RuntimeException
      * @throws UnexpectedValueException
      */
     private function processSignedProposal(
         SignedProposal $proposal,
-        TransactionRequest $context = null
+        TransactionOptions $options = null
     ): ProposalResponse {
-
-        if ($context && $context->hasPeer()) {
-            $peer = $context->getPeer();
+        if ($options && $options->hasPeer()) {
+            $peer = $options->getPeer();
         } else {
             $peer = $this->user->getOrganization()->getDefaultPeer();
         }
@@ -187,18 +183,17 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
     /**
      * @param ChannelHeader $channelHeader
      * @param string $payload
-     * @param TransactionRequest|null $request
+     * @param TransactionOptions|null $options
      * @return ProposalResponse
      */
     public function processChannelProposal(
         ChannelHeader $channelHeader,
         string $payload,
-        TransactionRequest $request = null
+        TransactionOptions $options = null
     ): ProposalResponse {
         $header = $this->createHeaderFromChannelHeader($channelHeader);
         $proposal = ProposalFactory::create($header, $payload);
 
-        return $this->processProposal($proposal, $request);
-
+        return $this->processProposal($proposal, $options);
     }
 }
