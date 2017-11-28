@@ -22,7 +22,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Channel;
-use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
+use AmericanExpress\HyperledgerFabricClient\ChannelProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
@@ -37,7 +37,7 @@ use PHPUnit\Framework\TestCase;
 class ChannelTest extends TestCase
 {
     /**
-     * @var ClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ChannelProposalProcessorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $client;
 
@@ -48,7 +48,7 @@ class ChannelTest extends TestCase
 
     protected function setUp()
     {
-        $this->client = $this->getMockBuilder(ClientInterface::class)
+        $this->client = $this->getMockBuilder(ChannelProposalProcessorInterface::class)
             ->getMock();
 
         $this->sut = new Channel('foo', $this->client);
@@ -56,7 +56,7 @@ class ChannelTest extends TestCase
 
     public function testQueryByChaincode()
     {
-        $this->client->method('processProposal')
+        $this->client->method('processChannelProposal')
             ->willReturn($proposalResponse = new ProposalResponse());
 
         $result = $this->sut->queryByChainCode(
@@ -87,7 +87,7 @@ class ChannelTest extends TestCase
 
     public function testChannelCanProcessChaincodeProposal()
     {
-        $this->client->method('processProposal')
+        $this->client->method('processChannelProposal')
             ->willReturn($proposalResponse = new ProposalResponse());
 
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId(

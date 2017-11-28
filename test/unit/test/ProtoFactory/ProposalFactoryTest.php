@@ -38,18 +38,16 @@ class ProposalFactoryTest extends TestCase
 {
     public function testCreate()
     {
-        $channelHeader = ChannelHeaderFactory::create(
-            $transactionContext = new TransactionContext(
-                SerializedIdentityFactory::fromBytes('Alice', 'Bob'),
-                'u58920du89f',
-                'MyTransactionId'
-            ),
-            'MyChannelId'
-        );
+        $serializedIdentity = SerializedIdentityFactory::fromBytes('Alice', 'Bob');
+        $nonce = 'u58920du89f';
+        $txId = 'MyTransactionId';
+
+        $channelHeader = ChannelHeaderFactory::create('MyChannelId');
+        $channelHeader->setTxId($txId);
 
         $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
-            $transactionContext->getSerializedIdentity(),
-            $transactionContext->getNonce()
+            $serializedIdentity,
+            $nonce
         ));
 
         $chaincodeInvocationSpec = ChaincodeInvocationSpecFactory::fromArgs([
@@ -61,7 +59,7 @@ class ProposalFactoryTest extends TestCase
             $chaincodeInvocationSpec
         );
 
-        $result = ProposalFactory::create($header, $chaincodeProposalPayload);
+        $result = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
         self::assertInstanceOf(Proposal::class, $result);
         self::assertContains('Alice', $result->getHeader());
         self::assertContains('Bob', $result->getHeader());

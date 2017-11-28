@@ -18,24 +18,23 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\ProtoFactory;
+namespace AmericanExpress\HyperledgerFabricClient;
 
-use Hyperledger\Fabric\Protos\Common\Header;
-use Hyperledger\Fabric\Protos\Peer\Proposal;
+use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
+use Hyperledger\Fabric\Protos\Common\ChannelHeader;
+use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
-class ProposalFactory
+interface ChannelProposalProcessorInterface
 {
     /**
-     * @param Header $header
+     * @param ChannelHeader $channelHeader
      * @param string $payload
-     * @return Proposal
+     * @param TransactionRequest|null $request
+     * @return ProposalResponse
      */
-    public static function create(Header $header, string $payload): Proposal
-    {
-        $proposal = new Proposal();
-        $proposal->setHeader($header->serializeToString());
-        $proposal->setPayload($payload);
-
-        return $proposal;
-    }
+    public function processChannelProposal(
+        ChannelHeader $channelHeader,
+        string $payload,
+        TransactionRequest $request = null
+    ): ProposalResponse;
 }

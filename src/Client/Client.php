@@ -23,10 +23,14 @@ namespace AmericanExpress\HyperledgerFabricClient\Client;
 use AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\ChannelFactory;
 use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
+use AmericanExpress\HyperledgerFabricClient\ChannelProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
@@ -35,13 +39,16 @@ use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Grpc\UnaryCall;
+use Hyperledger\Fabric\Protos\Common\ChannelHeader;
+use Hyperledger\Fabric\Protos\Common\Header;
+use Hyperledger\Fabric\Protos\Common\SignatureHeader;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use function igorw\get_in;
 
-final class Client implements ClientInterface
+final class Client implements ClientInterface, ChannelProposalProcessorInterface
 {
     /**
      * @var UserContextInterface
@@ -171,5 +178,39 @@ final class Client implements ClientInterface
         $identity = $this->user->getIdentity();
 
         return $this->transactionContextFactory->fromSerializedIdentity($identity);
+    }
+
+    /**
+     * @param ChannelHeader $channelHeader
+     * @return Header
+     */
+    private function createHeaderFromChannelHeader(ChannelHeader $channelHeader): Header
+    {
+        $transactionContext = $this->createTransactionContext();
+        $channelHeader->setTxId($transactionContext->getTxId());
+        $channelHeader->setEpoch($transactionContext->getEpoch());
+        $signatureHeader = SignatureHeaderFactory::create(
+            $transactionContext->getSerializedIdentity(),
+            $transactionContext->getNonce()
+        );
+        return HeaderFactory::create($channelHeader, $signatureHeader);
+    }
+
+    /**
+     * @param ChannelHeader $channelHeader
+     * @param string $payload
+     * @param TransactionRequest|null $request
+     * @return ProposalResponse
+     */
+    public function processChannelProposal(
+        ChannelHeader $channelHeader,
+        string $payload,
+        TransactionRequest $request = null
+    ): ProposalResponse {
+        $header = $this->createHeaderFromChannelHeader($channelHeader);
+        $proposal = ProposalFactory::create($header, $payload);
+
+        return $this->processProposal($proposal, $request);
+
     }
 }

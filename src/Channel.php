@@ -20,11 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Client\ClientInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionRequest;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
@@ -39,17 +35,17 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
     private $name;
 
     /**
-     * @var ClientInterface
+     * @var ChannelProposalProcessorInterface
      */
     private $client;
 
     /**
      * @param string $name
-     * @param ClientInterface $client
+     * @param ChannelProposalProcessorInterface $client
      */
     public function __construct(
         string $name,
-        ClientInterface $client
+        ChannelProposalProcessorInterface $client
     ) {
         $this->name = $name;
         $this->client = $client;
@@ -104,16 +100,9 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
         ChaincodeHeaderExtension $extension,
         TransactionRequest $request = null
     ): ProposalResponse {
-        $transactionContext = $this->client->createTransactionContext();
-        $channelHeader = ChannelHeaderFactory::create($transactionContext, $this->name);
+        $channelHeader = ChannelHeaderFactory::create($this->name);
         $channelHeader->setExtension($extension->serializeToString());
-        $signatureHeader = SignatureHeaderFactory::create(
-            $transactionContext->getSerializedIdentity(),
-            $transactionContext->getNonce()
-        );
-        $header = HeaderFactory::create($channelHeader, $signatureHeader);
-        $proposal = ProposalFactory::create($header, $payload);
 
-        return $this->client->processProposal($proposal, $request);
+        return $this->client->processChannelProposal($channelHeader, $payload->serializeToString(), $request);
     }
 }

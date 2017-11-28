@@ -105,12 +105,14 @@ TAG
             SerializedIdentityFactory::fromFile('1234', new \SplFileObject($this->privateKey->url()))
         );
         $channelHeader = ChannelHeaderFactory::create(
-            $transactionContext,
             'MyChannelId',
             3,
             1,
             TimestampFactory::fromDateTime(new \DateTime($dateTime))
         );
+        $channelHeader->setTxId($transactionContext->getTxId());
+        $channelHeader->setEpoch($transactionContext->getEpoch());
+
         $chaincodeId = ChaincodeIdFactory::create(
             'MyChaincodePath',
             'MyChaincodeName',
@@ -125,7 +127,7 @@ TAG
             $transactionContext->getNonce())
         );
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
-        $proposal = ProposalFactory::create($header, $chaincodeProposalPayload);
+        $proposal = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
 
         $result = $this->sut->signProposal($proposal, new \SplFileObject($this->privateKey->url()));
 

@@ -38,18 +38,16 @@ class SignedProposalFactoryTest extends TestCase
 {
     public function testFromProposal()
     {
-        $channelHeader = ChannelHeaderFactory::create(
-            $transactionContext = new TransactionContext(
-                SerializedIdentityFactory::fromBytes('Alice', 'Bob'),
-                'u58920du89f',
-                'MyTransactionId'
-            ),
-            'MyChannelId'
-        );
+        $serializedIdentity = SerializedIdentityFactory::fromBytes('Alice', 'Bob');
+        $nonce = 'u58920du89f';
+        $txId = 'MyTransactionId';
+
+        $channelHeader = ChannelHeaderFactory::create('MyChannelId');
+        $channelHeader->setTxId($txId);
 
         $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
-            $transactionContext->getSerializedIdentity(),
-            $transactionContext->getNonce()
+            $serializedIdentity,
+            $nonce
         ));
 
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([
@@ -57,7 +55,7 @@ class SignedProposalFactoryTest extends TestCase
             'bar',
         ]);
 
-        $proposal = ProposalFactory::create($header, $chaincodeProposalPayload);
+        $proposal = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
 
         $result = SignedProposalFactory::fromProposal($proposal, 'MySignature');
 

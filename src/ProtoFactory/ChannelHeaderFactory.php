@@ -29,7 +29,6 @@ class ChannelHeaderFactory
     private const DEFAULT_CHANNEL_HEADER_TYPE = 3;
 
     /**
-     * @param TransactionContext $transactionContext
      * @param string $channelId
      * @param int $type
      * @param int $version
@@ -37,7 +36,6 @@ class ChannelHeaderFactory
      * @return ChannelHeader
      */
     public static function create(
-        TransactionContext $transactionContext,
         string $channelId,
         int $type = self::DEFAULT_CHANNEL_HEADER_TYPE,
         int $version = 1,
@@ -48,9 +46,7 @@ class ChannelHeaderFactory
         $channelHeader = new ChannelHeader();
         $channelHeader->setType($type);
         $channelHeader->setVersion($version);
-        $channelHeader->setTxId($transactionContext->getTxId());
         $channelHeader->setChannelId($channelId);
-        $channelHeader->setEpoch($transactionContext->getEpoch());
         $channelHeader->setTimestamp($timestamp);
 
         return $channelHeader;

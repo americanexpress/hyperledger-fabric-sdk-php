@@ -26,6 +26,7 @@ use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContext;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionContextFactoryInterface;
@@ -140,6 +141,24 @@ class ClientTest extends TestCase
         self::assertInstanceOf(ProposalResponse::class, $response);
     }
 
+    public function testProcessChannelProposal()
+    {
+        $channelHeader = ChannelHeaderFactory::create('test-channel');
+
+        $this->endorserClient->method('ProcessProposal')
+            ->willReturn($this->unaryCall);
+
+        $this->unaryCall->method('wait')
+            ->willReturn([
+                $proposalResponse = new ProposalResponse(),
+                [ 'code' => 0 ]
+            ]);
+
+        $response = $this->sut->processChannelProposal($channelHeader, 'test-payload');
+
+        self::assertInstanceOf(ProposalResponse::class, $response);
+    }
+
     /**
      * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
      */
@@ -213,6 +232,33 @@ class ClientTest extends TestCase
             ]);
 
         $response = $this->sut->processProposal($proposal, $context);
+
+        self::assertInstanceOf(ProposalResponse::class, $response);
+    }
+
+    public function testProcessChannelProposalWithCustomPeer()
+    {
+        $channelHeader = ChannelHeaderFactory::create('test-channel');
+
+        $context = new TransactionRequest([
+            'peer' => new PeerOptions([
+                'name' => 'peer1',
+                'requests' => 'localhost:7051',
+            ]),
+        ]);
+
+        $this->endorserClient->method('ProcessProposal')
+            ->willReturn($this->unaryCall);
+
+        $this->unaryCall->method('wait')
+            ->willReturn([
+                $proposalResponse = new ProposalResponse(),
+                [
+                    'code' => 0,
+                ]
+            ]);
+
+        $response = $this->sut->processChannelProposal($channelHeader, 'test-payload', $context);
 
         self::assertInstanceOf(ProposalResponse::class, $response);
     }

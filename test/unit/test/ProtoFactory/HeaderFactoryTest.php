@@ -35,14 +35,13 @@ class HeaderFactoryTest extends TestCase
 {
     public function testCreate()
     {
+        $serializedIdentity = SerializedIdentityFactory::fromBytes('Alice', 'Bob');
+        $nonce = 'u58920du89f';
+
         $channelHeader = ChannelHeaderFactory::create(
-            new TransactionContext(
-                $serializedIdentity = SerializedIdentityFactory::fromBytes('Alice', 'Bob'),
-                $nonce = 'u58920du89f',
-                'MyTransactionId'
-            ),
             'MyChannelId'
         );
+        $channelHeader->setTxId('MyTransactionId');
 
         $signatureHeader = SignatureHeaderFactory::create($serializedIdentity, $nonce);
 
