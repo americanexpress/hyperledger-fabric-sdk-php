@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient;
+namespace AmericanExpress\HyperledgerFabricClient\Chaincode;
 
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;

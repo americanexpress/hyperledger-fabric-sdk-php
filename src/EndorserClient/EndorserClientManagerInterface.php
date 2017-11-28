@@ -18,28 +18,15 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient;
+namespace AmericanExpress\HyperledgerFabricClient\EndorserClient;
 
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\EndorserClientFactory;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 
-final class EndorserClientManager implements EndorserClientManagerInterface
+interface EndorserClientManagerInterface
 {
-    /**
-     * @var EndorserClient[]
-     */
-    private $instances = [];
-
     /**
      * @param string $host
      * @return EndorserClient
      */
-    public function get(string $host): EndorserClient
-    {
-        if (!\array_key_exists($host, $this->instances)) {
-            $this->instances[$host] = EndorserClientFactory::fromInsecureChannelCredentials($host);
-        }
-
-        return $this->instances[$host];
-    }
+    public function get(string $host): EndorserClient;
 }

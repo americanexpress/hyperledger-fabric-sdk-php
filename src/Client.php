@@ -18,13 +18,13 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Client;
+namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Channel;
+use AmericanExpress\HyperledgerFabricClient\Channel\Channel;
+use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
+use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
-use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
-use AmericanExpress\HyperledgerFabricClient\ChannelProposalProcessorInterface;
-use AmericanExpress\HyperledgerFabricClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;

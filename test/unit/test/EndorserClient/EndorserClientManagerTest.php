@@ -18,15 +18,32 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient;
+namespace AmericanExpressTest\HyperledgerFabricClient\EndorserClient;
 
+use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
+use PHPUnit\Framework\TestCase;
 
-interface EndorserClientManagerInterface
+/**
+ * @covers \AmericanExpress\HyperledgerFabricClient\EndorserClientManager
+ */
+class EndorserClientManagerTest extends TestCase
 {
     /**
-     * @param string $host
-     * @return EndorserClient
+     * @var EndorserClientManager
      */
-    public function get(string $host): EndorserClient;
+    private $sut;
+
+    protected function setUp()
+    {
+        $this->sut = new EndorserClientManager();
+    }
+
+    public function testGet()
+    {
+        $endorserClient = $this->sut->get('example.com');
+
+        self::assertInstanceOf(EndorserClient::class, $endorserClient);
+        self::assertSame($endorserClient, $this->sut->get('example.com'));
+    }
 }

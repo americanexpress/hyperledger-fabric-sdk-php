@@ -18,15 +18,15 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient\Client;
+namespace AmericanExpressTest\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Client\Client;
-use AmericanExpress\HyperledgerFabricClient\Client\ClientFactory;
+use AmericanExpress\HyperledgerFabricClient\Client;
+use AmericanExpress\HyperledgerFabricClient\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory
+ * @covers \AmericanExpress\HyperledgerFabricClient\ClientFactory
  */
 class ClientFactoryTest extends TestCase
 {

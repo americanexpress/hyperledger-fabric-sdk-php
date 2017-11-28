@@ -18,10 +18,10 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpressTest\HyperledgerFabricClient;
+namespace AmericanExpressTest\HyperledgerFabricClient\Chaincode;
 
-use AmericanExpress\HyperledgerFabricClient\Chaincode;
-use AmericanExpress\HyperledgerFabricClient\ChaincodeProposalProcessorInterface;
+use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
+use AmericanExpress\HyperledgerFabricClient\Chaincode\ChaincodeProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;

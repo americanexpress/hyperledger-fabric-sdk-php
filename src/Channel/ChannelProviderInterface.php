@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
-use AmericanExpress\HyperledgerFabricClient\ChannelInterface;
-
 interface ChannelProviderInterface
 {
     /**
