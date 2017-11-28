@@ -49,6 +49,11 @@ class MdanterEccSignatoryTest extends TestCase
     private $privateKey;
 
     /**
+     * @var \SplFileObject
+     */
+    private $privateKeyFile;
+
+    /**
      * @var MdanterEccSignatory
      */
     private $sut;
@@ -67,19 +72,113 @@ yz/n2NHyJgTg6kC05AaJMeGIinEF0JeJtRDNVQGzoQJQYjnzUTS9FvGh
 TAG
         );
         $files->addChild($this->privateKey);
+        $this->privateKeyFile = new \SplFileObject($this->privateKey->url());
 
         $this->sut = new MdanterEccSignatory();
     }
 
-    public function testSignProposal()
+    public function testSignEmptyProposal()
     {
-        $result = $this->sut->signProposal(new Proposal(), new \SplFileObject($this->privateKey->url()));
+        $result = $this->sut->signProposal(new Proposal(), $this->privateKeyFile);
 
         self::assertInstanceOf(SignedProposal::class, $result);
         self::assertInternalType('string', $result->getProposalBytes());
         self::assertEmpty($result->getProposalBytes());
         self::assertInternalType('string', $result->getSignature());
         self::assertNotEmpty($result->getSignature());
+    }
+
+    public function testSignProposal()
+    {
+        $proposal = new Proposal();
+        $proposal->setHeader('HEADER-STRING');
+        $proposal->setPayload('PAYLOAD-STRING');
+        $result = $this->sut->signProposal($proposal, $this->privateKeyFile);
+
+        self::assertEquals(
+            'Cg1IRUFERVItU1RSSU5HEg5QQVlMT0FELVNUUklORw==',
+            base64_encode($result->getProposalBytes())
+        );
+        self::assertEquals(
+            'MEQCIEfgYNT2Rve6kGy7Ter1/77KcJin1MImCroLqIzdiLmtAiBRjOCkd7aW6KM+qRzDxWmC1+X9aP/tzWD6/Z5a2E9zOA==',
+            base64_encode($result->getSignature())
+        );
+    }
+
+    /**
+     * @dataProvider getProposalSignatureCharacterizationData
+     * @param string $encodedProposalBytes
+     * @param string $encodedSignature
+     * @param string $proposalHeader
+     * @param string $proposalPayload
+     * @param string $proposalExtension
+     */
+    public function testGetSCharacterization(
+        string $encodedProposalBytes,
+        string $encodedSignature,
+        string $proposalHeader,
+        string $proposalPayload,
+        string $proposalExtension
+    ) {
+        $proposal = new Proposal();
+        $proposal->setHeader(base64_decode($proposalHeader));
+        $proposal->setPayload(base64_decode($proposalPayload));
+        $proposal->setExtension(base64_decode($proposalExtension));
+        $result = $this->sut->signProposal($proposal, new \SplFileObject($this->privateKey->url()));
+
+        self::assertInstanceOf(SignedProposal::class, $result);
+        self::assertEquals($encodedProposalBytes, base64_encode($result->getProposalBytes()));
+        self::assertEquals($encodedSignature, base64_encode($result->getSignature()));
+    }
+
+    /**
+     * @dataProvider getChainCodeProposalDataset
+     * @param string $dateTime
+     * @param string $proposalHeader
+     * @param string $proposalPayload
+     * @param string $proposalExtension
+     */
+    public function testCreateChaincodeProposal(
+        string $dateTime,
+        string $proposalHeader,
+        string $proposalPayload,
+        string $proposalExtension
+    ) {
+        $transactionContextFactory = new TransactionIdentifierGenerator(
+            new class implements NonceGeneratorInterface {
+                public function generateNonce(): string
+                {
+                    return 'u23m5k4hf86j';
+                }
+            }
+        );
+        $identity = SerializedIdentityFactory::fromFile('1234', $this->privateKeyFile);
+        $transactionContext = $transactionContextFactory->fromSerializedIdentity($identity);
+
+        $channelHeader = ChannelHeaderFactory::create('MyChannelId');
+        $channelHeader->setTxId($transactionContext->getId());
+        $channelHeader->setEpoch(0);
+        $channelHeader->setTimestamp(TimestampFactory::fromDateTime(new \DateTime($dateTime)));
+
+        $chaincodeId = ChaincodeIdFactory::create(
+            'MyChaincodePath',
+            'MyChaincodeName',
+            'MyChaincodeVersion'
+        );
+
+        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
+        $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
+
+        $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
+            $identity,
+            $transactionContext->getNonce()
+        ));
+        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
+        $proposal = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
+
+        self::assertEquals(base64_decode($proposalHeader), $proposal->getHeader());
+        self::assertEquals(base64_decode($proposalPayload), $proposal->getPayload());
+        self::assertEquals(base64_decode($proposalExtension), $proposal->getExtension());
     }
 
     /**
@@ -99,12 +198,10 @@ TAG
                 }
             }
         );
-        $identity = SerializedIdentityFactory::fromFile('1234', new \SplFileObject($this->privateKey->url()));
+        $identity = SerializedIdentityFactory::fromFile('1234', $this->privateKeyFile);
         $transactionContext = $transactionContextFactory->fromSerializedIdentity($identity);
 
-        $channelHeader = ChannelHeaderFactory::create(
-            'MyChannelId'
-        );
+        $channelHeader = ChannelHeaderFactory::create('MyChannelId');
         $channelHeader->setTxId($transactionContext->getId());
         $channelHeader->setEpoch(0);
         $channelHeader->setTimestamp(TimestampFactory::fromDateTime(new \DateTime($dateTime)));
@@ -132,9 +229,9 @@ TAG
         self::assertEquals($encodedSignature, base64_encode($result->getSignature()));
     }
 
-    public function dataGetS()
+    private function loadStaticData()
     {
-        $contents = file_get_contents(__DIR__ . '/data-get-s.json');
+        $contents = file_get_contents(__DIR__ . '/../../_files/signed-proposals.json');
 
         $json = json_decode($contents, true);
 
@@ -143,5 +240,40 @@ TAG
         }
 
         return $json;
+    }
+
+    public function getChainCodeProposalDataset()
+    {
+        $data = $this->loadStaticData();
+
+        return array_map(
+            function ($value) {
+                return array_intersect_key(
+                    $value,
+                    array_flip(['dateTime', 'proposalHeader', 'proposalPayload', 'proposalExtension'])
+                );
+            },
+            $data
+        );
+    }
+
+    public function getProposalSignatureCharacterizationData()
+    {
+        $data = $this->loadStaticData();
+
+        return array_map(
+            function ($value) {
+                return array_intersect_key(
+                    $value,
+                    array_flip(['encodedProposalBytes', 'encodedSignature', 'proposalHeader', 'proposalPayload', 'proposalExtension'])
+                );
+            },
+            $data
+        );
+    }
+
+    public function dataGetS()
+    {
+        return $this->loadStaticData();
     }
 }
