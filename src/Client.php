@@ -25,8 +25,7 @@ use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
-use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
-use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
+use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
@@ -34,15 +33,11 @@ use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
-use Assert\Assertion;
-use Assert\AssertionFailedException;
-use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
 use Hyperledger\Fabric\Protos\Common\Header;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
-use function igorw\get_in;
 
 final class Client implements ChannelProviderInterface, ChannelProposalProcessorInterface
 {
@@ -129,38 +124,20 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
      * @param SignedProposal $proposal
      * @param TransactionOptions|null $options
      * @return ProposalResponse
-     * @throws RuntimeException
-     * @throws UnexpectedValueException
      */
     private function processSignedProposal(
         SignedProposal $proposal,
         TransactionOptions $options = null
     ): ProposalResponse {
         if ($options && $options->hasPeer()) {
-            $peer = $options->getPeer();
+            $peerOptions = $options->getPeer();
         } else {
-            $peer = $this->user->getOrganization()->getDefaultPeer();
+            $peerOptions = $this->user->getOrganization()->getDefaultPeer();
         }
 
-        $endorserClient = $this->endorserClients->get($peer->getRequests());
+        $peer = new Peer($peerOptions, $this->endorserClients);
 
-        $simpleSurfaceActiveCall = $endorserClient->ProcessProposal($proposal);
-
-        try {
-            Assertion::isInstanceOf($simpleSurfaceActiveCall, UnaryCall::class);
-        } catch (AssertionFailedException $e) {
-            throw UnexpectedValueException::fromException($e);
-        }
-
-        /** @var UnaryCall $simpleSurfaceActiveCall */
-        [$proposalResponse, $status] = $simpleSurfaceActiveCall->wait();
-
-        if ($proposalResponse instanceof ProposalResponse) {
-            return $proposalResponse;
-        }
-
-        $status = (array) $status;
-        throw new RuntimeException(get_in($status, ['details']), get_in($status, ['code']));
+        return $peer->processSignedProposal($proposal);
     }
 
     /**
