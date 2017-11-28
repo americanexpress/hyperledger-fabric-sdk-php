@@ -34,7 +34,7 @@ class TransactionIdTest extends TestCase
         $nonce = 'u4i6o2j6n6';
         $txId = 'i3o6kf8t0ek';
 
-        $sut = new TransactionId($nonce, $txId);
+        $sut = new TransactionId($txId, $nonce);
 
         self::assertSame($nonce, $sut->getNonce());
         self::assertSame($txId, $sut->getId());

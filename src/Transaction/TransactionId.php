@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
-use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
-
 class TransactionId
 {
     /**
@@ -35,10 +33,10 @@ class TransactionId
     private $nonce;
 
     /**
-     * @param string $nonce
      * @param string $id
+     * @param string $nonce
      */
-    public function __construct(string $nonce, string $id)
+    public function __construct(string $id, string $nonce)
     {
         $this->nonce = $nonce;
         $this->id = $id;

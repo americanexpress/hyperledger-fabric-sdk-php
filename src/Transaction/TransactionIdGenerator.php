@@ -79,8 +79,8 @@ final class TransactionIdGenerator implements TransactionIdGeneratorInterface
         $compString = $this->asciiCharStringSerializer->serialize($comp);
 
         return new TransactionId(
-            $nonce,
-            \hash((string) $this->hashAlgorithm, $compString)
+            \hash((string) $this->hashAlgorithm, $compString),
+            $nonce
         );
     }
 }
