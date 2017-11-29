@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use PHPUnit\Framework\TestCase;
 
@@ -74,6 +75,21 @@ class TransactionOptionsTest extends TestCase
         self::assertSame([$peer], $sut->getPeers());
     }
 
+    public function testFromMultiDimensionalArray()
+    {
+        $sut = new TransactionOptions([
+            'peers' => [
+                [
+                    'name' => 'peer1',
+                ]
+            ],
+        ]);
+
+        self::assertCount(1, $sut->getPeers());
+        self::assertInstanceOf(PeerOptionsInterface::class, $sut->getPeers()[0]);
+        self::assertSame('peer1', $sut->getPeers()[0]->getName());
+    }
+
     public function testSetPeers()
     {
         $peer = new PeerOptions([
@@ -83,6 +99,19 @@ class TransactionOptionsTest extends TestCase
         $this->sut->setPeers([$peer]);
 
         self::assertSame([$peer], $this->sut->getPeers());
+    }
+
+    public function testSetPeersFromArray()
+    {
+        $this->sut->setPeers([
+            [
+                'name' => 'peer1',
+            ]
+        ]);
+
+        self::assertCount(1, $this->sut->getPeers());
+        self::assertInstanceOf(PeerOptionsInterface::class, $this->sut->getPeers()[0]);
+        self::assertSame('peer1', $this->sut->getPeers()[0]->getName());
     }
 
     public function testAddManyPeers()

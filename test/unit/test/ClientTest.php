@@ -24,7 +24,6 @@ use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Client;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
@@ -143,10 +142,10 @@ class ClientTest extends TestCase
 
         $context = new TransactionOptions([
             'peers' => [
-                new PeerOptions([
+                [
                     'name' => 'peer1',
                     'requests' => 'localhost:7051',
-                ]),
+                ],
             ],
         ]);
 
