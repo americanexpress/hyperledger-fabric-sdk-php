@@ -15,11 +15,7 @@
 # permissions and limitations under the License.
 
 # Dynamically compile `.proto` files into PHP classes.
-# TODO: When `google/protobuf:^3.5` becomes stable, upgrade to `google/protobuf:^3.5` in `composer.json`,
-# TODO:     remove the `protobuf/protos/google` dir, remove the `protobuf/dist/Google` dir,
-# TODO:     add `--proto_path=vendor/google/protobuf/src/google/protobuf` to the following command,
-# TODO:     and regenerate the PHP classes. We won't need to own Google's `GPBEmpty` and `Timestamp` classes.
-find protobuf/protos -name '*.proto' -exec protoc --proto_path=protobuf/protos/ --php_out=protobuf/dist/ --grpc_out=protobuf/dist/ --plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin {} \;
+find protobuf/protos -name '*.proto' -exec protoc --proto_path=protobuf/protos/ --proto_path=vendor/google/protobuf/src/google/protobuf --php_out=protobuf/dist/ --grpc_out=protobuf/dist/ --plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin {} \;
 
 # `\Hyperledger\Fabric\Protos\Orderer\AtomicBroadcastClient` is incorrectly generated with references to `\Orderer\BroadcastResponse`.
 find protobuf/dist -name '*.php' -exec sed -i '' -e 's/\\Orderer\\BroadcastResponse/\\Hyperledger\\Fabric\\Protos\\Orderer\\BroadcastResponse/g' {} \;
