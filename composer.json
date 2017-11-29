@@ -37,10 +37,12 @@
     "mikey179/vfsStream": "^1.6",
     "ocramius/finalizer": "^1.0",
     "phpunit/phpunit": "*",
+    "sami/sami": "^4.0",
     "squizlabs/php_codesniffer": "*"
   },
   "scripts": {
     "build": "composer lint:syntax && composer lint:style && composer lint:final && composer coverage && composer test:mutations",
+    "docs": "vendor/bin/sami.php update docs/sami.php",
     "lint:beautify": "vendor/bin/phpcbf --standard=PSR2 --extensions=php -v src/ test/",
     "lint:final": "vendor/bin/finalizer finalizer:check-final-classes src",
     "lint:style": "vendor/bin/phpcs --standard=PSR2 --extensions=php -v src/ test/ --ignore=test/integration/config.php",

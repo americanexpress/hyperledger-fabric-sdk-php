@@ -123,8 +123,15 @@ Check composer version (it should be 1.5 or plus)
 
 `composer install`
 
+### Generating SDK API Documentation
 
+```php
+composer docs
+```
 
+```bash
+open build/docs/index.html
+```
 
 ### Running the End2End test case
 
