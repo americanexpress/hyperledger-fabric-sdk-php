@@ -26,7 +26,6 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensio
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeIdFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
 class Chaincode
 {

@@ -32,7 +32,7 @@ use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use function igorw\get_in;
 
-class Peer implements PeerInterface
+final class Peer implements PeerInterface
 {
     /**
      * @var PeerOptionsInterface
@@ -59,7 +59,8 @@ class Peer implements PeerInterface
      * @param SignedProposal $proposal
      * @return Response
      */
-    public function processSignedProposal(SignedProposal $proposal): Response {
+    public function processSignedProposal(SignedProposal $proposal): Response
+    {
         $host = $this->options->getRequests();
 
         $endorserClient = $this->endorserClients->get($host);

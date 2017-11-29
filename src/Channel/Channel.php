@@ -28,7 +28,6 @@ use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 
 final class Channel implements ChannelInterface, ChaincodeProposalProcessorInterface
 {
@@ -65,14 +64,14 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
         ChaincodeID $chaincodeId,
         array $args = []
     ): ResponseCollection {
-        $chainCode = $this->getChainCode([
+        $chainCode = $this->getChaincode([
             'name' => $chaincodeId->getName(),
             'version' => $chaincodeId->getPath(),
             'path' => $chaincodeId->getVersion(),
         ]);
 
         $functionName = array_shift($args);
-        array_push($args, $request);
+        $args[] = $request;
 
         return $chainCode->$functionName(...$args);
     }

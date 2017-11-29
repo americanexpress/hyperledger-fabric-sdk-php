@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Organization;
 
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 
 interface OrganizationOptionsInterface
 {

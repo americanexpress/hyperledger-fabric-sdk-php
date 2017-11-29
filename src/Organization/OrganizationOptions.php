@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Organization;
 
-use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
 use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
