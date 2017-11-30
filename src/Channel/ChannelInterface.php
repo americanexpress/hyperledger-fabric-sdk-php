@@ -21,11 +21,12 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode\ChaincodeProviderInterface;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerCollectionInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 
-interface ChannelInterface extends ChaincodeProviderInterface
+interface ChannelInterface extends ChaincodeProviderInterface, PeerCollectionInterface
 {
     /**
      * @param TransactionOptions $request

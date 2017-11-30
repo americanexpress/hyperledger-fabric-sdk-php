@@ -24,7 +24,6 @@ use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Chaincode\ChaincodeProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerCollectionInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
@@ -39,7 +38,7 @@ use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
 
-final class Channel implements ChannelInterface, ChaincodeProposalProcessorInterface, PeerCollectionInterface
+final class Channel implements ChannelInterface, ChaincodeProposalProcessorInterface
 {
     /**
      * @var string
