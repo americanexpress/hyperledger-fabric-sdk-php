@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\ExceptionInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 
@@ -30,6 +31,7 @@ interface ChannelFactoryInterface
      * @param ProposalProcessorInterface $proposalProcessor
      * @param UserContextInterface $user
      * @return ChannelInterface
+     * @throws ExceptionInterface
      */
     public function create(
         string $name,

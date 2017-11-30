@@ -23,6 +23,7 @@ namespace AmericanExpress\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\ExceptionInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\UnaryCallResolver;
@@ -116,6 +117,7 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
      * @param Proposal $proposal
      * @param TransactionOptions|null $options
      * @return ResponseCollection
+     * @throws ExceptionInterface
      */
     public function processProposal(
         Proposal $proposal,

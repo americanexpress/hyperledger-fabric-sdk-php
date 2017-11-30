@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Proposal;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\ExceptionInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 
@@ -29,6 +30,7 @@ interface ProposalProcessorInterface
      * @param Proposal $proposal
      * @param TransactionOptions|null $options
      * @return ResponseCollection
+     * @throws ExceptionInterface
      */
     public function processProposal(Proposal $proposal, TransactionOptions $options): ResponseCollection;
 }

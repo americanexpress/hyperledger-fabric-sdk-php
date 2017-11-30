@@ -22,6 +22,8 @@ namespace AmericanExpress\HyperledgerFabricClient\Peer;
 
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\ExceptionInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 
 final class PeerFactory implements PeerFactoryInterface
 {
@@ -53,9 +55,18 @@ final class PeerFactory implements PeerFactoryInterface
     /**
      * @param mixed[] $options
      * @return PeerInterface
+     * @throws ExceptionInterface
      */
     public function fromArray(array $options): PeerInterface
     {
-        return $this->fromPeerOptions(new PeerOptions($options));
+        try {
+            return $this->fromPeerOptions(new PeerOptions($options));
+        } catch (ExceptionInterface $e) {
+            throw new InvalidArgumentException(
+                sprintf('Unable to create Peer.'),
+                0,
+                $e
+            );
+        }
     }
 }

@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Peer;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\ExceptionInterface;
+
 interface PeerFactoryInterface
 {
     /**
@@ -31,6 +33,7 @@ interface PeerFactoryInterface
     /**
      * @param mixed[] $options
      * @return PeerInterface
+     * @throws ExceptionInterface
      */
     public function fromArray(array $options): PeerInterface;
 }

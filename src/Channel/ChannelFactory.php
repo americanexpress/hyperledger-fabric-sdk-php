@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\ExceptionInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Identity\SerializedIdentityAwareHeaderGenerator;
 use AmericanExpress\HyperledgerFabricClient\Identity\SerializedIdentityAwareHeaderGeneratorInterface;
@@ -59,6 +61,7 @@ final class ChannelFactory implements ChannelFactoryInterface
      * @param ProposalProcessorInterface $proposalProcessor
      * @param UserContextInterface $user
      * @return ChannelInterface
+     * @throws ExceptionInterface
      */
     public function create(
         string $name,
@@ -69,7 +72,15 @@ final class ChannelFactory implements ChannelFactoryInterface
 
         $peers = $this->getPeers($user);
 
-        return new Channel($name, $proposalProcessor, $headerGenerator, $peers);
+        try {
+            return new Channel($name, $proposalProcessor, $headerGenerator, $peers);
+        } catch (ExceptionInterface $e) {
+            throw new InvalidArgumentException(
+                sprintf('Unable to create Peer.'),
+                0,
+                $e
+            );
+        }
     }
 
     /**
