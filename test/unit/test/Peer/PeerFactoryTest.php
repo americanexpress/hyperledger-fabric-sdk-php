@@ -71,4 +71,17 @@ class PeerFactoryTest extends TestCase
 
         self::assertInstanceOf(Peer::class, $result);
     }
+
+    public function testFromArray()
+    {
+        $this->endorserClients->method('get')
+            ->with('localhost:8080')
+            ->willReturn($this->endorserClient);
+
+        $result = $this->sut->fromArray([
+            'requests' => 'localhost:8080',
+        ]);
+
+        self::assertInstanceOf(Peer::class, $result);
+    }
 }

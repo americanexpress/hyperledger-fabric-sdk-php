@@ -27,4 +27,10 @@ interface PeerFactoryInterface
      * @return Peer
      */
     public function fromPeerOptions(PeerOptionsInterface $options): Peer;
+
+    /**
+     * @param mixed[] $options
+     * @return Peer
+     */
+    public function fromArray(array $options): Peer;
 }

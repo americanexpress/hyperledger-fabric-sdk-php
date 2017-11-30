@@ -26,7 +26,9 @@ use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
+use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactory;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
@@ -43,6 +45,11 @@ use PHPUnit\Framework\TestCase;
  */
 class ClientTest extends TestCase
 {
+    /**
+     * @var PeerInterface
+     */
+    private $peer;
+
     /**
      * @var UnaryCall|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -73,6 +80,8 @@ class ClientTest extends TestCase
         $this->endorserClient = $this->getMockBuilder(EndorserClient::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->peer = new Peer($this->endorserClient);
 
         /** @var EndorserClientManagerInterface|\PHPUnit_Framework_MockObject_MockObject $endorserClients */
         $endorserClients = $this->getMockBuilder(EndorserClientManagerInterface::class)
@@ -129,17 +138,12 @@ class ClientTest extends TestCase
 
         $this->unaryCall->method('wait')
             ->willReturn([
-                $proposalResponse = new ProposalResponse(),
+                new ProposalResponse(),
                 [ 'code' => 0 ]
             ]);
 
         $context = new TransactionOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                    'requests' => 'localhost:7051',
-                ],
-            ],
+            'peers' => [$this->peer],
         ]);
 
         $response = $this->sut->processProposal(new Proposal(), $context);
@@ -165,12 +169,7 @@ class ClientTest extends TestCase
             ]);
 
         $context = new TransactionOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                    'requests' => 'localhost:7051',
-                ],
-            ],
+            'peers' => [$this->peer],
         ]);
 
         $response = $this->sut->processProposal(new Proposal(), $context);

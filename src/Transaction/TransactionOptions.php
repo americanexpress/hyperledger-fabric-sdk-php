@@ -21,18 +21,18 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Transaction;
 
 use AmericanExpress\HyperledgerFabricClient\Options\AbstractOptions;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerCollectionInterface;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 
-class TransactionOptions extends AbstractOptions
+class TransactionOptions extends AbstractOptions implements PeerCollectionInterface
 {
     /**
-     * @var PeerOptionsInterface[]
+     * @var PeerInterface[]
      */
     private $peers = [];
 
     /**
-     * @return PeerOptionsInterface[]
+     * @return PeerInterface[]
      */
     public function getPeers(): array
     {
@@ -40,23 +40,20 @@ class TransactionOptions extends AbstractOptions
     }
 
     /**
-     * @param PeerOptionsInterface[]|array[] $peers
+     * @param PeerInterface[] $peers
      * @return void
      */
     public function setPeers(array $peers): void
     {
-        $peers = array_map(function ($peer): PeerOptionsInterface {
-            return $peer instanceof PeerOptionsInterface ? $peer : new PeerOptions($peer);
-        }, $peers);
-
         $this->peers = [];
         $this->addPeers(...$peers);
     }
 
     /**
-     * @param PeerOptionsInterface[] ...$peers
+     * @param PeerInterface[] ...$peers
+     * @return void
      */
-    public function addPeers(PeerOptionsInterface ...$peers): void
+    public function addPeers(PeerInterface ...$peers): void
     {
         $this->peers = array_merge($this->peers, $peers);
     }
@@ -70,10 +67,10 @@ class TransactionOptions extends AbstractOptions
     }
 
     /**
-     * @param PeerOptionsInterface[]|array[] $peers
-     * @return TransactionOptions
+     * @param PeerInterface[] ...$peers
+     * @return static
      */
-    public function withPeers(array $peers): TransactionOptions
+    public function withPeers(PeerInterface ...$peers): TransactionOptions
     {
         $options = new static();
         $options->setPeers($peers);

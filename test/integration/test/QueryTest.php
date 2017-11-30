@@ -22,6 +22,7 @@ namespace AmericanExpressTest\Integration\Test;
 
 use AmericanExpress\HyperledgerFabricClient\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use AmericanExpressTest\Integration\TestAsset\E2EUtils;
 use PHPUnit\Framework\TestCase;
@@ -54,9 +55,9 @@ class QueryTest extends TestCase
 
         $request = new TransactionOptions([
             'peers' => [
-                [
+                (new PeerFactory())->fromArray([
                     'requests' => 'localhost:7051',
-                ],
+                ]),
             ],
         ]);
 

@@ -22,7 +22,10 @@ namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Chaincode\ChaincodeProposalProcessorInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerCollectionInterface;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
@@ -30,11 +33,13 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use AmericanExpress\HyperledgerFabricClient\Identity\SerializedIdentityAwareHeaderGeneratorInterface;
+use Assert\Assertion;
+use Assert\AssertionFailedException;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
 
-final class Channel implements ChannelInterface, ChaincodeProposalProcessorInterface
+final class Channel implements ChannelInterface, ChaincodeProposalProcessorInterface, PeerCollectionInterface
 {
     /**
      * @var string
@@ -47,9 +52,9 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
     private $client;
 
     /**
-     * @var PeerOptionsInterface[] $peers
+     * @var PeerInterface[] $peers
      */
-    private $peers = [];
+    private $peers;
 
     /**
      * @var SerializedIdentityAwareHeaderGeneratorInterface
@@ -61,6 +66,7 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
      * @param ProposalProcessorInterface $client
      * @param SerializedIdentityAwareHeaderGeneratorInterface $userAwareHeaderGenerator
      * @param PeerOptionsInterface[] $peers
+     * @throws InvalidArgumentException
      */
     public function __construct(
         string $name,
@@ -68,6 +74,16 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
         SerializedIdentityAwareHeaderGeneratorInterface $userAwareHeaderGenerator,
         array $peers = []
     ) {
+        try {
+            Assertion::allIsInstanceOf($peers, PeerInterface::class);
+        } catch (AssertionFailedException $e) {
+            throw new InvalidArgumentException(
+                sprintf('Failed to create Channel `%s` due to invalid Peer collection.', $name),
+                0,
+                $e
+            );
+        }
+
         $this->name = $name;
         $this->client = $client;
         $this->headerGenerator = $userAwareHeaderGenerator;
@@ -110,15 +126,16 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
     }
 
     /**
-     * @param PeerOptionsInterface $peer
+     * @param PeerInterface[] ...$peers
+     * @return void
      */
-    public function addPeer(PeerOptionsInterface $peer): void
+    public function addPeers(PeerInterface ...$peers): void
     {
-        $this->peers[] = $peer;
+        $this->peers = array_merge($this->peers, $peers);
     }
 
     /**
-     * @return PeerOptionsInterface[]
+     * @return PeerInterface[]
      */
     public function getPeers(): array
     {
@@ -127,7 +144,7 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
 
     /**
      * @param TransactionOptions|null $options
-     * @return PeerOptionsInterface[]
+     * @return PeerInterface[]
      */
     private function resolvePeers(TransactionOptions $options): array
     {
@@ -148,7 +165,7 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
             $options = new TransactionOptions();
         }
 
-        return $options->withPeers($this->resolvePeers($options));
+        return $options->withPeers(...$this->resolvePeers($options));
     }
 
     /**
@@ -159,6 +176,7 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
      * @param ChaincodeHeaderExtension $extension
      * @param TransactionOptions|null $options
      * @return ResponseCollection
+     * @throws RuntimeException
      */
     public function processChaincodeProposal(
         ChaincodeProposalPayload $payload,

@@ -25,8 +25,8 @@ use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
-use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactoryInterface;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\UnaryCallResolver;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
@@ -103,12 +103,11 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     public function getChannel(string $name): ChannelInterface
     {
         if (!\array_key_exists($name, $this->channels)) {
-            $this->channels[$name] = new Channel(
-                $name,
-                $this,
-                $this->headerGenerator,
-                $this->user->getOrganization()->getPeers()
-            );
+            $peers = \array_map(function (PeerOptionsInterface $options) {
+                return $this->peerFactory->fromPeerOptions($options);
+            }, $this->user->getOrganization()->getPeers());
+
+            $this->channels[$name] = new Channel($name, $this, $this->headerGenerator, $peers);
         }
 
         return $this->channels[$name];
@@ -149,17 +148,10 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
             throw new RuntimeException('Could not determine peers for this transaction');
         }
 
-        $peerOptionsCollection = $options->getPeers();
-
-        // Create collection of peers.
-        $peers = \array_map(function (PeerOptionsInterface $peerOptions) {
-            return $this->peerFactory->fromPeerOptions($peerOptions);
-        }, $peerOptionsCollection);
-
         // Convert peers into asynchronous calls.
-        $calls = \array_map(function (Peer $peer) use ($proposal) {
+        $calls = \array_map(function (PeerInterface $peer) use ($proposal) {
             return $peer->processSignedProposal($proposal);
-        }, $peers);
+        }, $options->getPeers());
 
         // Resolve calls to responses.
         return $this->unaryCallResolver->resolveMany(...$calls);

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Peer;
 
+use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 
 class PeerFactory implements PeerFactoryInterface
@@ -33,9 +34,9 @@ class PeerFactory implements PeerFactoryInterface
      * PeerFactory constructor.
      * @param EndorserClientManagerInterface $endorserClients
      */
-    public function __construct(EndorserClientManagerInterface $endorserClients)
+    public function __construct(EndorserClientManagerInterface $endorserClients = null)
     {
-        $this->endorserClients = $endorserClients;
+        $this->endorserClients = $endorserClients ?: new EndorserClientManager();
     }
 
     /**
@@ -47,5 +48,14 @@ class PeerFactory implements PeerFactoryInterface
         $endorserClient = $this->endorserClients->get($options->getRequests());
 
         return new Peer($endorserClient);
+    }
+
+    /**
+     * @param mixed[] $options
+     * @return Peer
+     */
+    public function fromArray(array $options): Peer
+    {
+        return $this->fromPeerOptions(new PeerOptions($options));
     }
 }

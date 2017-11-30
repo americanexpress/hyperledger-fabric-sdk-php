@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Transaction;
 
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use PHPUnit\Framework\TestCase;
 
@@ -31,12 +31,20 @@ use PHPUnit\Framework\TestCase;
 class TransactionOptionsTest extends TestCase
 {
     /**
+     * @var PeerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $peer;
+
+    /**
      * @var TransactionOptions
      */
     private $sut;
 
     protected function setUp()
     {
+        $this->peer = $this->getMockBuilder(PeerInterface::class)
+            ->getMock();
+
         $this->sut = new TransactionOptions();
     }
 
@@ -51,103 +59,69 @@ class TransactionOptionsTest extends TestCase
         self::assertFalse($this->sut->hasPeers());
         self::assertCount(0, $this->sut->getPeers());
 
-        $peer = new PeerOptions([
-            'name' => 'peer1',
-        ]);
-
-        $this->sut->addPeers($peer);
+        $this->sut->addPeers($this->peer);
 
         self::assertTrue($this->sut->hasPeers());
         self::assertCount(1, $this->sut->getPeers());
-        self::assertSame([$peer], $this->sut->getPeers());
+        self::assertContains($this->peer, $this->sut->getPeers());
     }
 
     public function testFromArray()
     {
-        $peer = new PeerOptions([
-            'name' => 'peer1',
-        ]);
-
         $sut = new TransactionOptions([
-            'peers' => [$peer],
+            'peers' => [$this->peer],
         ]);
 
-        self::assertSame([$peer], $sut->getPeers());
+        self::assertTrue($sut->hasPeers());
+        self::assertCount(1, $sut->getPeers());
+        self::assertContains($this->peer, $sut->getPeers());
     }
 
     public function testFromMultiDimensionalArray()
     {
         $sut = new TransactionOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                ]
-            ],
+            'peers' => [$this->peer],
         ]);
 
         self::assertCount(1, $sut->getPeers());
-        self::assertInstanceOf(PeerOptionsInterface::class, $sut->getPeers()[0]);
-        self::assertSame('peer1', $sut->getPeers()[0]->getName());
+        self::assertContains($this->peer, $sut->getPeers());
     }
 
     public function testSetPeers()
     {
-        $peer = new PeerOptions([
-            'name' => 'peer1',
-        ]);
-
-        $this->sut->setPeers([$peer]);
-
-        self::assertSame([$peer], $this->sut->getPeers());
-    }
-
-    public function testSetPeersFromArray()
-    {
-        $this->sut->setPeers([
-            [
-                'name' => 'peer1',
-            ]
-        ]);
+        $this->sut->setPeers([$this->peer]);
 
         self::assertCount(1, $this->sut->getPeers());
-        self::assertInstanceOf(PeerOptionsInterface::class, $this->sut->getPeers()[0]);
-        self::assertSame('peer1', $this->sut->getPeers()[0]->getName());
+        self::assertContains($this->peer, $this->sut->getPeers());
     }
 
     public function testAddManyPeers()
     {
-        $this->sut->addPeers(
-            new PeerOptions([
-                'name' => 'peer1',
-            ]),
-            new PeerOptions([
-                'name' => 'peer2',
-            ]),
-            new PeerOptions([
-                'name' => 'peer3',
-            ])
-        );
+        $peer = $this->getMockBuilder(PeerInterface::class)
+            ->getMock();
 
-        self::assertCount(3, $this->sut->getPeers());
+        $this->sut->addPeers($this->peer, $peer);
+
+        self::assertCount(2, $this->sut->getPeers());
+        self::assertContains($this->peer, $this->sut->getPeers());
+        self::assertContains($peer, $this->sut->getPeers());
     }
 
     public function testAddPeersImmutable()
     {
-        $this->sut->addPeers(
-            new PeerOptions([
-                'name' => 'peer1',
-            ])
-        );
+        $this->sut->addPeers($this->peer);
 
-        $result = $this->sut->withPeers([
-            new PeerOptions([
-                'name' => 'peer2',
-            ])
-        ]);
+        $peer = $this->getMockBuilder(PeerInterface::class)
+            ->getMock();
 
-        self::assertInstanceOf(TransactionOptions::class, $result);
-        self::assertNotSame($this->sut, $result);
-        self::assertSame('peer1', $this->sut->getPeers()[0]->getName());
-        self::assertSame('peer2', $result->getPeers()[0]->getName());
+        $result = $this->sut->withPeers($peer);
+
+        self::assertCount(1, $result->getPeers());
+        self::assertNotContains($this->peer, $result->getPeers());
+        self::assertContains($peer, $result->getPeers());
+
+        self::assertCount(1, $this->sut->getPeers());
+        self::assertContains($this->peer, $this->sut->getPeers());
+        self::assertNotContains($peer, $this->sut->getPeers());
     }
 }

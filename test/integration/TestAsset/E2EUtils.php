@@ -22,6 +22,7 @@ namespace AmericanExpressTest\Integration\TestAsset;
 
 use AmericanExpress\HyperledgerFabricClient\ClientFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigFactory;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactory;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
@@ -35,18 +36,18 @@ class E2EUtils
     public function queryChaincode(string $org): ResponseCollection
     {
         $config = ClientConfigFactory::fromFile(new \SplFileObject(__DIR__ . '/../config.php'));
-        $request = new TransactionOptions([
+        $options = [
             'peers' => [
-                [
+                (new PeerFactory())->fromArray([
                     'requests' => 'localhost:7051',
-                ],
+                ]),
             ],
-        ]);
+        ];
 
         return ClientFactory::fromConfig($config, $org)
             ->getChannel('foo')
             ->queryByChainCode(
-                $request,
+                new TransactionOptions($options),
                 (new ChaincodeID())
                     ->setPath('github.com/example_cc')
                     ->setName('example_cc')

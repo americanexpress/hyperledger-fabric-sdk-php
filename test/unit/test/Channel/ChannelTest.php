@@ -23,7 +23,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Channel\Channel;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
@@ -39,6 +39,11 @@ use PHPUnit\Framework\TestCase;
  */
 class ChannelTest extends TestCase
 {
+    /**
+     * @var PeerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $peer;
+
     /**
      * @var ProposalProcessorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -62,6 +67,9 @@ class ChannelTest extends TestCase
         $this->headerGenerator = $this->getMockBuilder(SerializedIdentityAwareHeaderGeneratorInterface::class)
             ->getMock();
 
+        $this->peer = $this->getMockBuilder(PeerInterface::class)
+            ->getMock();
+
         $this->sut = new Channel('foo', $this->client, $this->headerGenerator);
     }
 
@@ -72,27 +80,34 @@ class ChannelTest extends TestCase
 
     public function testCanSpecifyInitialPeers()
     {
-        $peerOptions = new PeerOptions();
-        $peerOptions->setName('peer1');
         $this->sut = new Channel(
             'foo',
             $this->client,
             $this->headerGenerator,
-            [ $peerOptions ]
+            [$this->peer]
         );
         self::assertCount(1, $this->sut->getPeers());
-        self::assertContains($peerOptions, $this->sut->getPeers());
+        self::assertContains($this->peer, $this->sut->getPeers());
     }
 
-    public function testCanAddPeers()
+    public function testCanAddOnePeer()
     {
-        $peerOptions = new PeerOptions();
-        $peerOptions->setName('peer1');
-
-        $this->sut->addPeer($peerOptions);
+        $this->sut->addPeers($this->peer);
 
         self::assertCount(1, $this->sut->getPeers());
-        self::assertContains($peerOptions, $this->sut->getPeers());
+        self::assertContains($this->peer, $this->sut->getPeers());
+    }
+
+    public function testCanAddManyPeers()
+    {
+        $peer = $this->getMockBuilder(PeerInterface::class)
+            ->getMock();
+
+        $this->sut->addPeers($this->peer, $peer);
+
+        self::assertCount(2, $this->sut->getPeers());
+        self::assertContains($this->peer, $this->sut->getPeers());
+        self::assertContains($peer, $this->sut->getPeers());
     }
 
     public function testQueryByChaincode()
@@ -102,11 +117,7 @@ class ChannelTest extends TestCase
 
         $result = $this->sut->queryByChainCode(
             new TransactionOptions([
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                    ],
-                ],
+                'peers' => [$this->peer],
             ]),
             (new ChaincodeID())
                 ->setPath('FizBuz')
@@ -134,51 +145,37 @@ class ChannelTest extends TestCase
             ->willReturn($proposalResponse = new ResponseCollection());
 
         $result = $this->doChaincodeProposal(new TransactionOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                ],
-            ],
+            'peers' => [$this->peer],
         ]));
         self::assertSame($proposalResponse, $result);
     }
 
     public function testChannelCanProcessChaincodeProposalWithDefaultPeers()
     {
-        $peerOptions = new PeerOptions();
-        $peerOptions->setName('peerInitial');
-
         $this->sut = new Channel(
             'foo',
             $processor = new MockProposalProcessor(),
             $this->headerGenerator,
-            [ $peerOptions ]
+            [$this->peer]
         );
 
         $this->doChaincodeProposal(null, $this->sut);
-        self::assertSame('peerInitial', $processor->getTransactionOptions()->getPeers()[0]->getName());
+        self::assertContains($this->peer, $processor->getTransactionOptions()->getPeers());
     }
 
     public function testChannelCanProcessChaincodeProposalAndOverrideDefaultPeers()
     {
-        $peerInitial = new PeerOptions();
-        $peerInitial->setName('peerInitial');
-
-        $peerOverride = new PeerOptions();
-        $peerOverride->setName('peerOverride');
-
         $this->sut = new Channel(
             'foo',
             $processor = new MockProposalProcessor(),
-            $this->headerGenerator,
-            [ $peerInitial ]
+            $this->headerGenerator
         );
 
         $transactionOptions = new TransactionOptions();
-        $transactionOptions->addPeers($peerOverride);
+        $transactionOptions->addPeers($this->peer);
 
         $this->doChaincodeProposal($transactionOptions);
-        self::assertSame('peerOverride', $processor->getTransactionOptions()->getPeers()[0]->getName());
+        self::assertContains($this->peer, $processor->getTransactionOptions()->getPeers());
     }
 
     /**
@@ -220,5 +217,13 @@ class ChannelTest extends TestCase
             $this->createChaincodeHeaderExtension(),
             $options
         );
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
+     */
+    public function testFailToCreateChannelWithInvalidPeers()
+    {
+        new Channel('foo', $this->client, $this->headerGenerator, [new \stdClass()]);
     }
 }
