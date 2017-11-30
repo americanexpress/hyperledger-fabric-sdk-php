@@ -105,6 +105,47 @@ TAG
         );
     }
 
+    private function createMockTransactionIdentifierGenerator()
+    {
+        return new TransactionIdentifierGenerator(
+            new class implements NonceGeneratorInterface {
+                public function generateNonce(): string
+                {
+                    return 'u23m5k4hf86j';
+                }
+            }
+        );
+    }
+
+    private function createChaincodeProposal(string $dateTime)
+    {
+        $transactionContextFactory = $this->createMockTransactionIdentifierGenerator();
+        $identity = SerializedIdentityFactory::fromFile('1234', $this->privateKeyFile);
+        $transactionContext = $transactionContextFactory->fromSerializedIdentity($identity);
+
+        $channelHeader = ChannelHeaderFactory::create('MyChannelId');
+        $channelHeader->setTxId($transactionContext->getId());
+        $channelHeader->setEpoch(0);
+        $channelHeader->setTimestamp(TimestampFactory::fromDateTime(new \DateTime($dateTime)));
+
+        $chaincodeId = ChaincodeIdFactory::create(
+            'MyChaincodePath',
+            'MyChaincodeName',
+            'MyChaincodeVersion'
+        );
+
+        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
+        $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
+
+        $header = HeaderFactory::create(SignatureHeaderFactory::create(
+            $identity,
+            $transactionContext->getNonce()
+        ), $channelHeader);
+
+        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
+        return ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
+    }
+
     /**
      * @dataProvider getProposalSignatureCharacterizationData
      * @param string $encodedProposalBytes
@@ -144,38 +185,7 @@ TAG
         string $proposalPayload,
         string $proposalExtension
     ) {
-        $transactionContextFactory = new TransactionIdentifierGenerator(
-            new class implements NonceGeneratorInterface {
-                public function generateNonce(): string
-                {
-                    return 'u23m5k4hf86j';
-                }
-            }
-        );
-        $identity = SerializedIdentityFactory::fromFile('1234', $this->privateKeyFile);
-        $transactionContext = $transactionContextFactory->fromSerializedIdentity($identity);
-
-        $channelHeader = ChannelHeaderFactory::create('MyChannelId');
-        $channelHeader->setTxId($transactionContext->getId());
-        $channelHeader->setEpoch(0);
-        $channelHeader->setTimestamp(TimestampFactory::fromDateTime(new \DateTime($dateTime)));
-
-        $chaincodeId = ChaincodeIdFactory::create(
-            'MyChaincodePath',
-            'MyChaincodeName',
-            'MyChaincodeVersion'
-        );
-
-        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
-        $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
-
-        $header = HeaderFactory::create(SignatureHeaderFactory::create(
-            $identity,
-            $transactionContext->getNonce()
-        ), $channelHeader);
-
-        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
-        $proposal = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
+        $proposal = $this->createChaincodeProposal($dateTime);
 
         self::assertEquals(base64_decode($proposalHeader), $proposal->getHeader());
         self::assertEquals(base64_decode($proposalPayload), $proposal->getPayload());
@@ -191,39 +201,7 @@ TAG
      */
     public function testGetS(string $dateTime, string $encodedProposalBytes, string $encodedSignature)
     {
-        $transactionContextFactory = new TransactionIdentifierGenerator(
-            new class implements NonceGeneratorInterface {
-                public function generateNonce(): string
-                {
-                    return 'u23m5k4hf86j';
-                }
-            }
-        );
-        $identity = SerializedIdentityFactory::fromFile('1234', $this->privateKeyFile);
-        $transactionContext = $transactionContextFactory->fromSerializedIdentity($identity);
-
-        $channelHeader = ChannelHeaderFactory::create('MyChannelId');
-        $channelHeader->setTxId($transactionContext->getId());
-        $channelHeader->setEpoch(0);
-        $channelHeader->setTimestamp(TimestampFactory::fromDateTime(new \DateTime($dateTime)));
-
-        $chaincodeId = ChaincodeIdFactory::create(
-            'MyChaincodePath',
-            'MyChaincodeName',
-            'MyChaincodeVersion'
-        );
-
-        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
-        $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
-
-        $header = HeaderFactory::create(SignatureHeaderFactory::create(
-            $identity,
-            $transactionContext->getNonce()
-        ), $channelHeader);
-
-        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
-        $proposal = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
-
+        $proposal = $this->createChaincodeProposal($dateTime);
         $result = $this->sut->signProposal($proposal, new \SplFileObject($this->privateKey->url()));
 
         self::assertInstanceOf(SignedProposal::class, $result);
