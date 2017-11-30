@@ -22,11 +22,15 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Channel;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Channel\Channel;
-use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProposalProcessorInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
+use AmericanExpress\HyperledgerFabricClient\Identity\SerializedIdentityAwareHeaderGeneratorInterface;
+use AmericanExpressTest\HyperledgerFabricClient\TestAsset\MockProposalProcessor;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use PHPUnit\Framework\TestCase;
 
@@ -36,9 +40,14 @@ use PHPUnit\Framework\TestCase;
 class ChannelTest extends TestCase
 {
     /**
-     * @var ChannelProposalProcessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProposalProcessorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $client;
+
+    /**
+     * @var SerializedIdentityAwareHeaderGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $headerGenerator;
 
     /**
      * @var Channel
@@ -47,15 +56,48 @@ class ChannelTest extends TestCase
 
     protected function setUp()
     {
-        $this->client = $this->getMockBuilder(ChannelProposalProcessorInterface::class)
+        $this->client = $this->getMockBuilder(ProposalProcessorInterface::class)
             ->getMock();
 
-        $this->sut = new Channel('foo', $this->client);
+        $this->headerGenerator = $this->getMockBuilder(SerializedIdentityAwareHeaderGeneratorInterface::class)
+            ->getMock();
+
+        $this->sut = new Channel('foo', $this->client, $this->headerGenerator);
+    }
+
+    public function testPeersIsEmptyCollectionByDefault()
+    {
+        self::assertCount(0, $this->sut->getPeers());
+    }
+
+    public function testCanSpecifyInitialPeers()
+    {
+        $peerOptions = new PeerOptions();
+        $peerOptions->setName('peer1');
+        $this->sut = new Channel(
+            'foo',
+            $this->client,
+            $this->headerGenerator,
+            [ $peerOptions ]
+        );
+        self::assertCount(1, $this->sut->getPeers());
+        self::assertContains($peerOptions, $this->sut->getPeers());
+    }
+
+    public function testCanAddPeers()
+    {
+        $peerOptions = new PeerOptions();
+        $peerOptions->setName('peer1');
+
+        $this->sut->addPeer($peerOptions);
+
+        self::assertCount(1, $this->sut->getPeers());
+        self::assertContains($peerOptions, $this->sut->getPeers());
     }
 
     public function testQueryByChaincode()
     {
-        $this->client->method('processChannelProposal')
+        $this->client->method('processProposal')
             ->willReturn($proposalResponse = new ResponseCollection());
 
         $result = $this->sut->queryByChainCode(
@@ -88,31 +130,95 @@ class ChannelTest extends TestCase
 
     public function testChannelCanProcessChaincodeProposal()
     {
-        $this->client->method('processChannelProposal')
+        $this->client->method('processProposal')
             ->willReturn($proposalResponse = new ResponseCollection());
 
-        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId(
+        $result = $this->doChaincodeProposal(new TransactionOptions([
+            'peers' => [
+                [
+                    'name' => 'peer1',
+                ],
+            ],
+        ]));
+        self::assertSame($proposalResponse, $result);
+    }
+
+    public function testChannelCanProcessChaincodeProposalWithDefaultPeers()
+    {
+        $peerOptions = new PeerOptions();
+        $peerOptions->setName('peerInitial');
+
+        $this->sut = new Channel(
+            'foo',
+            $processor = new MockProposalProcessor(),
+            $this->headerGenerator,
+            [ $peerOptions ]
+        );
+
+        $this->doChaincodeProposal(null, $this->sut);
+        self::assertSame('peerInitial', $processor->getTransactionOptions()->getPeers()[0]->getName());
+    }
+
+    public function testChannelCanProcessChaincodeProposalAndOverrideDefaultPeers()
+    {
+        $peerInitial = new PeerOptions();
+        $peerInitial->setName('peerInitial');
+
+        $peerOverride = new PeerOptions();
+        $peerOverride->setName('peerOverride');
+
+        $this->sut = new Channel(
+            'foo',
+            $processor = new MockProposalProcessor(),
+            $this->headerGenerator,
+            [ $peerInitial ]
+        );
+
+        $transactionOptions = new TransactionOptions();
+        $transactionOptions->addPeers($peerOverride);
+
+        $this->doChaincodeProposal($transactionOptions);
+        self::assertSame('peerOverride', $processor->getTransactionOptions()->getPeers()[0]->getName());
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testThrowsRuntimeExceptionOnMissingPeers()
+    {
+        $this->client->method('processProposal')
+            ->willReturn($proposalResponse = new ResponseCollection());
+
+        $this->doChaincodeProposal();
+    }
+
+    public function createChaincodeHeaderExtension()
+    {
+        return ChaincodeHeaderExtensionFactory::fromChaincodeId(
             (new ChaincodeID())
                 ->setPath('FizBuz')
                 ->setName('FooBar')
                 ->setVersion('v12.34')
         );
-        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([
+    }
+
+    public function createChaincodeProposalPayload()
+    {
+        return ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([
             'foo' => 'bar',
         ]);
+    }
 
-        $result = $this->sut->processChaincodeProposal(
-            $chaincodeProposalPayload,
-            $chaincodeHeaderExtension,
-            new TransactionOptions([
-                'peers' => [
-                    [
-                        'name' => 'peer1',
-                    ],
-                ],
-            ])
+    public function doChaincodeProposal(TransactionOptions $options = null, Channel $channel = null)
+    {
+        if ($channel === null) {
+            $channel = $this->sut;
+        }
+
+        return $channel->processChaincodeProposal(
+            $this->createChaincodeProposalPayload(),
+            $this->createChaincodeHeaderExtension(),
+            $options
         );
-
-        self::assertSame($proposalResponse, $result);
     }
 }

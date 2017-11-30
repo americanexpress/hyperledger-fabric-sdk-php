@@ -40,7 +40,7 @@ class TransactionOptions extends AbstractOptions
     }
 
     /**
-     * @param PeerOptionsInterface[] $peers
+     * @param PeerOptionsInterface[]|array[] $peers
      * @return void
      */
     public function setPeers(array $peers): void
@@ -67,5 +67,17 @@ class TransactionOptions extends AbstractOptions
     public function hasPeers(): bool
     {
         return count($this->peers) > 0;
+    }
+
+    /**
+     * @param PeerOptionsInterface[]|array[] $peers
+     * @return TransactionOptions
+     */
+    public function withPeers(array $peers): TransactionOptions
+    {
+        $options = new static();
+        $options->setPeers($peers);
+
+        return $options;
     }
 }

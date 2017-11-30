@@ -22,9 +22,14 @@ namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Chaincode\ChaincodeProposalProcessorInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
+use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
+use AmericanExpress\HyperledgerFabricClient\Identity\SerializedIdentityAwareHeaderGeneratorInterface;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
@@ -37,20 +42,36 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
     private $name;
 
     /**
-     * @var ChannelProposalProcessorInterface
+     * @var ProposalProcessorInterface
      */
     private $client;
 
     /**
+     * @var PeerOptionsInterface[] $peers
+     */
+    private $peers = [];
+
+    /**
+     * @var SerializedIdentityAwareHeaderGeneratorInterface
+     */
+    private $headerGenerator;
+
+    /**
      * @param string $name
-     * @param ChannelProposalProcessorInterface $client
+     * @param ProposalProcessorInterface $client
+     * @param SerializedIdentityAwareHeaderGeneratorInterface $userAwareHeaderGenerator
+     * @param PeerOptionsInterface[] $peers
      */
     public function __construct(
         string $name,
-        ChannelProposalProcessorInterface $client
+        ProposalProcessorInterface $client,
+        SerializedIdentityAwareHeaderGeneratorInterface $userAwareHeaderGenerator,
+        array $peers = []
     ) {
         $this->name = $name;
         $this->client = $client;
+        $this->headerGenerator = $userAwareHeaderGenerator;
+        $this->peers = $peers;
     }
 
     /**
@@ -89,6 +110,48 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
     }
 
     /**
+     * @param PeerOptionsInterface $peer
+     */
+    public function addPeer(PeerOptionsInterface $peer): void
+    {
+        $this->peers[] = $peer;
+    }
+
+    /**
+     * @return PeerOptionsInterface[]
+     */
+    public function getPeers(): array
+    {
+        return $this->peers;
+    }
+
+    /**
+     * @param TransactionOptions|null $options
+     * @return PeerOptionsInterface[]
+     */
+    private function resolvePeers(TransactionOptions $options): array
+    {
+        if ($options->hasPeers()) {
+            return $options->getPeers();
+        }
+
+        return $this->getPeers();
+    }
+
+    /**
+     * @param TransactionOptions|null $options
+     * @return TransactionOptions
+     */
+    private function normalizeTransactionOptions(TransactionOptions $options = null): TransactionOptions
+    {
+        if ($options === null) {
+            $options = new TransactionOptions();
+        }
+
+        return $options->withPeers($this->resolvePeers($options));
+    }
+
+    /**
      *
      * Envelopes a Chaincode function invocation from a Chaincode object
      *
@@ -105,6 +168,14 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
         $channelHeader = ChannelHeaderFactory::create($this->name);
         $channelHeader->setExtension($extension->serializeToString());
 
-        return $this->client->processChannelProposal($channelHeader, $payload->serializeToString(), $options);
+        $options = $this->normalizeTransactionOptions($options);
+        if (!$options->hasPeers()) {
+            throw new RuntimeException('Could not determine peers for this transaction');
+        }
+
+        $header = $this->headerGenerator->generateHeader($channelHeader);
+        $proposal = ProposalFactory::create($header, $payload->serializeToString());
+
+        return $this->client->processProposal($proposal, $options);
     }
 }

@@ -18,27 +18,18 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\ProtoFactory;
+namespace AmericanExpress\HyperledgerFabricClient\Header;
 
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
 use Hyperledger\Fabric\Protos\Common\Header;
-use Hyperledger\Fabric\Protos\Common\SignatureHeader;
+use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 
-class HeaderFactory
+interface HeaderGeneratorInterface
 {
     /**
-     * @param SignatureHeader $signatureHeader
+     * @param SerializedIdentity $identity
      * @param ChannelHeader $channelHeader
      * @return Header
      */
-    public static function create(
-        SignatureHeader $signatureHeader,
-        ChannelHeader $channelHeader
-    ): Header {
-        $header = new Header();
-        $header->setChannelHeader($channelHeader->serializeToString());
-        $header->setSignatureHeader($signatureHeader->serializeToString());
-
-        return $header;
-    }
+    public function fromChannelHeader(SerializedIdentity $identity, ChannelHeader $channelHeader): Header;
 }

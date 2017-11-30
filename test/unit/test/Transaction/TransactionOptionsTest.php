@@ -130,4 +130,24 @@ class TransactionOptionsTest extends TestCase
 
         self::assertCount(3, $this->sut->getPeers());
     }
+
+    public function testAddPeersImmutable()
+    {
+        $this->sut->addPeers(
+            new PeerOptions([
+                'name' => 'peer1',
+            ])
+        );
+
+        $result = $this->sut->withPeers([
+            new PeerOptions([
+                'name' => 'peer2',
+            ])
+        ]);
+
+        self::assertInstanceOf(TransactionOptions::class, $result);
+        self::assertNotSame($this->sut, $result);
+        self::assertSame('peer1', $this->sut->getPeers()[0]->getName());
+        self::assertSame('peer2', $result->getPeers()[0]->getName());
+    }
 }

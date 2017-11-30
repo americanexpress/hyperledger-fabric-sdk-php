@@ -18,23 +18,16 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Channel;
+namespace AmericanExpress\HyperledgerFabricClient\Identity;
 
-use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use Hyperledger\Fabric\Protos\Common\ChannelHeader;
+use Hyperledger\Fabric\Protos\Common\Header;
 
-interface ChannelProposalProcessorInterface
+interface SerializedIdentityAwareHeaderGeneratorInterface
 {
     /**
      * @param ChannelHeader $channelHeader
-     * @param string $payload
-     * @param TransactionOptions|null $options
-     * @return ResponseCollection
+     * @return Header
      */
-    public function processChannelProposal(
-        ChannelHeader $channelHeader,
-        string $payload,
-        TransactionOptions $options = null
-    ): ResponseCollection;
+    public function generateHeader(ChannelHeader $channelHeader): Header;
 }

@@ -44,10 +44,10 @@ class SignedProposalFactoryTest extends TestCase
         $channelHeader = ChannelHeaderFactory::create('MyChannelId');
         $channelHeader->setTxId($txId);
 
-        $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
+        $header = HeaderFactory::create(SignatureHeaderFactory::create(
             $serializedIdentity,
             $nonce
-        ));
+        ), $channelHeader);
 
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([
             'foo',

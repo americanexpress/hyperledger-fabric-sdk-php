@@ -22,25 +22,22 @@ namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Channel\Channel;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
-use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
+use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
+use AmericanExpress\HyperledgerFabricClient\Identity\SerializedIdentityAwareHeaderGenerator;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
-use Hyperledger\Fabric\Protos\Common\ChannelHeader;
-use Hyperledger\Fabric\Protos\Common\Header;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 
-final class Client implements ChannelProviderInterface, ChannelProposalProcessorInterface
+final class Client implements ChannelProviderInterface, ProposalProcessorInterface
 {
     /**
      * @var UserContextInterface
@@ -63,35 +60,30 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
     private $channels = [];
 
     /**
-     * @var TransactionIdentifierGeneratorInterface
+     * @var SerializedIdentityAwareHeaderGenerator
      */
-    private $transactionIdGenerator;
-
-    /**
-     * @var int
-     */
-    private $epoch;
+    private $headerGenerator;
 
     /**
      * Client constructor.
      * @param UserContextInterface $user
      * @param SignatoryInterface $signatory
      * @param EndorserClientManagerInterface $endorserClients
-     * @param TransactionIdentifierGeneratorInterface $transactionIdGenerator
-     * @param int $epoch
+     * @param HeaderGeneratorInterface $headerGenerator
      */
     public function __construct(
         UserContextInterface $user,
         SignatoryInterface $signatory,
         EndorserClientManagerInterface $endorserClients,
-        TransactionIdentifierGeneratorInterface $transactionIdGenerator,
-        int $epoch = 0
+        HeaderGeneratorInterface $headerGenerator
     ) {
         $this->user = $user;
         $this->signatory = $signatory;
         $this->endorserClients = $endorserClients;
-        $this->transactionIdGenerator = $transactionIdGenerator;
-        $this->epoch = $epoch;
+        $this->headerGenerator = new SerializedIdentityAwareHeaderGenerator(
+            $this->user->getIdentity(),
+            $headerGenerator
+        );
     }
 
     /**
@@ -101,7 +93,12 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
     public function getChannel(string $name): ChannelInterface
     {
         if (!\array_key_exists($name, $this->channels)) {
-            $this->channels[$name] = new Channel($name, $this);
+            $this->channels[$name] = new Channel(
+                $name,
+                $this,
+                $this->headerGenerator,
+                $this->user->getOrganization()->getPeers()
+            );
         }
 
         return $this->channels[$name];
@@ -112,9 +109,9 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
      * @param TransactionOptions|null $options
      * @return ResponseCollection
      */
-    private function processProposal(
+    public function processProposal(
         Proposal $proposal,
-        TransactionOptions $options = null
+        TransactionOptions $options
     ): ResponseCollection {
         $privateKey = $this->user->getOrganization()->getPrivateKey();
 
@@ -127,17 +124,17 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
      * @param SignedProposal $proposal
      * @param TransactionOptions|null $options
      * @return ResponseCollection
+     * @throws RuntimeException
      */
     private function processSignedProposal(
         SignedProposal $proposal,
-        TransactionOptions $options = null
+        TransactionOptions $options
     ): ResponseCollection {
-        if ($options && $options->hasPeers()) {
-            $peerOptionsCollection = $options->getPeers();
-        } else {
-            $peerOptionsCollection = $this->user->getOrganization()->getPeers();
+        if (!$options->hasPeers()) {
+            throw new RuntimeException('Could not determine peers for this transaction');
         }
 
+        $peerOptionsCollection = $options->getPeers();
         $endorserClients = $this->endorserClients;
 
         $peers = array_map(function (PeerOptionsInterface $peerOptions) use ($endorserClients) {
@@ -147,39 +144,5 @@ final class Client implements ChannelProviderInterface, ChannelProposalProcessor
         return new ResponseCollection(array_map(function (Peer $peer) use ($proposal) {
             return $peer->processSignedProposal($proposal);
         }, $peers));
-    }
-
-    /**
-     * @param ChannelHeader $channelHeader
-     * @return Header
-     */
-    private function createHeaderFromChannelHeader(ChannelHeader $channelHeader): Header
-    {
-        $identity = $this->user->getIdentity();
-        $transactionId = $this->transactionIdGenerator->fromSerializedIdentity($identity);
-        $channelHeader->setTxId($transactionId->getId());
-        $channelHeader->setEpoch($this->epoch);
-        $signatureHeader = SignatureHeaderFactory::create(
-            $identity,
-            $transactionId->getNonce()
-        );
-        return HeaderFactory::create($channelHeader, $signatureHeader);
-    }
-
-    /**
-     * @param ChannelHeader $channelHeader
-     * @param string $payload
-     * @param TransactionOptions|null $options
-     * @return ResponseCollection
-     */
-    public function processChannelProposal(
-        ChannelHeader $channelHeader,
-        string $payload,
-        TransactionOptions $options = null
-    ): ResponseCollection {
-        $header = $this->createHeaderFromChannelHeader($channelHeader);
-        $proposal = ProposalFactory::create($header, $payload);
-
-        return $this->processProposal($proposal, $options);
     }
 }

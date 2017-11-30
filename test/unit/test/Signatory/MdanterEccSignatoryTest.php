@@ -169,10 +169,11 @@ TAG
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
         $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
 
-        $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
+        $header = HeaderFactory::create(SignatureHeaderFactory::create(
             $identity,
             $transactionContext->getNonce()
-        ));
+        ), $channelHeader);
+
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
         $proposal = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
 
@@ -215,10 +216,11 @@ TAG
         $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
         $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
 
-        $header = HeaderFactory::create($channelHeader, SignatureHeaderFactory::create(
+        $header = HeaderFactory::create(SignatureHeaderFactory::create(
             $identity,
             $transactionContext->getNonce()
-        ));
+        ), $channelHeader);
+
         $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
         $proposal = ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
 

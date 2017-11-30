@@ -22,6 +22,7 @@ namespace AmericanExpress\HyperledgerFabricClient;
 
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager;
+use AmericanExpress\HyperledgerFabricClient\Header\HeaderGenerator;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGenerator;
@@ -49,6 +50,11 @@ class ClientFactory
             $config->getHashAlgorithm()
         );
 
-        return new Client($user, $signatory, $endorserClients, $transactionContextFactory);
+        return new Client(
+            $user,
+            $signatory,
+            $endorserClients,
+            new HeaderGenerator($transactionContextFactory, $config->getEpoch())
+        );
     }
 }

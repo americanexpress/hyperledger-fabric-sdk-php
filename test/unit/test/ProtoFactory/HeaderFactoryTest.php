@@ -44,7 +44,7 @@ class HeaderFactoryTest extends TestCase
 
         $signatureHeader = SignatureHeaderFactory::create($serializedIdentity, $nonce);
 
-        $result = HeaderFactory::create($channelHeader, $signatureHeader);
+        $result = HeaderFactory::create($signatureHeader, $channelHeader);
 
         self::assertInstanceOf(Header::class, $result);
         self::assertContains('MyChannelId', $result->getChannelHeader());

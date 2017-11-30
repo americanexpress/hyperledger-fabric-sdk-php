@@ -23,16 +23,17 @@ namespace AmericanExpressTest\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Client;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 use AmericanExpress\HyperledgerFabricClient\User\UserContext;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\MSP\SerializedIdentity;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
+use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use PHPUnit\Framework\TestCase;
 
@@ -57,9 +58,9 @@ class ClientTest extends TestCase
     private $endorserClient;
 
     /**
-     * @var TransactionIdentifierGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var HeaderGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $transactionIdGenerator;
+    private $headerGenerator;
 
     /**
      * @var Client
@@ -101,10 +102,15 @@ class ClientTest extends TestCase
             'privateKey' => __FILE__,
         ]));
 
-        $this->transactionIdGenerator = $this->getMockBuilder(TransactionIdentifierGeneratorInterface::class)
+        $this->headerGenerator = $this->getMockBuilder(HeaderGeneratorInterface::class)
             ->getMock();
 
-        $this->sut = new Client($user, $this->signatory, $endorserClients, $this->transactionIdGenerator);
+        $this->sut = new Client(
+            $user,
+            $this->signatory,
+            $endorserClients,
+            $this->headerGenerator
+        );
     }
 
     public function testGetChannel()
@@ -112,14 +118,11 @@ class ClientTest extends TestCase
         $result = $this->sut->getChannel('foo');
 
         self::assertInstanceOf(ChannelInterface::class, $result);
-
         self::assertSame($result, $this->sut->getChannel('foo'));
     }
 
-    public function testProcessChannelProposal()
+    public function testProcessProposal()
     {
-        $channelHeader = ChannelHeaderFactory::create('test-channel');
-
         $this->endorserClient->method('ProcessProposal')
             ->willReturn($this->unaryCall);
 
@@ -128,17 +131,6 @@ class ClientTest extends TestCase
                 $proposalResponse = new ProposalResponse(),
                 [ 'code' => 0 ]
             ]);
-
-        $response = $this->sut->processChannelProposal($channelHeader, 'test-payload');
-
-        self::assertInstanceOf(ResponseCollection::class, $response);
-        self::assertCount(1, $response->getProposalResponses());
-        self::assertCount(0, $response->getExceptions());
-    }
-
-    public function testProcessChannelProposalWithCustomPeer()
-    {
-        $channelHeader = ChannelHeaderFactory::create('test-channel');
 
         $context = new TransactionOptions([
             'peers' => [
@@ -149,18 +141,7 @@ class ClientTest extends TestCase
             ],
         ]);
 
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn($this->unaryCall);
-
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                $proposalResponse = new ProposalResponse(),
-                [
-                    'code' => 0,
-                ]
-            ]);
-
-        $response = $this->sut->processChannelProposal($channelHeader, 'test-payload', $context);
+        $response = $this->sut->processProposal(new Proposal(), $context);
 
         self::assertInstanceOf(ResponseCollection::class, $response);
         self::assertCount(1, $response->getProposalResponses());
@@ -172,9 +153,16 @@ class ClientTest extends TestCase
         $this->endorserClient->method('ProcessProposal')
             ->willReturn(new \stdClass());
 
-        $channelHeader = ChannelHeaderFactory::create('test-channel');
+        $context = new TransactionOptions([
+            'peers' => [
+                [
+                    'name' => 'peer1',
+                    'requests' => 'localhost:7051',
+                ],
+            ],
+        ]);
 
-        $response = $this->sut->processChannelProposal($channelHeader, 'test-payload');
+        $response = $this->sut->processProposal(new Proposal(), $context);
 
         self::assertInstanceOf(ResponseCollection::class, $response);
         self::assertCount(0, $response->getProposalResponses());
@@ -196,12 +184,27 @@ class ClientTest extends TestCase
                 ]
             ]);
 
-        $channelHeader = ChannelHeaderFactory::create('test-channel');
+        $context = new TransactionOptions([
+            'peers' => [
+                [
+                    'name' => 'peer1',
+                    'requests' => 'localhost:7051',
+                ],
+            ],
+        ]);
 
-        $response = $this->sut->processChannelProposal($channelHeader, 'test-payload');
+        $response = $this->sut->processProposal(new Proposal(), $context);
 
         self::assertInstanceOf(ResponseCollection::class, $response);
         self::assertCount(0, $response->getProposalResponses());
         self::assertCount(1, $response->getExceptions());
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testThrowsRuntimeExceptionOnMissingPeers()
+    {
+        $this->sut->processProposal(new Proposal(), new TransactionOptions());
     }
 }
