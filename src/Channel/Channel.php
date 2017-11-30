@@ -21,9 +21,9 @@ declare(strict_types=1);
 namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
-use AmericanExpress\HyperledgerFabricClient\Chaincode\ChaincodeProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerCollectionInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
@@ -35,10 +35,9 @@ use AmericanExpress\HyperledgerFabricClient\Identity\SerializedIdentityAwareHead
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeHeaderExtension;
-use Hyperledger\Fabric\Protos\Peer\ChaincodeID;
 use Hyperledger\Fabric\Protos\Peer\ChaincodeProposalPayload;
 
-final class Channel implements ChannelInterface, ChaincodeProposalProcessorInterface
+final class Channel implements ChannelInterface, PeerCollectionInterface
 {
     /**
      * @var string
@@ -87,29 +86,6 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
         $this->client = $client;
         $this->headerGenerator = $userAwareHeaderGenerator;
         $this->peers = $peers;
-    }
-
-    /**
-     * @param TransactionOptions $request
-     * @param ChaincodeID $chaincodeId
-     * @param mixed[] $args
-     * @return ResponseCollection
-     */
-    public function queryByChainCode(
-        TransactionOptions $request,
-        ChaincodeID $chaincodeId,
-        array $args = []
-    ): ResponseCollection {
-        $chainCode = $this->getChaincode([
-            'name' => $chaincodeId->getName(),
-            'version' => $chaincodeId->getPath(),
-            'path' => $chaincodeId->getVersion(),
-        ]);
-
-        $functionName = array_shift($args);
-        $args[] = $request;
-
-        return $chainCode->$functionName(...$args);
     }
 
     /**

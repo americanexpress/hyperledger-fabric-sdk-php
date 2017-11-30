@@ -125,27 +125,6 @@ class ChannelTest extends TestCase
         self::assertContains($peer, $this->sut->getPeers());
     }
 
-    public function testQueryByChaincode()
-    {
-        $this->client->method('processProposal')
-            ->willReturn($proposalResponse = new ResponseCollection());
-
-        $result = $this->sut->queryByChainCode(
-            new TransactionOptions([
-                'peers' => [$this->peer],
-            ]),
-            (new ChaincodeID())
-                ->setPath('FizBuz')
-                ->setName('FooBar')
-                ->setVersion('v12.34'),
-            [
-                'foo' => 'bar',
-            ]
-        );
-
-        self::assertSame($proposalResponse, $result);
-    }
-
     public function testChannelCanCreateChaincode()
     {
         $chainCode = $this->sut->getChaincode('FizBuz');

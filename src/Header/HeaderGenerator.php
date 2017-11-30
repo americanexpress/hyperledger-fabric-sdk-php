@@ -39,7 +39,7 @@ final class HeaderGenerator implements HeaderGeneratorInterface
     /**
      * @var int
      */
-    private $epoch = 0;
+    private $epoch;
 
     /**
      * HeaderGenerator constructor.
