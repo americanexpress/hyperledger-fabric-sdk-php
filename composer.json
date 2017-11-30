@@ -1,6 +1,6 @@
 {
   "name": "americanexpress/hyperledger-fabric-sdk-php",
-  "description": "Hyperledger fabric client SDK in PHP",
+  "description": "Hyperledger Fabric client SDK in PHP",
   "type": "library",
   "homepage": "http://americanexpress.io/",
   "keywords": ["hyperledger", "fabric", "sdk", "php", "grpc", "protobuf"],
