@@ -20,14 +20,18 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Peer;
 
-use AmericanExpress\HyperledgerFabricClient\Proposal\Response;
+use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 
 interface PeerInterface
 {
     /**
+     * Asynchronous transformation of a SignedProposal into a Response.
+     *
+     * Response wraps a ProposalResponse upon success, or an Exception upon failure.
+     *
      * @param SignedProposal $proposal
-     * @return Response
+     * @return UnaryCall
      */
-    public function processSignedProposal(SignedProposal $proposal): Response;
+    public function processSignedProposal(SignedProposal $proposal): UnaryCall;
 }

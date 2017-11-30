@@ -23,10 +23,8 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Peer;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
-use AmericanExpress\HyperledgerFabricClient\Proposal\Response;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
-use Hyperledger\Fabric\Protos\Peer\ProposalResponse;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use PHPUnit\Framework\TestCase;
 
@@ -73,72 +71,13 @@ class PeerTest extends TestCase
 
         $this->sut = new Peer($options, $endorserClients);
     }
-
     public function testProcessChannelProposal()
     {
         $this->endorserClient->method('ProcessProposal')
             ->willReturn($this->unaryCall);
 
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                $proposalResponse = new ProposalResponse(),
-                [ 'code' => 0 ]
-            ]);
+        $result = $this->sut->processSignedProposal(new SignedProposal());
 
-        $response = $this->sut->processSignedProposal(new SignedProposal());
-
-        self::assertInstanceOf(Response::class, $response);
-        self::assertFalse($response->isException());
-    }
-
-    public function testProcessChannelProposalWithCustomPeer()
-    {
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn($this->unaryCall);
-
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                $proposalResponse = new ProposalResponse(),
-                [
-                    'code' => 0,
-                ]
-            ]);
-
-        $response = $this->sut->processSignedProposal(new SignedProposal());
-
-        self::assertInstanceOf(Response::class, $response);
-        self::assertFalse($response->isException());
-    }
-
-    public function testProcessProposalRequiresUnaryCall()
-    {
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn(new \stdClass());
-
-        $response = $this->sut->processSignedProposal(new SignedProposal());
-
-        self::assertInstanceOf(Response::class, $response);
-        self::assertTrue($response->isException());
-    }
-
-    public function testProcessSignedProposalHandlesConnectionError()
-    {
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn($this->unaryCall);
-
-        $this->unaryCall->method('wait')
-            ->willReturn([
-                null,
-                [
-                    'code' => 14,
-                    'details' => 'Connect failed',
-                    'metadata' => [],
-                ]
-            ]);
-
-        $response = $this->sut->processSignedProposal(new SignedProposal());
-
-        self::assertInstanceOf(Response::class, $response);
-        self::assertTrue($response->isException());
+        self::assertSame($this->unaryCall, $result);
     }
 }

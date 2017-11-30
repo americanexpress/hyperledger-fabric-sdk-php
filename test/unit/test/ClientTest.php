@@ -148,27 +148,6 @@ class ClientTest extends TestCase
         self::assertCount(0, $response->getExceptions());
     }
 
-    public function testProcessProposalRequiresUnaryCall()
-    {
-        $this->endorserClient->method('ProcessProposal')
-            ->willReturn(new \stdClass());
-
-        $context = new TransactionOptions([
-            'peers' => [
-                [
-                    'name' => 'peer1',
-                    'requests' => 'localhost:7051',
-                ],
-            ],
-        ]);
-
-        $response = $this->sut->processProposal(new Proposal(), $context);
-
-        self::assertInstanceOf(ResponseCollection::class, $response);
-        self::assertCount(0, $response->getProposalResponses());
-        self::assertCount(1, $response->getExceptions());
-    }
-
     public function testProcessSignedProposalHandlesConnectionError()
     {
         $this->endorserClient->method('ProcessProposal')

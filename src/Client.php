@@ -28,7 +28,9 @@ use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
+use AmericanExpress\HyperledgerFabricClient\Peer\UnaryCallResolver;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
+use AmericanExpress\HyperledgerFabricClient\Peer\UnaryCallResolverInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
@@ -65,17 +67,24 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     private $headerGenerator;
 
     /**
+     * @var UnaryCallResolverInterface
+     */
+    private $unaryCallResolver;
+
+    /**
      * Client constructor.
      * @param UserContextInterface $user
      * @param SignatoryInterface $signatory
      * @param EndorserClientManagerInterface $endorserClients
      * @param HeaderGeneratorInterface $headerGenerator
+     * @param UnaryCallResolverInterface|null $unaryCallResolver
      */
     public function __construct(
         UserContextInterface $user,
         SignatoryInterface $signatory,
         EndorserClientManagerInterface $endorserClients,
-        HeaderGeneratorInterface $headerGenerator
+        HeaderGeneratorInterface $headerGenerator,
+        UnaryCallResolverInterface $unaryCallResolver = null
     ) {
         $this->user = $user;
         $this->signatory = $signatory;
@@ -84,6 +93,7 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
             $this->user->getIdentity(),
             $headerGenerator
         );
+        $this->unaryCallResolver = $unaryCallResolver ?: new UnaryCallResolver();
     }
 
     /**
@@ -121,6 +131,11 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     }
 
     /**
+     * The SignedProposal instances is asynchronously transmitted to Peers. This method
+     * waits until all Responses are collected and returns the ResponseCollection.
+     *
+     * Each Response in the Collection wraps a ProposalResponse upon success, or an Exception upon failure.
+     *
      * @param SignedProposal $proposal
      * @param TransactionOptions|null $options
      * @return ResponseCollection
@@ -137,12 +152,17 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
         $peerOptionsCollection = $options->getPeers();
         $endorserClients = $this->endorserClients;
 
-        $peers = array_map(function (PeerOptionsInterface $peerOptions) use ($endorserClients) {
+        // Create collection of peers.
+        $peers = \array_map(function (PeerOptionsInterface $peerOptions) use ($endorserClients) {
             return new Peer($peerOptions, $endorserClients);
         }, $peerOptionsCollection);
 
-        return new ResponseCollection(array_map(function (Peer $peer) use ($proposal) {
+        // Convert peers into asynchronous calls.
+        $calls = \array_map(function (Peer $peer) use ($proposal) {
             return $peer->processSignedProposal($proposal);
-        }, $peers));
+        }, $peers);
+
+        // Resolve calls to responses.
+        return $this->unaryCallResolver->resolveMany(...$calls);
     }
 }
