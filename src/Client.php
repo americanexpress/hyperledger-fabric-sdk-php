@@ -35,6 +35,20 @@ use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 
+/**
+ * #### Example Usage
+ *
+ * ```php
+ * $client = ClientFactory::fromConfig(new ClientConfig([]));
+ *
+ * $proposal = new Proposal();
+ * $options = new TransactionOptions();
+ *
+ * // Set up and configure `Proposal` and `TransactionOptions`
+ *
+ * $proposalResponseCollection = $client->processProposal($proposal, $options);
+ * ```
+ */
 final class Client implements ChannelProviderInterface, ProposalProcessorInterface
 {
     /**
@@ -82,6 +96,8 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     }
 
     /**
+     * Creates a configured `Channel` object
+     *
      * @param string $name
      * @return ChannelInterface
      */
@@ -95,6 +111,8 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     }
 
     /**
+     * Signs and Submits a `Proposal` to the network based on provided `TransactionOptions`
+     *
      * @param Proposal $proposal
      * @param TransactionOptions|null $options
      * @return ResponseCollection

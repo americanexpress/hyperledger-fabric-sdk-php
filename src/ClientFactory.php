@@ -30,9 +30,25 @@ use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGenerator;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextFactory;
 
+/**
+ * Factory class that simplifies the creation of a `Client` instance
+ *
+ * #### Example Usage
+ *
+ * ```php
+ * $config = ClientConfigFactory::fromFile(new \SplFileObject('config.php'));
+ * $client = ClientFactory::fromConfig($config);
+ * ```
+ */
 class ClientFactory
 {
     /**
+     *
+     * Factory method that instantiates a `Client` object from an instance of `ClientConfigurationInterface`
+     *
+     * The `$organization` parameter can be optionally provided to select the desired organization, if the configuration
+     * includes multiple organizations
+     *
      * @param ClientConfigInterface $config
      * @param string|null $organization
      * @return Client

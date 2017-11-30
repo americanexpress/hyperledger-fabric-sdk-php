@@ -27,6 +27,15 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeIdFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
 
+/**
+ * #### Example Usage
+ *
+ * ```php
+ * $client = ClientFactory::fromConfig(new ClientConfig([]));
+ *
+ * $responseCollection = $client->getChannel('foo')->getChaincode('bar')->invoke('query', 'foobar');
+ * ```
+ */
 class Chaincode
 {
     /**
