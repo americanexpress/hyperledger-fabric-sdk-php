@@ -32,16 +32,16 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGenerator;
+use AmericanExpressTest\HyperledgerFabricClient\Chaincode\AbstractChaincodeTest;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory
  */
-class MdanterEccSignatoryTest extends TestCase
+class MdanterEccSignatoryTest extends AbstractChaincodeTest
 {
     /**
      * @var vfsStreamFile
@@ -105,47 +105,6 @@ TAG
         );
     }
 
-    private function createMockTransactionIdentifierGenerator()
-    {
-        return new TransactionIdentifierGenerator(
-            new class implements NonceGeneratorInterface {
-                public function generateNonce(): string
-                {
-                    return 'u23m5k4hf86j';
-                }
-            }
-        );
-    }
-
-    private function createChaincodeProposal(string $dateTime)
-    {
-        $transactionContextFactory = $this->createMockTransactionIdentifierGenerator();
-        $identity = SerializedIdentityFactory::fromFile('1234', $this->privateKeyFile);
-        $transactionContext = $transactionContextFactory->fromSerializedIdentity($identity);
-
-        $channelHeader = ChannelHeaderFactory::create('MyChannelId');
-        $channelHeader->setTxId($transactionContext->getId());
-        $channelHeader->setEpoch(0);
-        $channelHeader->setTimestamp(TimestampFactory::fromDateTime(new \DateTime($dateTime)));
-
-        $chaincodeId = ChaincodeIdFactory::create(
-            'MyChaincodePath',
-            'MyChaincodeName',
-            'MyChaincodeVersion'
-        );
-
-        $chaincodeHeaderExtension = ChaincodeHeaderExtensionFactory::fromChaincodeId($chaincodeId);
-        $channelHeader->setExtension($chaincodeHeaderExtension->serializeToString());
-
-        $header = HeaderFactory::create(SignatureHeaderFactory::create(
-            $identity,
-            $transactionContext->getNonce()
-        ), $channelHeader);
-
-        $chaincodeProposalPayload = ChaincodeProposalPayloadFactory::fromChaincodeInvocationSpecArgs([]);
-        return ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
-    }
-
     /**
      * @dataProvider getProposalSignatureCharacterizationData
      * @param string $encodedProposalBytes
@@ -185,7 +144,7 @@ TAG
         string $proposalPayload,
         string $proposalExtension
     ) {
-        $proposal = $this->createChaincodeProposal($dateTime);
+        $proposal = $this->createChaincodeProposal($dateTime, $this->privateKeyFile);
 
         self::assertEquals(base64_decode($proposalHeader), $proposal->getHeader());
         self::assertEquals(base64_decode($proposalPayload), $proposal->getPayload());
@@ -201,40 +160,12 @@ TAG
      */
     public function testGetS(string $dateTime, string $encodedProposalBytes, string $encodedSignature)
     {
-        $proposal = $this->createChaincodeProposal($dateTime);
+        $proposal = $this->createChaincodeProposal($dateTime, $this->privateKeyFile);
         $result = $this->sut->signProposal($proposal, new \SplFileObject($this->privateKey->url()));
 
         self::assertInstanceOf(SignedProposal::class, $result);
         self::assertEquals($encodedProposalBytes, base64_encode($result->getProposalBytes()));
         self::assertEquals($encodedSignature, base64_encode($result->getSignature()));
-    }
-
-    private function loadStaticData()
-    {
-        $contents = file_get_contents(__DIR__ . '/../../_files/signed-proposals.json');
-
-        $json = json_decode($contents, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException(json_last_error_msg(), json_last_error());
-        }
-
-        return $json;
-    }
-
-    public function getChainCodeProposalDataset()
-    {
-        $data = $this->loadStaticData();
-
-        return array_map(
-            function ($value) {
-                return array_intersect_key(
-                    $value,
-                    array_flip(['dateTime', 'proposalHeader', 'proposalPayload', 'proposalExtension'])
-                );
-            },
-            $data
-        );
     }
 
     public function getProposalSignatureCharacterizationData()
