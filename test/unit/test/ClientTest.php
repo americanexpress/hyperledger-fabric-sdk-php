@@ -20,14 +20,13 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient;
 
+use AmericanExpress\HyperledgerFabricClient\Channel\ChannelFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Client;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
-use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactory;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
@@ -45,6 +44,11 @@ use PHPUnit\Framework\TestCase;
  */
 class ClientTest extends TestCase
 {
+    /**
+     * @var ChannelFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $channelFactory;
+
     /**
      * @var PeerInterface
      */
@@ -64,11 +68,6 @@ class ClientTest extends TestCase
      * @var EndorserClient|\PHPUnit_Framework_MockObject_MockObject
      */
     private $endorserClient;
-
-    /**
-     * @var HeaderGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $headerGenerator;
 
     /**
      * @var Client
@@ -112,14 +111,13 @@ class ClientTest extends TestCase
             'privateKey' => __FILE__,
         ]));
 
-        $this->headerGenerator = $this->getMockBuilder(HeaderGeneratorInterface::class)
+        $this->channelFactory = $this->getMockBuilder(ChannelFactoryInterface::class)
             ->getMock();
 
         $this->sut = new Client(
             $user,
             $this->signatory,
-            new PeerFactory($endorserClients),
-            $this->headerGenerator
+            $this->channelFactory
         );
     }
 

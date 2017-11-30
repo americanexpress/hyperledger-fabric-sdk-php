@@ -41,9 +41,9 @@ final class PeerFactory implements PeerFactoryInterface
 
     /**
      * @param PeerOptionsInterface $options
-     * @return Peer
+     * @return PeerInterface
      */
-    public function fromPeerOptions(PeerOptionsInterface $options): Peer
+    public function fromPeerOptions(PeerOptionsInterface $options): PeerInterface
     {
         $endorserClient = $this->endorserClients->get($options->getRequests());
 
@@ -52,9 +52,9 @@ final class PeerFactory implements PeerFactoryInterface
 
     /**
      * @param mixed[] $options
-     * @return Peer
+     * @return PeerInterface
      */
-    public function fromArray(array $options): Peer
+    public function fromArray(array $options): PeerInterface
     {
         return $this->fromPeerOptions(new PeerOptions($options));
     }

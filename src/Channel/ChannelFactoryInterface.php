@@ -18,19 +18,22 @@
 
 declare(strict_types=1);
 
-namespace AmericanExpress\HyperledgerFabricClient\Peer;
+namespace AmericanExpress\HyperledgerFabricClient\Channel;
 
-interface PeerFactoryInterface
+use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
+use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
+
+interface ChannelFactoryInterface
 {
     /**
-     * @param PeerOptionsInterface $options
-     * @return PeerInterface
+     * @param string $name
+     * @param ProposalProcessorInterface $proposalProcessor
+     * @param UserContextInterface $user
+     * @return ChannelInterface
      */
-    public function fromPeerOptions(PeerOptionsInterface $options): PeerInterface;
-
-    /**
-     * @param mixed[] $options
-     * @return PeerInterface
-     */
-    public function fromArray(array $options): PeerInterface;
+    public function create(
+        string $name,
+        ProposalProcessorInterface $proposalProcessor,
+        UserContextInterface $user
+    ): ChannelInterface;
 }

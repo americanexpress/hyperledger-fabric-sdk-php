@@ -20,21 +20,17 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient;
 
-use AmericanExpress\HyperledgerFabricClient\Channel\Channel;
+use AmericanExpress\HyperledgerFabricClient\Channel\ChannelFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
-use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\UnaryCallResolver;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\UnaryCallResolverInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
-use AmericanExpress\HyperledgerFabricClient\Identity\SerializedIdentityAwareHeaderGenerator;
 use AmericanExpress\HyperledgerFabricClient\User\UserContextInterface;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
@@ -47,9 +43,9 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     private $user;
 
     /**
-     * @var PeerFactoryInterface
+     * @var ChannelFactoryInterface
      */
-    private $peerFactory;
+    private $channelFactory;
 
     /**
      * @var SignatoryInterface
@@ -62,11 +58,6 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     private $channels = [];
 
     /**
-     * @var SerializedIdentityAwareHeaderGenerator
-     */
-    private $headerGenerator;
-
-    /**
      * @var UnaryCallResolverInterface
      */
     private $unaryCallResolver;
@@ -75,24 +66,18 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
      * Client constructor.
      * @param UserContextInterface $user
      * @param SignatoryInterface $signatory
-     * @param PeerFactoryInterface $peerFactory
-     * @param HeaderGeneratorInterface $headerGenerator
+     * @param ChannelFactoryInterface $channelFactory
      * @param UnaryCallResolverInterface|null $unaryCallResolver
      */
     public function __construct(
         UserContextInterface $user,
         SignatoryInterface $signatory,
-        PeerFactoryInterface $peerFactory,
-        HeaderGeneratorInterface $headerGenerator,
+        ChannelFactoryInterface $channelFactory,
         UnaryCallResolverInterface $unaryCallResolver = null
     ) {
         $this->user = $user;
         $this->signatory = $signatory;
-        $this->peerFactory = $peerFactory;
-        $this->headerGenerator = new SerializedIdentityAwareHeaderGenerator(
-            $this->user->getIdentity(),
-            $headerGenerator
-        );
+        $this->channelFactory = $channelFactory;
         $this->unaryCallResolver = $unaryCallResolver ?: new UnaryCallResolver();
     }
 
@@ -103,11 +88,7 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     public function getChannel(string $name): ChannelInterface
     {
         if (!\array_key_exists($name, $this->channels)) {
-            $peers = \array_map(function (PeerOptionsInterface $options) {
-                return $this->peerFactory->fromPeerOptions($options);
-            }, $this->user->getOrganization()->getPeers());
-
-            $this->channels[$name] = new Channel($name, $this, $this->headerGenerator, $peers);
+            $this->channels[$name] = $this->channelFactory->create($name, $this, $this->user);
         }
 
         return $this->channels[$name];
