@@ -23,10 +23,10 @@ namespace AmericanExpress\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\Channel\Channel;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelProviderInterface;
-use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\UnaryCallResolver;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ProposalProcessorInterface;
@@ -47,9 +47,9 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
     private $user;
 
     /**
-     * @var EndorserClientManagerInterface
+     * @var PeerFactoryInterface
      */
-    private $endorserClients;
+    private $peerFactory;
 
     /**
      * @var SignatoryInterface
@@ -75,20 +75,20 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
      * Client constructor.
      * @param UserContextInterface $user
      * @param SignatoryInterface $signatory
-     * @param EndorserClientManagerInterface $endorserClients
+     * @param PeerFactoryInterface $peerFactory
      * @param HeaderGeneratorInterface $headerGenerator
      * @param UnaryCallResolverInterface|null $unaryCallResolver
      */
     public function __construct(
         UserContextInterface $user,
         SignatoryInterface $signatory,
-        EndorserClientManagerInterface $endorserClients,
+        PeerFactoryInterface $peerFactory,
         HeaderGeneratorInterface $headerGenerator,
         UnaryCallResolverInterface $unaryCallResolver = null
     ) {
         $this->user = $user;
         $this->signatory = $signatory;
-        $this->endorserClients = $endorserClients;
+        $this->peerFactory = $peerFactory;
         $this->headerGenerator = new SerializedIdentityAwareHeaderGenerator(
             $this->user->getIdentity(),
             $headerGenerator
@@ -150,11 +150,10 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
         }
 
         $peerOptionsCollection = $options->getPeers();
-        $endorserClients = $this->endorserClients;
 
         // Create collection of peers.
-        $peers = \array_map(function (PeerOptionsInterface $peerOptions) use ($endorserClients) {
-            return new Peer($peerOptions, $endorserClients);
+        $peers = \array_map(function (PeerOptionsInterface $peerOptions) {
+            return $this->peerFactory->fromPeerOptions($peerOptions);
         }, $peerOptionsCollection);
 
         // Convert peers into asynchronous calls.

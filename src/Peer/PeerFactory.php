@@ -20,35 +20,32 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Peer;
 
-use Grpc\UnaryCall;
-use Hyperledger\Fabric\Protos\Peer\EndorserClient;
-use Hyperledger\Fabric\Protos\Peer\SignedProposal;
+use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 
-final class Peer implements PeerInterface
+class PeerFactory implements PeerFactoryInterface
 {
     /**
-     * @var EndorserClient
+     * @var EndorserClientManagerInterface
      */
-    private $endorserClient;
+    private $endorserClients;
 
     /**
-     * Peer constructor.
-     * @param EndorserClient $endorserClient
+     * PeerFactory constructor.
+     * @param EndorserClientManagerInterface $endorserClients
      */
-    public function __construct(EndorserClient $endorserClient)
+    public function __construct(EndorserClientManagerInterface $endorserClients)
     {
-        $this->endorserClient = $endorserClient;
+        $this->endorserClients = $endorserClients;
     }
 
     /**
-     * Asynchronous transformation of a SignedProposal into a UnaryCall.
-     *
-     * @param SignedProposal $proposal
-     * @return UnaryCall
+     * @param PeerOptionsInterface $options
+     * @return Peer
      */
-    public function processSignedProposal(SignedProposal $proposal): UnaryCall
+    public function fromPeerOptions(PeerOptionsInterface $options): Peer
     {
-        /** @var UnaryCall $simpleSurfaceActiveCall */
-        return $this->endorserClient->ProcessProposal($proposal);
+        $endorserClient = $this->endorserClients->get($options->getRequests());
+
+        return new Peer($endorserClient);
     }
 }

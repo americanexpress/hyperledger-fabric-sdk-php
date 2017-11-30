@@ -20,9 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Peer;
 
-use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
-use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
 use Grpc\UnaryCall;
 use Hyperledger\Fabric\Protos\Peer\EndorserClient;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
@@ -54,22 +52,11 @@ class PeerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var EndorserClientManagerInterface|\PHPUnit_Framework_MockObject_MockObject $endorserClients */
-        $endorserClients = $this->getMockBuilder(EndorserClientManagerInterface::class)
-            ->getMock();
-
-        $endorserClients->method('get')
-            ->willReturn($this->endorserClient);
-
         $this->unaryCall = $this->getMockBuilder(UnaryCall::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $options = new PeerOptions([
-            'requests' => 'localhost:7051',
-        ]);
-
-        $this->sut = new Peer($options, $endorserClients);
+        $this->sut = new Peer($this->endorserClient);
     }
     public function testProcessChannelProposal()
     {

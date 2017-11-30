@@ -26,6 +26,7 @@ use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Header\HeaderGeneratorInterface;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
+use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactory;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
 use AmericanExpress\HyperledgerFabricClient\Signatory\SignatoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionOptions;
@@ -108,7 +109,7 @@ class ClientTest extends TestCase
         $this->sut = new Client(
             $user,
             $this->signatory,
-            $endorserClients,
+            new PeerFactory($endorserClients),
             $this->headerGenerator
         );
     }
