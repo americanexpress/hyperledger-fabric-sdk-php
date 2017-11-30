@@ -265,7 +265,13 @@ TAG
             function ($value) {
                 return array_intersect_key(
                     $value,
-                    array_flip(['encodedProposalBytes', 'encodedSignature', 'proposalHeader', 'proposalPayload', 'proposalExtension'])
+                    array_flip([
+                        'encodedProposalBytes',
+                        'encodedSignature',
+                        'proposalHeader',
+                        'proposalPayload',
+                        'proposalExtension',
+                    ])
                 );
             },
             $data

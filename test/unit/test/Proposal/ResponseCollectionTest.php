@@ -56,4 +56,24 @@ class ResponseCollectionTest extends TestCase
         self::assertTrue($sut->hasExceptions());
         self::assertCount(2, $sut->getExceptions());
     }
+
+    public function testGetSingleResponse()
+    {
+        $sut = new ResponseCollection([
+            Response::fromProposalResponse(new ProposalResponse()),
+        ]);
+
+        self::assertTrue($sut->hasProposalResponses());
+        self::assertCount(1, $sut->getProposalResponses());
+    }
+
+    public function testGetExceptionResponse()
+    {
+        $sut = new ResponseCollection([
+            Response::fromException(new \Exception()),
+        ]);
+
+        self::assertTrue($sut->hasExceptions());
+        self::assertCount(1, $sut->getExceptions());
+    }
 }

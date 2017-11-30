@@ -49,10 +49,9 @@
     "lint:style": "vendor/bin/phpcs --standard=PSR2 --extensions=php -v src/ test/ --ignore=test/integration/config.php",
     "lint:syntax": "vendor/bin/parallel-lint src/ protobuf/dist/ test/",
     "protoc": "bin/compile-protos.sh",
-    "test:integration": "vendor/bin/phpunit --testsuite integration",
-    "test:mutations": "vendor/bin/humbug",
-    "test:units": "vendor/bin/phpunit --testsuite unit",
-    "coverage": "vendor/bin/phpunit --testsuite unit --coverage-text --coverage-html=build/coverage/html",
-    "test": "vendor/bin/phpunit --testsuite unit"
+    "test:integration": "vendor/bin/phpunit -c test/integration",
+    "test:mutations": "vendor/bin/humbug && cat humbuglog.txt",
+    "coverage": "vendor/bin/phpunit --coverage-text --coverage-html=build/coverage/html",
+    "test": "vendor/bin/phpunit"
   }
 }
