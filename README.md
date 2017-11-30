@@ -65,15 +65,12 @@ $response = \AmericanExpress\HyperledgerFabricClient\Client\ClientFactory::fromC
 ## Phase 1
 
 * For phase 1, we are providing client access for basic chaincode operations like query by chain code.
-* It’s under assumption that we have a running blockchain network, with a predefined channel and an installed chaincode.
-* A predefined script is provided to bring up the test network as per the test cases.
-
-
+* It’s assumed that we have a running blockchain network, with a predefined channel and an installed chaincode.
+* A [predefined script](test/fixture/sdkintegration/docker-compose.yaml) is provided to bring up the test network as per the test cases.
 
 ## Phase 2 (Upcoming)
 
 * In next release we are targeting to add more chaincode operations like create channel, invoke & install etc
-
 
 ## Latest builds of Fabric and Fabric-ca v1.1.0
 
@@ -81,47 +78,37 @@ Hyperledger Fabric v1.1.0 is currently under active development.
 
 You can clone these projects by going to the [Hyperledger repository](https://gerrit.hyperledger.org/r/#/admin/projects/).
 
-
-
-
-
-
 - - - - - - -
 
 ### Prerequisites ###
 
-#### [Latest Docker](https://docs.docker.com/engine/installation)
-Check docker version (it should be 17+)
+#### [Docker version ^17.0](https://docs.docker.com/engine/installation)
+Check version of Docker:
+```bash
+docker --version
+```
 
-`docker --version`
-
-
-#### [PHP version 7+](http://php.net/manual/en/install.php)
-Check version of PHP
-
-`php --version`
-
+#### [PHP version ^7.1](http://php.net/manual/en/install.php)
+Check version of PHP:
+```bash
+php --version
+```
 
 #### [PHP GMP extension](http://php.net/manual/en/gmp.installation.php)
 Check PHP-GMP setup in php.ini
 
-
 #### [Composer tool](https://getcomposer.org/doc/00-intro.md)
 Check composer version (it should be 1.5 or plus)
-
-`composer --version`
-
-
-
+```bash
+composer --version
+```
 
 ### Installing SDK (for development)
 
-
-`git clone {fabric-sdk-php}`
-
-`cd fabric-sdk-php`
-
-`composer install`
+```bash
+git clone https://github.com/americanexpress/hyperledger-fabric-sdk-php && cd $_
+composer update
+```
 
 ### Generating SDK API Documentation
 
@@ -135,25 +122,19 @@ open build/docs/index.html
 
 ### Running the End2End test case
 
-
 Before running the tests, we need to bring up the fabric network and fixture(s):
 ```bash
-(cd ./test/fixture/sdkintegration && docker-compose up -d)
+composer fixture:up
 ```
 
-Stream the logs:
+At present, we are providing example test case for Querying a chaincode, which can be run as below:
 ```bash
-(cd ./test/fixture/sdkintegration && docker-compose logs -f)
+composer test:integration
 ```
 
-At present we are providing example test case for Querying a chaincode, which can be run as below:
+After running the tests, feel free to bring down the fabric network:
 ```bash
-./vendor/bin/phpunit
-```
-
-After running the tests, you can bring down the fabric network:
-```bash
-(cd ./test/fixture/sdkintegration && docker-compose down)
+composer fixture:down
 ```
 
 Read more about [Docker Compose](https://docs.docker.com/compose/overview/)
@@ -172,7 +153,7 @@ We welcome Your interest in the American Express Open Source Community on Github
 Project managed by the American Express Open Source Community must accept and sign an Agreement indicating agreement to
 the terms below. Except for the rights granted in this Agreement to American Express and to recipients of software
 distributed by American Express, You reserve all right, title, and interest, if any, in and to Your Contributions.
-Please [fill out the Agreement](https://cla-assistant.io/americanexpress/fabric-sdk-php).
+Please [fill out the Agreement](https://cla-assistant.io/americanexpress/hyperledger-fabric-sdk-php).
 
 Please feel free to open pull requests and see `CONTRIBUTING.md` for commit formatting details.
 

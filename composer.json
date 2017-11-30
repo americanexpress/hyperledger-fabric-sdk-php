@@ -40,8 +40,10 @@
     "squizlabs/php_codesniffer": "*"
   },
   "scripts": {
-    "build": "composer lint:syntax && composer lint:style && composer lint:final && composer coverage && composer test:mutations",
+    "build": "composer lint:syntax && composer lint:style && composer lint:final && composer coverage && composer test:mutations && composer docs",
     "docs": "vendor/bin/sami.php update docs/sami.php",
+    "fixture:up": "(cd ./test/fixture/sdkintegration && docker-compose up -d)",
+    "fixture:down": "(cd ./test/fixture/sdkintegration && docker-compose down)",
     "lint:beautify": "vendor/bin/phpcbf --standard=PSR2 --extensions=php -v src/ test/",
     "lint:final": "vendor/bin/finalizer finalizer:check-final-classes src",
     "lint:style": "vendor/bin/phpcs --standard=PSR2 --extensions=php -v src/ test/ --ignore=test/integration/config.php",
