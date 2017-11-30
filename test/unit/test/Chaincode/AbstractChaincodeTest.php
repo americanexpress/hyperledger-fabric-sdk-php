@@ -31,11 +31,41 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFacto
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGenerator;
+use Hyperledger\Fabric\Protos\Peer\Proposal;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractChaincodeTest extends TestCase
 {
-    private function createMockTransactionIdentifierGenerator()
+    /**
+     * @var vfsStreamFile
+     */
+    protected $privateKey;
+
+    /**
+     * @var \SplFileObject
+     */
+    protected $privateKeyFile;
+
+    protected function setUp()
+    {
+        $files = vfsStream::setup('test');
+
+        $this->privateKey = vfsStream::newFile('foo');
+        $this->privateKey->setContent(<<<'TAG'
+-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQghnA7rdgbZi/wndus
+iXjyf0KgE6OKZjQ+5INjwelRAC6hRANCAASb3u+hY+U/FZvhYDN6d08HJ1v56UJU
+yz/n2NHyJgTg6kC05AaJMeGIinEF0JeJtRDNVQGzoQJQYjnzUTS9FvGh
+-----END PRIVATE KEY-----
+TAG
+        );
+        $files->addChild($this->privateKey);
+        $this->privateKeyFile = new \SplFileObject($this->privateKey->url());
+    }
+
+    private function createMockTransactionIdentifierGenerator(): TransactionIdentifierGenerator
     {
         return new TransactionIdentifierGenerator(
             new class implements NonceGeneratorInterface {
@@ -47,7 +77,7 @@ abstract class AbstractChaincodeTest extends TestCase
         );
     }
 
-    protected function createChaincodeProposal(string $dateTime, \SplFileObject $privateKeyFile)
+    protected function createChaincodeProposal(string $dateTime, \SplFileObject $privateKeyFile): Proposal
     {
         $transactionContextFactory = $this->createMockTransactionIdentifierGenerator();
         $identity = SerializedIdentityFactory::fromFile('1234', $privateKeyFile);
@@ -76,7 +106,10 @@ abstract class AbstractChaincodeTest extends TestCase
         return ProposalFactory::create($header, $chaincodeProposalPayload->serializeToString());
     }
 
-    protected function loadStaticData()
+    /**
+     * @return array[]
+     */
+    protected function loadStaticData(): array
     {
         $contents = file_get_contents(__DIR__ . '/../../_files/signed-proposals.json');
 
@@ -89,7 +122,10 @@ abstract class AbstractChaincodeTest extends TestCase
         return $json;
     }
 
-    public function getChainCodeProposalDataset()
+    /**
+     * @return array[]
+     */
+    public function getChainCodeProposalDataset(): array
     {
         $data = $this->loadStaticData();
 
@@ -102,5 +138,13 @@ abstract class AbstractChaincodeTest extends TestCase
             },
             $data
         );
+    }
+
+    /**
+     * @return \SplFileObject
+     */
+    protected function getPrivateKeyFile(): \SplFileObject
+    {
+        return $this->privateKeyFile;
     }
 }

@@ -20,23 +20,10 @@ declare(strict_types=1);
 
 namespace AmericanExpressTest\HyperledgerFabricClient\Signatory;
 
-use AmericanExpress\HyperledgerFabricClient\Nonce\NonceGeneratorInterface;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeHeaderExtensionFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeIdFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChaincodeProposalPayloadFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ChannelHeaderFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
-use AmericanExpress\HyperledgerFabricClient\ProtoFactory\TimestampFactory;
 use AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory;
-use AmericanExpress\HyperledgerFabricClient\Transaction\TransactionIdentifierGenerator;
 use AmericanExpressTest\HyperledgerFabricClient\Chaincode\AbstractChaincodeTest;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamFile;
 
 /**
  * @covers \AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory
@@ -44,36 +31,13 @@ use org\bovigo\vfs\vfsStreamFile;
 class MdanterEccSignatoryTest extends AbstractChaincodeTest
 {
     /**
-     * @var vfsStreamFile
-     */
-    private $privateKey;
-
-    /**
-     * @var \SplFileObject
-     */
-    private $privateKeyFile;
-
-    /**
      * @var MdanterEccSignatory
      */
     private $sut;
 
     protected function setUp()
     {
-        $files = vfsStream::setup('test');
-
-        $this->privateKey = vfsStream::newFile('foo');
-        $this->privateKey->setContent(<<<'TAG'
------BEGIN PRIVATE KEY-----
-MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQghnA7rdgbZi/wndus
-iXjyf0KgE6OKZjQ+5INjwelRAC6hRANCAASb3u+hY+U/FZvhYDN6d08HJ1v56UJU
-yz/n2NHyJgTg6kC05AaJMeGIinEF0JeJtRDNVQGzoQJQYjnzUTS9FvGh
------END PRIVATE KEY-----
-TAG
-        );
-        $files->addChild($this->privateKey);
-        $this->privateKeyFile = new \SplFileObject($this->privateKey->url());
-
+        parent::setUp();
         $this->sut = new MdanterEccSignatory();
     }
 
@@ -132,26 +96,6 @@ TAG
     }
 
     /**
-     * @dataProvider getChainCodeProposalDataset
-     * @param string $dateTime
-     * @param string $proposalHeader
-     * @param string $proposalPayload
-     * @param string $proposalExtension
-     */
-    public function testCreateChaincodeProposal(
-        string $dateTime,
-        string $proposalHeader,
-        string $proposalPayload,
-        string $proposalExtension
-    ) {
-        $proposal = $this->createChaincodeProposal($dateTime, $this->privateKeyFile);
-
-        self::assertEquals(base64_decode($proposalHeader), $proposal->getHeader());
-        self::assertEquals(base64_decode($proposalPayload), $proposal->getPayload());
-        self::assertEquals(base64_decode($proposalExtension), $proposal->getExtension());
-    }
-
-    /**
      * @covers       \AmericanExpress\HyperledgerFabricClient\Signatory\MdanterEccSignatory::getS
      * @dataProvider dataGetS
      * @param string $dateTime
@@ -160,7 +104,7 @@ TAG
      */
     public function testGetS(string $dateTime, string $encodedProposalBytes, string $encodedSignature)
     {
-        $proposal = $this->createChaincodeProposal($dateTime, $this->privateKeyFile);
+        $proposal = $this->createChaincodeProposal($dateTime, $this->getPrivateKeyFile());
         $result = $this->sut->signProposal($proposal, new \SplFileObject($this->privateKey->url()));
 
         self::assertInstanceOf(SignedProposal::class, $result);

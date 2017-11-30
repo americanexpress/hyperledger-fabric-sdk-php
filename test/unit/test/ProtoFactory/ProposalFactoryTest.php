@@ -27,14 +27,20 @@ use AmericanExpress\HyperledgerFabricClient\ProtoFactory\HeaderFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SerializedIdentityFactory;
 use AmericanExpress\HyperledgerFabricClient\ProtoFactory\SignatureHeaderFactory;
+use AmericanExpressTest\HyperledgerFabricClient\Chaincode\AbstractChaincodeTest;
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \AmericanExpress\HyperledgerFabricClient\ProtoFactory\ProposalFactory
  */
-class ProposalFactoryTest extends TestCase
+class ProposalFactoryTest extends AbstractChaincodeTest
 {
+    protected function setUp()
+    {
+        parent::setUp();
+    }
+
     public function testCreate()
     {
         $serializedIdentity = SerializedIdentityFactory::fromBytes('Alice', 'Bob');
@@ -68,5 +74,25 @@ class ProposalFactoryTest extends TestCase
         self::assertContains('foo', $result->getPayload());
         self::assertContains('bar', $result->getPayload());
         self::assertSame('', $result->getExtension());
+    }
+
+    /**
+     * @dataProvider getChainCodeProposalDataset
+     * @param string $dateTime
+     * @param string $proposalHeader
+     * @param string $proposalPayload
+     * @param string $proposalExtension
+     */
+    public function testCreateChaincodeProposal(
+        string $dateTime,
+        string $proposalHeader,
+        string $proposalPayload,
+        string $proposalExtension
+    ) {
+        $proposal = $this->createChaincodeProposal($dateTime, $this->getPrivateKeyFile());
+
+        self::assertEquals(base64_decode($proposalHeader), $proposal->getHeader());
+        self::assertEquals(base64_decode($proposalPayload), $proposal->getPayload());
+        self::assertEquals(base64_decode($proposalExtension), $proposal->getExtension());
     }
 }
