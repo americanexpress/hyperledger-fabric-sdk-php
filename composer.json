@@ -17,8 +17,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "AmericanExpressTest\\HyperledgerFabricClient\\TestAsset\\": "test/unit/TestAsset",
-      "AmericanExpressTest\\Integration\\TestAsset\\": "test/integration/TestAsset"
+      "AmericanExpressTest\\HyperledgerFabricClient\\TestAsset\\": "test/unit/TestAsset"
     }
   },
   "require": {
