@@ -23,7 +23,7 @@ namespace AmericanExpress\HyperledgerFabricClient\Peer;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
 
-class PeerFactory implements PeerFactoryInterface
+final class PeerFactory implements PeerFactoryInterface
 {
     /**
      * @var EndorserClientManagerInterface

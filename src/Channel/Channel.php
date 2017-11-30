@@ -135,6 +135,16 @@ final class Channel implements ChannelInterface, ChaincodeProposalProcessorInter
     }
 
     /**
+     * @param PeerInterface[] $peers
+     * @return void
+     */
+    public function setPeers(array $peers): void
+    {
+        $this->peers = [];
+        $this->addPeers(...$peers);
+    }
+
+    /**
      * @return PeerInterface[]
      */
     public function getPeers(): array

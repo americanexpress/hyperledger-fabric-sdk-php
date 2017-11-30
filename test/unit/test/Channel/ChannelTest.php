@@ -110,6 +110,21 @@ class ChannelTest extends TestCase
         self::assertContains($peer, $this->sut->getPeers());
     }
 
+    public function testCanSetManyPeers()
+    {
+        $peer = $this->getMockBuilder(PeerInterface::class)
+            ->getMock();
+
+        $this->sut->setPeers([
+            $this->peer,
+            $peer,
+        ]);
+
+        self::assertCount(2, $this->sut->getPeers());
+        self::assertContains($this->peer, $this->sut->getPeers());
+        self::assertContains($peer, $this->sut->getPeers());
+    }
+
     public function testQueryByChaincode()
     {
         $this->client->method('processProposal')
