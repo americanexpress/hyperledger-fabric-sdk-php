@@ -69,6 +69,7 @@ class TransactionOptions extends AbstractOptions implements PeerCollectionInterf
     /**
      * @param PeerInterface[] ...$peers
      * @return static
+     * @throws \AmericanExpress\HyperledgerFabricClient\Exception\BadMethodCallException
      */
     public function withPeers(PeerInterface ...$peers): TransactionOptions
     {

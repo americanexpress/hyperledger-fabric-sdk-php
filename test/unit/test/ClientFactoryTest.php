@@ -48,12 +48,49 @@ class ClientFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
      */
     public function testFromInvalidConfig()
     {
         $config = new ClientConfig([]);
 
         ClientFactory::fromConfig($config, 'peerOrg1');
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
+     */
+    public function testThrowsExceptionOnInvalidOrganization()
+    {
+        $config = new ClientConfig([
+            'organizations' => [
+                [
+                    'name' => 'peerOrg1',
+                    'mspId' => 'FooBar',
+                    'adminCerts' => __FILE__,
+                ],
+            ],
+        ]);
+
+        ClientFactory::fromConfig($config,'INVALID-ORG');
+    }
+
+    /**
+     * @expectedException \AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException
+     */
+    public function testThrowsExceptionOnInvalidNonce()
+    {
+        $config = new ClientConfig([
+            'organizations' => [
+                [
+                    'name' => 'peerOrg1',
+                    'mspId' => 'FooBar',
+                    'adminCerts' => __FILE__,
+                ],
+            ],
+            'nonce-size' => -5
+        ]);
+
+        ClientFactory::fromConfig($config);
     }
 }

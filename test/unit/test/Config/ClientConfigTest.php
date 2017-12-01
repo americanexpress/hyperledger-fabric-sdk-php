@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Config;
 
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfig;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptionsInterface;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -201,5 +202,19 @@ class ClientConfigTest extends TestCase
 
         self::assertInstanceOf(OrganizationOptionsInterface::class, $result);
         self::assertSame('peerOrg1', $result->getName());
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testThrowsExceptionOnInvalidOrganizationConfig()
+    {
+        new ClientConfig([
+            'organizations' => [
+                [
+                    'THIS' => 'IS NOT GOING TO WORK'
+                ],
+            ],
+        ]);
     }
 }

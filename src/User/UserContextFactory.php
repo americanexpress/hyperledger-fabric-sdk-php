@@ -31,6 +31,7 @@ class UserContextFactory
      * @param ClientConfigInterface $config
      * @param string|null $organization
      * @return UserContext
+     * @throws UnexpectedValueException
      */
     public static function fromConfig(
         ClientConfigInterface $config,

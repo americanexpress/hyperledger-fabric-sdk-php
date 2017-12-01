@@ -101,11 +101,16 @@ final class Client implements ChannelProviderInterface, ProposalProcessorInterfa
      *
      * @param string $name
      * @return ChannelInterface
+     * @throws RuntimeException
      */
     public function getChannel(string $name): ChannelInterface
     {
         if (!\array_key_exists($name, $this->channels)) {
-            $this->channels[$name] = $this->channelFactory->create($name, $this, $this->user);
+            try {
+                $this->channels[$name] = $this->channelFactory->create($name, $this, $this->user);
+            } catch (ExceptionInterface $e) {
+                throw new RuntimeException('Cannot create requested Channel', 0, $e);
+            }
         }
 
         return $this->channels[$name];

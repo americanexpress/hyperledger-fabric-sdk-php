@@ -23,6 +23,7 @@ namespace AmericanExpress\HyperledgerFabricClient\Channel;
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
+use AmericanExpress\HyperledgerFabricClient\Exception\ExceptionInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerCollectionInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptionsInterface;
@@ -94,10 +95,15 @@ final class Channel implements ChannelInterface, PeerCollectionInterface
      *
      * @param string | array $nameOrVersionedName
      * @return Chaincode
+     * @throws InvalidArgumentException
      */
     public function getChaincode($nameOrVersionedName): Chaincode
     {
-        return new Chaincode($nameOrVersionedName, $this);
+        try {
+            return new Chaincode($nameOrVersionedName, $this);
+        } catch (ExceptionInterface $e) {
+            throw new InvalidArgumentException('Can not create Chaincode as requested', 0, $e);
+        }
     }
 
     /**
@@ -179,6 +185,14 @@ final class Channel implements ChannelInterface, PeerCollectionInterface
         $header = $this->headerGenerator->generateHeader($channelHeader);
         $proposal = ProposalFactory::create($header, $payload->serializeToString());
 
-        return $this->client->processProposal($proposal, $options);
+        try {
+            return $this->client->processProposal($proposal, $options);
+        } catch (ExceptionInterface $e) {
+            throw new RuntimeException(
+                'Unable to process Chaincode proposal',
+                0,
+                $e
+            );
+        }
     }
 }

@@ -23,6 +23,8 @@ namespace AmericanExpress\HyperledgerFabricClient;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelFactory;
 use AmericanExpress\HyperledgerFabricClient\Config\ClientConfigInterface;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManager;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
+use AmericanExpress\HyperledgerFabricClient\Exception\UnexpectedValueException;
 use AmericanExpress\HyperledgerFabricClient\Header\HeaderGenerator;
 use AmericanExpress\HyperledgerFabricClient\Nonce\RandomBytesNonceGenerator;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactory;
@@ -52,16 +54,25 @@ class ClientFactory
      * @param ClientConfigInterface $config
      * @param string|null $organization
      * @return Client
+     * @throws InvalidArgumentException
      */
     public static function fromConfig(
         ClientConfigInterface $config,
         string $organization = null
     ): Client {
-        $user = UserContextFactory::fromConfig($config, $organization);
+        try {
+            $user = UserContextFactory::fromConfig($config, $organization);
+        } catch (UnexpectedValueException $e) {
+            throw new InvalidArgumentException('Could not create Client; invalid organization config');
+        }
 
         $signatory = new MdanterEccSignatory($config->getHashAlgorithm());
 
-        $nonceGenerator = new RandomBytesNonceGenerator($config->getNonceSize());
+        try {
+            $nonceGenerator = new RandomBytesNonceGenerator($config->getNonceSize());
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException('Could not create Client; invalid nonce size', 0, $e);
+        }
 
         $transactionContextFactory = new TransactionIdentifierGenerator($nonceGenerator, $config->getHashAlgorithm());
 

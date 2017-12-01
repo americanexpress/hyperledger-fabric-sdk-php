@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace AmericanExpressTest\HyperledgerFabricClient\Peer;
 
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerFactory;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerOptions;
@@ -83,5 +84,16 @@ class PeerFactoryTest extends TestCase
         ]);
 
         self::assertInstanceOf(Peer::class, $result);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testFromArrayThrowsExceptionOnInvalidConfig()
+    {
+        $this->sut->fromArray([
+            'not' => 'useful',
+            'configuration' => 'values'
+        ]);
     }
 }

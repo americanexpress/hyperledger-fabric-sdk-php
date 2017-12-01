@@ -72,15 +72,7 @@ final class ChannelFactory implements ChannelFactoryInterface
 
         $peers = $this->getPeers($user);
 
-        try {
-            return new Channel($name, $proposalProcessor, $headerGenerator, $peers);
-        } catch (ExceptionInterface $e) {
-            throw new InvalidArgumentException(
-                sprintf('Unable to create Peer.'),
-                0,
-                $e
-            );
-        }
+        return new Channel($name, $proposalProcessor, $headerGenerator, $peers);
     }
 
     /**

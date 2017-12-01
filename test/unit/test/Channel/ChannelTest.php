@@ -22,6 +22,7 @@ namespace AmericanExpressTest\HyperledgerFabricClient\Channel;
 
 use AmericanExpress\HyperledgerFabricClient\Chaincode\Chaincode;
 use AmericanExpress\HyperledgerFabricClient\Channel\Channel;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Peer\PeerInterface;
 use AmericanExpress\HyperledgerFabricClient\Proposal\ResponseCollection;
@@ -133,6 +134,14 @@ class ChannelTest extends TestCase
         self::assertSame($chainCode->getName(), 'FizBuz');
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testChannelThrowsExceptionOnEmptyChaincodeName()
+    {
+        $this->sut->getChaincode('');
+    }
+
     public function testChannelCanProcessChaincodeProposal()
     {
         $this->client->method('processProposal')
@@ -142,6 +151,19 @@ class ChannelTest extends TestCase
             'peers' => [$this->peer],
         ]));
         self::assertSame($proposalResponse, $result);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testChannelWillWrapExceptionOnProcessChaincodeProposal()
+    {
+        $this->client->method('processProposal')
+            ->willThrowException(new InvalidArgumentException());
+
+        $this->doChaincodeProposal(new TransactionOptions([
+            'peers' => [$this->peer],
+        ]));
     }
 
     public function testChannelCanProcessChaincodeProposalWithDefaultPeers()

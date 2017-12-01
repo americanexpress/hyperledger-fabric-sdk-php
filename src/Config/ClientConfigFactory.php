@@ -20,11 +20,14 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Config;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
+
 class ClientConfigFactory
 {
     /**
      * @param \SplFileObject $file
      * @return ClientConfig
+     * @throws InvalidArgumentException
      */
     public static function fromFile(\SplFileObject $file): ClientConfig
     {

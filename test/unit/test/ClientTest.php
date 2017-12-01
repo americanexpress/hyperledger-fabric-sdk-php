@@ -24,6 +24,7 @@ use AmericanExpress\HyperledgerFabricClient\Channel\ChannelFactoryInterface;
 use AmericanExpress\HyperledgerFabricClient\Channel\ChannelInterface;
 use AmericanExpress\HyperledgerFabricClient\Client;
 use AmericanExpress\HyperledgerFabricClient\EndorserClient\EndorserClientManagerInterface;
+use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\Exception\RuntimeException;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
 use AmericanExpress\HyperledgerFabricClient\Peer\Peer;
@@ -127,6 +128,17 @@ class ClientTest extends TestCase
 
         self::assertInstanceOf(ChannelInterface::class, $result);
         self::assertSame($result, $this->sut->getChannel('foo'));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testChannelWrapsException()
+    {
+        $this->channelFactory->method('create')
+            ->willThrowException(new InvalidArgumentException());
+
+        $this->sut->getChannel('foo');
     }
 
     public function testProcessProposal()

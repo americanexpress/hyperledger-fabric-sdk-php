@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace AmericanExpress\HyperledgerFabricClient\Config;
 
+use AmericanExpress\HyperledgerFabricClient\Exception\BadMethodCallException;
 use AmericanExpress\HyperledgerFabricClient\Exception\InvalidArgumentException;
 use AmericanExpress\HyperledgerFabricClient\HashAlgorithm;
 use AmericanExpress\HyperledgerFabricClient\Organization\OrganizationOptions;
@@ -58,7 +59,7 @@ final class ClientConfig implements ClientConfigInterface
                 $this->config['crypto-hash-algo'] = new HashAlgorithm((string) $hash);
             } catch (InvalidArgumentException $e) {
                 throw new InvalidArgumentException(
-                    "Unable to create Channel from Config; Invalid 'crypto-hash-algo' supplied",
+                    "Unable to create ClientConfig; Invalid 'crypto-hash-algo' supplied",
                     $e->getCode(),
                     $e
                 );
@@ -66,7 +67,11 @@ final class ClientConfig implements ClientConfigInterface
         }
 
         $this->config['organizations'] = array_map(function (array $data) {
-            return new OrganizationOptions($data);
+            try {
+                return new OrganizationOptions($data);
+            } catch (BadMethodCallException $e) {
+                throw new InvalidArgumentException('Cannot create ClientConfig; invalid organizations key', 0, $e);
+            }
         }, $this->config['organizations']);
     }
 
