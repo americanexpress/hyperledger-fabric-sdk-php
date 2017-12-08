@@ -1,5 +1,8 @@
 language: php
 
+services:
+  - docker
+
 php:
   - 7.1
   - 7.2
@@ -26,7 +29,6 @@ jobs:
     - stage: lint
       php: 7.1
       script:
-        - composer install --no-interaction --prefer-source
         - composer validate
     - stage: lint
       php: 7.1
@@ -43,7 +45,7 @@ jobs:
       script:
         - composer install --no-interaction --prefer-source
         - composer lint:style
-    - stage: big-test
+    - stage: test
       php: 7.1
       script:
         - composer install --no-interaction --prefer-source
@@ -51,6 +53,11 @@ jobs:
         - composer coverage
       after_success:
         - travis_retry php vendor/bin/coveralls
+    - stage: big-test
+      php: 7.1
+      script:
+        - composer install --no-interaction --prefer-source
+        - composer fixture:up && sleep 30 && composer test:integration
     - stage: big-test
       php: 7.1
       script:

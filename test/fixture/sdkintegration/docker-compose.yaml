@@ -169,3 +169,12 @@ services:
         - peer1.org1.example.com
         - peer0.org2.example.com
         - peer1.org2.example.com
+  wait_for_dependencies:
+      image: dadarek/wait-for-dependencies
+      depends_on:
+        - orderer.example.com
+        - peer0.org1.example.com
+        - peer1.org1.example.com
+        - peer0.org2.example.com
+        - peer1.org2.example.com
+      command: orderer.example.com:7050 peer0.org1.example.com:7051 peer0.org1.example.com:7053 peer1.org1.example.com:7056 peer1.org1.example.com:7058 peer0.org2.example.com:8051 peer0.org2.example.com:8053 peer1.org2.example.com:8056 peer1.org2.example.com:8058
