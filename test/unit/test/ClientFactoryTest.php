@@ -72,7 +72,7 @@ class ClientFactoryTest extends TestCase
             ],
         ]);
 
-        ClientFactory::fromConfig($config,'INVALID-ORG');
+        ClientFactory::fromConfig($config, 'INVALID-ORG');
     }
 
     /**

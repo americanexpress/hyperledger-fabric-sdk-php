@@ -28,7 +28,10 @@ use AmericanExpress\HyperledgerFabricClient\Serializer\SignedCharStringSerialize
 use Hyperledger\Fabric\Protos\Peer\Proposal;
 use Hyperledger\Fabric\Protos\Peer\SignedProposal;
 use Mdanter\Ecc\Crypto\Key\PrivateKeyInterface;
+use Mdanter\Ecc\Crypto\Signature\HasherInterface;
 use Mdanter\Ecc\Crypto\Signature\Signature;
+use Mdanter\Ecc\Crypto\Signature\SignatureInterface;
+use Mdanter\Ecc\Crypto\Signature\SignHasher;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Math\GmpMath;
@@ -82,6 +85,11 @@ final class MdanterEccSignatory implements SignatoryInterface
     private $signer;
 
     /**
+     * @var HasherInterface
+     */
+    private $hasher;
+
+    /**
      * Utils constructor.
      * @param HashAlgorithm $hashAlgorithm
      * @throws RuntimeException
@@ -96,6 +104,7 @@ final class MdanterEccSignatory implements SignatoryInterface
         $this->generator = EccFactory::getNistCurves()->generator256();
         $this->signer = new Signer($this->adapter);
         $this->gmpMath = new GmpMath();
+        $this->hasher = new SignHasher((string) $this->hashAlgorithm, $this->gmpMath);
         $this->derSignatureSerializer = new DerSignatureSerializer();
     }
 
@@ -139,7 +148,7 @@ final class MdanterEccSignatory implements SignatoryInterface
     {
         $dataString = $this->asciiCharStringSerializer->serialize($dataArray);
 
-        $hash = $this->signer->hashData($this->generator, (string) $this->hashAlgorithm, $dataString);
+        $hash = $this->hasher->makeHash($dataString, $this->generator);
 
         # Derandomized signatures are not necessary, but can reduce
         # the attack surface for a private key that is to be used often.
@@ -155,10 +164,10 @@ final class MdanterEccSignatory implements SignatoryInterface
     }
 
     /**
-     * @param Signature $signature
+     * @param SignatureInterface $signature
      * @return \GMP
      */
-    private function getS(Signature $signature): \GMP
+    private function getS(SignatureInterface $signature): \GMP
     {
         $order = $this->generator->getOrder();
         $halfOrder = $this->adapter->rightShift($order, 1);

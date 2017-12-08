@@ -23,11 +23,11 @@
   "require": {
     "php": "^7.1",
     "ext-grpc": "*",
-    "beberlei/assert": "^2.0",
+    "beberlei/assert": "^2.6",
     "google/protobuf": "^v3.5.0",
     "grpc/grpc": "^v1.3.0",
     "igorw/get-in": "^1.0",
-    "mdanter/ecc": "^v0.4.2"
+    "mdanter/ecc": "^v0.5.0"
   },
   "require-dev": {
     "humbug/humbug": "1.0.x-dev",
@@ -50,7 +50,7 @@
     "protoc": "bin/compile-protos.sh",
     "test:integration": "vendor/bin/phpunit -c test/integration",
     "test:mutations": "vendor/bin/humbug && cat humbuglog.txt",
-    "coverage": "vendor/bin/phpunit --coverage-text --coverage-html=build/coverage/html",
+    "coverage": "vendor/bin/phpunit --coverage-text --coverage-html=build/coverage/html --coverage-clover=build/coverage/clover.xml",
     "test": "vendor/bin/phpunit"
   }
 }
