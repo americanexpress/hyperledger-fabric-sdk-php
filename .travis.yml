@@ -3,14 +3,22 @@ language: php
 services:
   - docker
 
-php:
-  - 7.1
-  - 7.2
-  - nightly
-
-env:
-  - DEPS=latest
-  - DEPS=lowest
+matrix:
+  include:
+    - php: 7.1
+      env:
+        - DEPS=lowest
+    - php: 7.1
+      env:
+        - DEPS=latest
+    - php: 7.2
+      env:
+        - DEPS=lowest
+    - php: 7.2
+      env:
+        - DEPS=latest
+        - PUBLISH_COVERAGE=true
+        - PUBLISH_DOCS=true
 
 before_install:
   - pecl install grpc
@@ -18,53 +26,18 @@ before_install:
 install:
   - if [[ $DEPS == 'latest' ]]; then travis_retry composer update --no-interaction --prefer-source ; fi
   - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --no-interaction --prefer-source --prefer-lowest ; fi
+  - if [[ $PUBLISH_COVERAGE == 'true' ]]; then travis_retry composer require --dev php-coveralls/php-coveralls --no-interaction ; fi
 
 script:
-  - composer test
+  - composer validate
+  - composer lint:syntax
+  - composer lint:style
+  - composer lint:final
+  - if [[ $PUBLISH_COVERAGE != 'true' ]]; then composer test ; fi
+  - if [[ $PUBLISH_COVERAGE == 'true' ]]; then composer coverage ; fi
+  - composer fixture:up && sleep 30 && composer test:integration
+  - composer test:mutations
+  - if [[ $PUBLISH_DOCS == 'true' ]]; then composer docs ; fi
 
-jobs:
-  allow_failures:
-    - php: nightly
-  include:
-    - stage: lint
-      php: 7.1
-      script:
-        - composer validate
-    - stage: lint
-      php: 7.1
-      script:
-        - composer install --no-interaction --prefer-source
-        - composer lint:final
-    - stage: lint
-      php: 7.1
-      script:
-        - composer install --no-interaction --prefer-source
-        - composer lint:syntax
-    - stage: lint
-      php: 7.1
-      script:
-        - composer install --no-interaction --prefer-source
-        - composer lint:style
-    - stage: test
-      php: 7.1
-      script:
-        - composer install --no-interaction --prefer-source
-        - composer require --dev php-coveralls/php-coveralls --no-interaction
-        - composer coverage
-      after_success:
-        - travis_retry php vendor/bin/coveralls
-    - stage: big-test
-      php: 7.1
-      script:
-        - composer install --no-interaction --prefer-source
-        - composer fixture:up && sleep 30 && composer test:integration
-    - stage: big-test
-      php: 7.1
-      script:
-        - composer install --no-interaction --prefer-source
-        - composer test:mutations
-    - stage: docs
-      php: 7.1
-      script:
-        - composer install --no-interaction --prefer-source
-        - composer docs
+after_success:
+  - if [[ $PUBLISH_COVERAGE == 'true' ]]; then travis_retry php vendor/bin/php-coveralls ; fi
