@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/americanexpress/hyperledger-fabric-sdk-php.svg?branch=master)](https://travis-ci.org/americanexpress/hyperledger-fabric-sdk-php)
+[![Coverage Status](https://coveralls.io/repos/americanexpress/hyperledger-fabric-sdk-php/badge.svg?branch=master)](https://coveralls.io/r/americanexpress/hyperledger-fabric-sdk-php?branch=master)
 
 # Hyperledger Fabric Client SDK for PHP
 - - - - - - - - 
