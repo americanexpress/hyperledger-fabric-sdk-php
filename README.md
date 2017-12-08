@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/americanexpress/hyperledger-fabric-sdk-php.svg?branch=master)](https://travis-ci.org/americanexpress/hyperledger-fabric-sdk-php)
+
 # Hyperledger Fabric Client SDK for PHP
 - - - - - - - - 
 
