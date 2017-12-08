@@ -1,0 +1,11 @@
+build:
+  tests:
+    override:
+      -
+        command: 'vendor/bin/phpunit --coverage-clover=build/coverage/clover.xml'
+        coverage:
+          file: 'build/coverage/clover.xml'
+          format: 'php-clover'
+filter:
+    excluded_paths:
+        - protobuf/*
