@@ -26,7 +26,7 @@ before_install:
 install:
   - if [[ $DEPS == 'latest' ]]; then travis_retry composer update --no-interaction --prefer-source ; fi
   - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --no-interaction --prefer-source --prefer-lowest ; fi
-  - if [[ $PUBLISH_COVERAGE == 'true' ]]; then travis_retry composer require --dev php-coveralls/php-coveralls --no-interaction ; fi
+  - if [[ $PUBLISH_COVERAGE == 'true' ]]; then travis_retry composer require --dev satooshi/php-coveralls --no-interaction ; fi
 
 script:
   - composer validate
@@ -40,4 +40,4 @@ script:
   - if [[ $PUBLISH_DOCS == 'true' ]]; then composer docs ; fi
 
 after_success:
-  - if [[ $PUBLISH_COVERAGE == 'true' ]]; then travis_retry php vendor/bin/php-coveralls ; fi
+  - if [[ $PUBLISH_COVERAGE == 'true' ]]; then travis_retry php vendor/bin/coveralls ; fi
